@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="StudyFlow: organiza tus proyectos, tareas y horarios universitarios.">
+    <title>Inicio | StudyFlow</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../css/estilos-generales.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+  </head>
+  <body data-page="dashboard">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header id="main-nav"></header>
+    <main id="contenido" class="page-shell dashboard-page">
+      <section class="welcome-row" aria-labelledby="dashboard-title">
+        <div>
+          <p class="eyebrow" id="dashboard-date">Miércoles, 12 de agosto</p>
+          <h1 id="dashboard-title">Hola, <span data-user-first-name>Valentina</span> <span aria-hidden="true">👋</span></h1>
+          <p>Así va tu semana. Tienes <strong id="pending-count">0 tareas</strong> por avanzar.</p>
+        </div>
+        <div class="welcome-actions">
+          <a class="btn btn-secondary" href="crear-horario.html"><i class="bi bi-calendar-plus"></i> Mi horario</a>
+          <a class="btn btn-primary" href="crear-proyecto.html"><i class="bi bi-plus-lg"></i> Nuevo proyecto</a>
+        </div>
+      </section>
+
+      <section class="dashboard-layout">
+        <div class="calendar-panel panel">
+          <div class="section-head">
+            <div>
+              <h2>Tu agenda académica</h2>
+              <p>Una vista de los compromisos de todos tus proyectos.</p>
+            </div>
+            <div class="project-legend" id="project-legend" aria-label="Proyectos en el calendario"></div>
+          </div>
+          <div id="dashboard-calendar" aria-label="Calendario semanal de tareas"></div>
+        </div>
+        <aside class="right-rail">
+          <section class="summary-card card">
+            <div class="section-head"><h2>Tu ritmo</h2><i class="bi bi-activity"></i></div>
+            <div class="rhythm-score"><span id="completion-score">0%</span><small>completado</small></div>
+            <div class="progress-track"><div id="completion-progress" class="progress-bar" style="width:0%"></div></div>
+            <p id="completion-caption">Vamos paso a paso.</p>
+          </section>
+          <section class="upcoming-card panel">
+            <div class="section-head"><div><h2>Próximamente</h2><p>Prioridades de la semana</p></div><a href="proyectos.html" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right"></i></a></div>
+            <div id="upcoming-tasks" class="upcoming-list"></div>
+          </section>
+        </aside>
+      </section>
+
+      <section class="dashboard-bottom">
+        <section class="complete-panel panel" aria-labelledby="complete-title">
+          <div class="complete-icon"><i class="bi bi-check2"></i></div>
+          <div><h2 id="complete-title">¿Terminaste algo?</h2><p>Registra el avance y mantenemos al día tus proyectos.</p></div>
+          <button id="open-complete-task" class="btn btn-soft" type="button">Marcar tarea terminada <i class="bi bi-arrow-right"></i></button>
+        </section>
+        <section class="projects-snapshot panel" aria-labelledby="projects-snapshot-title">
+          <div class="section-head"><div><h2 id="projects-snapshot-title">Tus proyectos</h2><p>Estado general</p></div><a class="btn btn-secondary btn-sm" href="proyectos.html">Ver todos</a></div>
+          <div id="project-snapshot-list" class="project-snapshot-list"></div>
+        </section>
+      </section>
+    </main>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+  </body>
+</html>

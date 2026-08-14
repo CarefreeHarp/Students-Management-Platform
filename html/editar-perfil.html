@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Actualiza tu información académica en AulaFlow." />
+    <title>Editar perfil | AulaFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="../css/estilos-generales.css" />
+    <link rel="stylesheet" href="../css/perfil.css" />
+    <link rel="stylesheet" href="../css/editar-perfil.css" />
+  </head>
+  <body class="app-page edit-profile-page" data-page="editar-perfil">
+    <header class="site-header" id="main-nav" aria-label="Navegación principal">
+      <a class="site-brand" href="./index.html"><span class="brand-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>AulaFlow</a>
+      <nav class="site-links" aria-label="Secciones"><a href="./index.html">Inicio</a><a href="./proyectos.html">Proyectos</a><a href="./crear-horario.html">Horarios</a></nav>
+      <a class="profile-nav-link is-active" href="./perfil.html"><span class="nav-avatar" aria-hidden="true">VG</span><span>Mi perfil</span></a>
+    </header>
+
+    <main class="edit-profile-shell">
+      <a class="back-link" href="./perfil.html"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mi perfil</a>
+      <section class="edit-profile-card" aria-labelledby="edit-profile-title">
+        <div class="edit-profile-header"><div><p class="eyebrow">CONFIGURACIÓN PERSONAL</p><h1 id="edit-profile-title">Edita tu perfil</h1><p>Mantén actualizada tu información para que tu espacio se sienta más tuyo.</p></div><span class="edit-header-icon" aria-hidden="true"><i class="bi bi-person-gear"></i></span></div>
+
+        <form id="edit-profile-form" class="edit-profile-form" novalidate>
+          <section class="avatar-editor" aria-labelledby="photo-title">
+            <div class="avatar-frame avatar-frame-edit"><img id="edit-profile-avatar" src="" alt="Vista previa de la foto de perfil" /></div>
+            <div><h2 id="photo-title">Foto de perfil</h2><p>Usa una imagen clara para que tu equipo te reconozca más fácil.</p><label class="upload-button" for="avatar-file"><i class="bi bi-image" aria-hidden="true"></i> Cambiar foto</label><input id="avatar-file" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" /><small>PNG, JPG o WEBP · máximo 2 MB</small></div>
+          </section>
+
+          <div class="form-section-heading"><h2>Datos personales</h2><p>Esta información aparecerá en tu perfil.</p></div>
+          <div class="edit-form-grid">
+            <div class="edit-field"><label for="edit-first-name">Nombre</label><input id="edit-first-name" name="firstName" type="text" autocomplete="given-name" required /></div>
+            <div class="edit-field"><label for="edit-last-name">Apellido</label><input id="edit-last-name" name="lastName" type="text" autocomplete="family-name" required /></div>
+            <div class="edit-field full-width"><label for="edit-email">Correo institucional</label><input id="edit-email" name="email" type="email" autocomplete="email" required /></div>
+            <div class="edit-field full-width"><label for="edit-description">Descripción</label><textarea id="edit-description" name="description" rows="3" maxlength="180" placeholder="Cuéntale a tu equipo qué te interesa o en qué estás trabajando."></textarea><span class="field-hint"><span id="description-count">0</span>/180 caracteres</span></div>
+          </div>
+
+          <div class="form-section-heading academic-heading"><h2>Información académica</h2><p>Nos ayuda a contextualizar tus horarios y proyectos.</p></div>
+          <div class="edit-form-grid">
+            <div class="edit-field full-width"><label for="edit-university">Universidad</label><input id="edit-university" name="university" type="text" autocomplete="organization" required /></div>
+            <div class="edit-field"><label for="edit-career">Programa</label><input id="edit-career" name="career" type="text" required /></div>
+            <div class="edit-field"><label for="edit-semester">Semestre</label><input id="edit-semester" name="semester" type="number" min="1" max="20" required /></div>
+            <div class="edit-field"><label for="edit-age">Edad</label><input id="edit-age" name="age" type="number" min="15" max="99" required /></div>
+          </div>
+
+          <p id="edit-profile-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+          <div class="form-actions"><a href="./perfil.html" class="cancel-button">Cancelar</a><button class="primary-button" type="submit">Guardar cambios <i class="bi bi-check2" aria-hidden="true"></i></button></div>
+        </form>
+      </section>
+    </main>
+
+    <script src="../js/main.js" defer></script>
+    <script src="../js/perfil.js" defer></script>
+  </body>
+</html>

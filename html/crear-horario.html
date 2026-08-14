@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Crea y compara alternativas de horario de clases en StudyFlow."
+    />
+    <title>Crear horario · StudyFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="../css/estilos-generales.css" />
+    <link rel="stylesheet" href="../css/crear-horario.css" />
+    <script src="../js/main.js" defer></script>
+    <script src="../js/crear-horario.js" defer></script>
+  </head>
+  <body class="app-page schedule-page-shell" data-page="schedule">
+    <div id="main-nav"></div>
+
+    <main class="app-main schedule-page schedule-main">
+      <section class="schedule-hero" aria-labelledby="schedule-page-title">
+        <div>
+          <p class="schedule-hero__eyebrow"><i class="bi bi-calendar3"></i> Planificador académico</p>
+          <h1 id="schedule-page-title">Construye el horario que mejor se adapta a ti</h1>
+          <p>
+            Registra tus materias disponibles y deja que StudyFlow organice alternativas para comparar tu semana.
+          </p>
+        </div>
+        <a class="schedule-text-link" href="index.html"><i class="bi bi-arrow-left"></i> Volver al panel</a>
+      </section>
+
+      <div class="schedule-workspace">
+        <aside class="schedule-editor" aria-labelledby="subject-form-title">
+          <div class="schedule-editor__intro">
+            <span class="schedule-icon-badge"><i class="bi bi-journal-plus"></i></span>
+            <div>
+              <h2 id="subject-form-title">Materias disponibles</h2>
+              <p>Agrega las secciones que podrías cursar este semestre.</p>
+            </div>
+          </div>
+
+          <form id="subject-form" class="subject-form" novalidate>
+            <div class="form-field form-field--full">
+              <label for="subject-name">Nombre de la materia</label>
+              <input id="subject-name" name="name" type="text" placeholder="Ej. Arquitectura de software" maxlength="80" required />
+            </div>
+
+            <div class="form-field">
+              <label for="subject-day">Día</label>
+              <select id="subject-day" name="day" required>
+                <option value="lunes">Lunes</option>
+                <option value="martes">Martes</option>
+                <option value="miercoles">Miércoles</option>
+                <option value="jueves">Jueves</option>
+                <option value="viernes">Viernes</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="subject-credits">Créditos</label>
+              <input id="subject-credits" name="credits" type="number" min="1" max="12" placeholder="3" inputmode="numeric" />
+            </div>
+
+            <div class="form-field">
+              <label for="subject-start">Hora de inicio</label>
+              <input id="subject-start" name="start" type="time" min="07:00" max="19:00" step="900" value="08:00" required />
+            </div>
+
+            <div class="form-field">
+              <label for="subject-end">Hora de finalización</label>
+              <input id="subject-end" name="end" type="time" min="07:00" max="19:00" step="900" value="10:00" required />
+            </div>
+
+            <div class="form-field form-field--full">
+              <label for="subject-professor">Profesor <span>(opcional)</span></label>
+              <input id="subject-professor" name="professor" type="text" placeholder="Ej. Prof. Andrea Torres" maxlength="70" />
+            </div>
+
+            <p id="subject-form-error" class="subject-form__error" role="alert" hidden></p>
+            <button class="button button--primary subject-form__submit" type="submit">
+              <i class="bi bi-plus-lg"></i> Añadir materia
+            </button>
+          </form>
+
+          <div class="registered-subjects">
+            <div class="registered-subjects__heading">
+              <h3>Registradas <span id="subject-count">0</span></h3>
+              <button id="clear-subjects" type="button" class="registered-subjects__clear">Limpiar</button>
+            </div>
+            <div id="subject-list" class="subject-list" aria-live="polite"></div>
+          </div>
+        </aside>
+
+        <section class="schedule-preview-card" aria-labelledby="draft-calendar-title">
+          <div class="schedule-preview-card__header">
+            <div>
+              <p class="section-kicker">Vista previa</p>
+              <h2 id="draft-calendar-title">Tu semana actual</h2>
+              <p id="draft-calendar-caption">Añade materias para visualizar tu horario.</p>
+            </div>
+            <div class="schedule-preview-card__actions">
+              <button id="save-schedule" class="button button--secondary" type="button" disabled>
+                <i class="bi bi-bookmark-check"></i> Guardar opción
+              </button>
+              <button id="generate-schedules" class="button button--ai" type="button">
+                <i class="bi bi-stars"></i> Generar horarios con IA
+              </button>
+            </div>
+          </div>
+
+          <div class="schedule-calendar-wrap">
+            <div id="draft-calendar" class="schedule-calendar" aria-label="Calendario semanal de materias"></div>
+          </div>
+
+          <div class="schedule-preview-card__footer">
+            <span><i class="bi bi-info-circle"></i> La IA puede proponer secciones alternativas con base en tus preferencias.</span>
+            <span id="draft-credit-count">0 créditos</span>
+          </div>
+        </section>
+      </div>
+
+      <section id="ai-results" class="ai-results" aria-labelledby="ai-results-title" hidden>
+        <div class="ai-results__heading">
+          <div>
+            <p class="section-kicker"><i class="bi bi-stars"></i> Recomendaciones de IA</p>
+            <h2 id="ai-results-title">Compara tus alternativas</h2>
+            <p id="ai-results-summary">Selecciona una propuesta para verla en el calendario principal.</p>
+          </div>
+          <span class="ai-results__pill"><i class="bi bi-lightning-charge-fill"></i> Simulación inteligente</span>
+        </div>
+        <div id="schedule-options" class="schedule-options" role="list" aria-live="polite"></div>
+      </section>
+    </main>
+  </body>
+</html>

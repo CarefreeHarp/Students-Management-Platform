@@ -1,0 +1,83 @@
+@import url("./perfil.css");
+
+.edit-profile-shell {
+  width: min(820px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 28px 0 64px;
+}
+
+.edit-profile-card {
+  overflow: hidden;
+  border: 1px solid var(--page-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgb(36 43 77 / 5%);
+}
+
+.edit-profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 30px 33px 27px;
+  border-bottom: 1px solid var(--page-line);
+  background: linear-gradient(104deg, #faf9ff, #f6fcfc);
+}
+
+.edit-profile-header h1,
+.form-section-heading h2,
+.avatar-editor h2 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  letter-spacing: -0.045em;
+}
+
+.edit-profile-header h1 { font-size: 1.55rem; }
+.edit-profile-header > div > p:last-child { margin: 8px 0 0; color: var(--page-muted); font-size: 0.84rem; }
+.edit-header-icon { display: grid; width: 46px; height: 46px; flex: 0 0 46px; place-items: center; border-radius: 14px; color: #6856dd; background: #eeebff; font-size: 1.22rem; }
+
+.edit-profile-form { padding: 0 33px 30px; }
+.avatar-editor { display: flex; align-items: center; gap: 19px; padding: 25px 0; border-bottom: 1px solid var(--page-line); }
+.avatar-frame-edit { flex-basis: 76px; width: 76px; height: 76px; margin: 0; border-width: 3px; box-shadow: 0 6px 16px rgb(42 37 93 / 12%); }
+.avatar-editor h2 { font-size: 0.93rem; }
+.avatar-editor p { margin: 5px 0 11px; color: var(--page-muted); font-size: 0.76rem; }
+.avatar-editor small { display: block; margin-top: 8px; color: #929aae; font-size: 0.65rem; }
+.avatar-editor input[type="file"] { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.upload-button { display: inline-flex; align-items: center; gap: 7px; min-height: 31px; padding: 0 11px; border: 1px solid #ded9fb; border-radius: 8px; color: #604ecb; background: #f8f7ff; font-size: 0.71rem; font-weight: 800; cursor: pointer; }
+.upload-button:hover { background: #efecff; }
+
+.form-section-heading { margin: 27px 0 17px; }
+.form-section-heading h2 { font-size: 1rem; }
+.form-section-heading p { margin: 5px 0 0; color: var(--page-muted); font-size: 0.76rem; }
+.academic-heading { margin-top: 29px; }
+.edit-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.edit-field { display: grid; gap: 7px; }
+.edit-field.full-width { grid-column: 1 / -1; }
+.edit-field label { color: #46516d; font-size: 0.75rem; font-weight: 800; }
+.edit-field input,
+.edit-field textarea { width: 100%; border: 1px solid #e4e7ef; border-radius: 10px; outline: none; color: var(--page-ink); background: #fff; font: 500 0.82rem "DM Sans", sans-serif; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.edit-field input { height: 43px; padding: 0 12px; }
+.edit-field textarea { min-height: 88px; padding: 11px 12px; resize: vertical; line-height: 1.5; }
+.edit-field input:focus,
+.edit-field textarea:focus { border-color: #8978ee; box-shadow: 0 0 0 4px rgb(104 86 232 / 10%); }
+.field-hint { color: #a0a7b8; text-align: right; font-size: 0.65rem; }
+.edit-profile-form .form-feedback { margin-top: 17px; }
+.form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 25px; padding-top: 21px; border-top: 1px solid var(--page-line); }
+.cancel-button { color: #69738d; background: transparent; }
+.cancel-button:hover { color: #4d3cc2; background: #f4f2ff; }
+
+@media (max-width: 600px) {
+  .edit-profile-shell { width: min(100% - 28px, 820px); padding-top: 20px; }
+  .edit-profile-header { padding: 24px 20px; }
+  .edit-profile-form { padding: 0 20px 24px; }
+  .edit-form-grid { grid-template-columns: 1fr; gap: 14px; }
+  .edit-field.full-width { grid-column: auto; }
+  .form-actions { justify-content: stretch; }
+  .form-actions > * { flex: 1; }
+}
+
+@media (max-width: 410px) {
+  .avatar-editor { align-items: flex-start; }
+  .avatar-frame-edit { flex-basis: 64px; width: 64px; height: 64px; }
+  .edit-header-icon { display: none; }
+}
