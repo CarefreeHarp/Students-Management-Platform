@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Crear cuenta', 'Crea tu cuenta de StudyFlow y empieza a organizar tu semestre.')}"></head>
+  <body data-page="registro">
+    <main class="auth-layout">
+      <section class="auth-showcase" aria-labelledby="register-showcase-title">
+        <a class="auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow, volver al inicio de sesión">
+          <span class="brand-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
+          <span>StudyFlow</span>
+        </a>
+
+        <div class="max-w-[30ch]">
+          <p class="eyebrow">Empieza hoy</p>
+          <h1 id="register-showcase-title">Un espacio claro para cada meta de tu semestre.</h1>
+          <p class="mt-3">Planifica con tu equipo, concentra tus fechas importantes y avanza con menos estrés.</p>
+        </div>
+
+        <ul class="benefit-list" aria-label="Beneficios de StudyFlow">
+          <li><span><i class="bi bi-calendar2-check" aria-hidden="true"></i></span><div><strong>Todo en un calendario</strong><small>Clases, tareas y entregas en una vista.</small></div></li>
+          <li><span><i class="bi bi-people" aria-hidden="true"></i></span><div><strong>Proyectos en equipo</strong><small>Comparte responsabilidades sin perder el contexto.</small></div></li>
+          <li><span><i class="bi bi-stars" aria-hidden="true"></i></span><div><strong>Impulso con IA</strong><small>Obtén una primera ruta para empezar más rápido.</small></div></li>
+        </ul>
+      </section>
+
+      <section class="auth-panel" aria-labelledby="register-title">
+        <div class="auth-card register-card">
+          <a class="mobile-brand auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow">
+            <span class="brand-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
+            <span>StudyFlow</span>
+          </a>
+
+          <div class="auth-heading">
+            <p class="eyebrow">Crea tu cuenta</p>
+            <h2 id="register-title">Organiza un mejor semestre</h2>
+            <p>Solo necesitamos algunos datos para personalizar tu espacio.</p>
+          </div>
+
+          <form id="register-form" class="auth-form" novalidate>
+            <div class="two-columns">
+              <div class="form-field">
+                <label for="register-first-name">Nombre</label>
+                <span class="input-wrap"><i class="bi bi-person" aria-hidden="true"></i><input id="register-first-name" name="firstName" type="text" autocomplete="given-name" placeholder="Valentina" required></span>
+              </div>
+              <div class="form-field">
+                <label for="register-last-name">Apellido</label>
+                <span class="input-wrap"><i class="bi bi-person" aria-hidden="true"></i><input id="register-last-name" name="lastName" type="text" autocomplete="family-name" placeholder="Gómez" required></span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="register-email">Correo institucional</label>
+              <span class="input-wrap"><i class="bi bi-envelope" aria-hidden="true"></i><input id="register-email" name="email" type="email" autocomplete="email" placeholder="tu.correo@universidad.edu" required></span>
+            </div>
+
+            <div class="two-columns">
+              <div class="form-field">
+                <label for="register-university">Universidad</label>
+                <span class="input-wrap"><i class="bi bi-buildings" aria-hidden="true"></i><input id="register-university" name="university" type="text" autocomplete="organization" placeholder="Universidad Central" required></span>
+              </div>
+              <div class="form-field">
+                <label for="register-age">Edad</label>
+                <span class="input-wrap"><i class="bi bi-cake2" aria-hidden="true"></i><input id="register-age" name="age" type="number" min="15" max="99" placeholder="20" required></span>
+              </div>
+            </div>
+
+            <div class="two-columns">
+              <div class="form-field">
+                <label for="register-career">Programa</label>
+                <span class="input-wrap"><i class="bi bi-mortarboard" aria-hidden="true"></i><input id="register-career" name="career" type="text" placeholder="Ingeniería de Sistemas" required></span>
+              </div>
+              <div class="form-field">
+                <label for="register-semester">Semestre</label>
+                <span class="input-wrap"><i class="bi bi-book" aria-hidden="true"></i><input id="register-semester" name="semester" type="number" min="1" max="20" placeholder="6" required></span>
+              </div>
+            </div>
+
+            <div class="two-columns">
+              <div class="form-field">
+                <label for="register-password">Contraseña</label>
+                <span class="input-wrap"><i class="bi bi-lock" aria-hidden="true"></i><input id="register-password" name="password" type="password" autocomplete="new-password" minlength="6" placeholder="Mínimo 6 caracteres" required><button class="password-toggle" type="button" data-password-toggle="register-password" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button></span>
+              </div>
+              <div class="form-field">
+                <label for="register-password-confirmation">Confirmar contraseña</label>
+                <span class="input-wrap"><i class="bi bi-shield-lock" aria-hidden="true"></i><input id="register-password-confirmation" name="passwordConfirmation" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" required><button class="password-toggle" type="button" data-password-toggle="register-password-confirmation" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button></span>
+              </div>
+            </div>
+
+            <label class="check-label" for="accept-terms"><input id="accept-terms" name="terms" type="checkbox" required><span>Acepto los <a href="#" class="text-action" data-demo-action="terms">términos de uso</a> y la política de privacidad.</span></label>
+            <p id="register-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+            <button class="btn btn-primary w-full" type="submit">Crear mi cuenta <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+          </form>
+
+          <p class="auth-switch">¿Ya tienes una cuenta? <a th:href="@{/login}" href="/login">Inicia sesión</a></p>
+        </div>
+      </section>
+    </main>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/registro.js}" src="/js/registro.js" defer></script>
+  </body>
+</html>

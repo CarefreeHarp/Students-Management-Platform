@@ -1,0 +1,625 @@
+/* ============================================================================
+   StudyFlow · Hoja de estilos única (Tailwind CSS)
+   ----------------------------------------------------------------------------
+   Sustituye a los 9 archivos CSS vanilla del proyecto original.
+   - @layer base       -> tipografía, fondo y reset del documento
+   - @layer components -> vocabulario visual compartido (botones, tarjetas,
+                          formularios, calendarios, diálogos...) construido con
+                          @apply, para que HTML y JS reutilicen una sola clase
+   - Las utilidades de Tailwind se usan directamente en las plantillas para el
+     layout específico de cada página.
+   Compilar con: npm run css
+   ========================================================================== */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply min-h-full scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen min-w-[320px] bg-canvas font-sans text-[15px] leading-normal text-ink;
+  }
+
+  h1, h2, h3, h4 {
+    @apply m-0 font-display leading-[1.15];
+  }
+
+  h1 { @apply text-[clamp(26px,3vw,35px)] tracking-[-1.35px]; }
+  h2 { @apply text-xl tracking-[-0.65px]; }
+  h3 { @apply text-[15px] tracking-[-0.25px]; }
+
+  a { @apply text-inherit no-underline; }
+  button { @apply cursor-pointer; }
+  img { @apply max-w-full; }
+  button, input, select, textarea { font: inherit; }
+
+  :focus-visible {
+    @apply outline outline-[3px] outline-offset-2 outline-primary/25;
+  }
+}
+
+@layer components {
+
+  /* ---------- Accesibilidad ---------- */
+  .sr-only {
+    @apply absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
+    clip: rect(0 0 0 0);
+  }
+
+  .skip-link {
+    @apply fixed left-4 z-[3000] rounded-[10px] bg-ink px-3.5 py-2.5 text-white;
+    top: -50px;
+  }
+  .skip-link:focus { @apply top-4; }
+
+  /* ---------- Navegación superior (renderizada por main.js) ---------- */
+  .app-nav {
+    @apply sticky top-0 z-[100] flex min-h-[70px] items-center border-b border-line/90 bg-white/90 px-[4.5vw] backdrop-blur-lg;
+  }
+  .nav-inner {
+    @apply mx-auto flex w-[min(1360px,100%)] items-center gap-7 max-[900px]:gap-3.5 max-[620px]:gap-2;
+  }
+  .brand {
+    @apply inline-flex flex-none items-center gap-2.5 font-display text-[18px] font-extrabold tracking-[-0.7px] text-ink max-[620px]:text-base;
+  }
+  .brand-mark {
+    @apply grid h-[34px] w-[34px] place-items-center rounded-[11px] text-lg text-white max-[620px]:h-[31px] max-[620px]:w-[31px];
+    background: linear-gradient(135deg, #7675ee, #4a4bcf);
+    box-shadow: 0 7px 14px rgba(91, 92, 226, .22);
+  }
+  .nav-links {
+    @apply mr-auto flex items-center gap-1 max-[900px]:gap-0
+           max-[620px]:absolute max-[620px]:inset-x-3 max-[620px]:top-[62px] max-[620px]:hidden
+           max-[620px]:rounded-sm max-[620px]:border max-[620px]:border-line max-[620px]:bg-white max-[620px]:p-2 max-[620px]:shadow;
+  }
+  .nav-links.open { @apply max-[620px]:grid; }
+  .nav-link {
+    @apply rounded-[9px] px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-primary-soft hover:text-primary
+           max-[900px]:p-2 max-[620px]:p-2.5;
+  }
+  .nav-link.active { @apply bg-primary-soft text-primary; }
+  .nav-link span { @apply max-[900px]:hidden max-[620px]:inline; }
+  .nav-actions { @apply flex items-center gap-2.5; }
+  .profile-menu { @apply relative; }
+  .profile-trigger {
+    @apply flex items-center gap-2 rounded-full border-0 bg-transparent p-1 text-ink hover:bg-primary-soft;
+  }
+  .profile-trigger > i { @apply max-[620px]:hidden; }
+  .nav-avatar, .avatar {
+    @apply grid h-[34px] w-[34px] flex-none place-items-center overflow-hidden rounded-full border-2 border-white text-xs font-extrabold text-white;
+    background: linear-gradient(135deg, #f6ad7b, #d56d87);
+    box-shadow: 0 2px 7px rgba(44, 47, 88, .14);
+  }
+  .nav-avatar img, .avatar img { @apply h-full w-full object-cover; }
+  .profile-dropdown {
+    @apply invisible absolute right-0 top-[calc(100%+9px)] z-[120] w-[175px] -translate-y-1 rounded-sm border border-line bg-white p-[7px] opacity-0 shadow transition-all duration-150;
+  }
+  .profile-menu:hover .profile-dropdown,
+  .profile-menu:focus-within .profile-dropdown { @apply visible translate-y-0 opacity-100; }
+  .profile-dropdown a {
+    @apply block rounded-lg px-2.5 py-2 text-[13px] font-semibold text-muted hover:bg-primary-soft hover:text-primary;
+  }
+  .mobile-nav-toggle {
+    @apply hidden border-0 bg-transparent text-[22px] text-ink max-[620px]:ml-auto max-[620px]:block;
+  }
+  .nav-actions .btn { @apply max-[620px]:hidden; }
+
+  /* ---------- Estructura de página ---------- */
+  .page-shell {
+    @apply mx-auto w-[min(1360px,calc(100%-48px))] pb-14 pt-9
+           max-[900px]:w-[min(100%-32px,1360px)] max-[900px]:pt-7
+           max-[620px]:w-[min(100%-24px,1360px)] max-[620px]:py-6;
+  }
+  .page-heading {
+    @apply mb-7 flex items-end justify-between gap-4 max-[620px]:mb-5 max-[620px]:flex-col max-[620px]:items-start;
+  }
+  .eyebrow, .section-kicker {
+    @apply m-0 mb-[5px] inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.08em] text-primary;
+  }
+  .muted, .section-intro { @apply text-muted; }
+  .section-head, .section-heading {
+    @apply mb-[18px] flex items-center justify-between gap-3;
+  }
+  .section-head p, .section-heading p { @apply mt-1 text-[13px] text-muted; }
+  .back-link {
+    @apply mb-4 inline-flex items-center gap-2 text-[13px] font-bold text-muted transition-colors hover:text-primary;
+  }
+
+  /* ---------- Botones (vocabulario único para HTML y JS) ---------- */
+  .btn {
+    @apply inline-flex min-h-[40px] items-center justify-center gap-2 rounded-[10px] border border-transparent bg-white px-3.5 py-2.5
+           text-[13px] font-bold text-ink transition-all duration-200 hover:-translate-y-px;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-dark;
+    box-shadow: 0 7px 16px rgba(91, 92, 226, .2);
+  }
+  .btn-secondary { @apply border-line text-ink hover:border-[#cfd4e4] hover:bg-white; }
+  .btn-soft { @apply bg-primary-soft text-primary hover:bg-[#e2e2ff]; }
+  .btn-ghost { @apply bg-transparent text-muted hover:bg-primary-soft hover:text-primary; }
+  .btn-danger { @apply bg-danger-soft text-danger; }
+  .btn-ai {
+    @apply border-0 text-white;
+    background: linear-gradient(135deg, #6d6cec, #22a7bc);
+    box-shadow: 0 8px 20px rgba(72, 92, 214, .24);
+  }
+  .btn-sm { @apply min-h-[34px] px-2.5 py-[7px] text-xs; }
+  .btn-icon { @apply w-10 p-0; }
+  .btn:disabled { @apply cursor-not-allowed opacity-50 hover:translate-y-0; }
+  .icon-button {
+    @apply grid h-[31px] w-[31px] flex-none place-items-center rounded-lg border-0 bg-[#f3f4f8] text-muted transition-colors hover:bg-primary-soft hover:text-primary;
+  }
+  .text-action, .subtle-link, .focus-link {
+    @apply inline-flex items-center gap-1.5 text-[13px] font-bold text-primary hover:text-primary-dark;
+  }
+
+  /* ---------- Superficies ---------- */
+  .card {
+    @apply rounded border border-[#e0e4ef]/90 bg-white shadow-sm;
+  }
+  .panel, .form-panel {
+    @apply rounded border border-[#e0e4ef]/90 bg-white p-[22px] shadow-sm max-[620px]:p-4;
+  }
+  .step-number {
+    @apply grid h-8 w-8 flex-none place-items-center rounded-[10px] bg-primary-soft font-display text-[13px] font-extrabold text-primary;
+  }
+  .panel-heading { @apply mb-4 flex items-center gap-3; }
+  .panel-heading h2 { @apply text-base; }
+  .panel-heading p { @apply mt-0.5 text-[13px] text-muted; }
+  .panel-heading--split { @apply flex-wrap justify-between; }
+  .panel-heading-content { @apply flex items-center gap-3; }
+
+  /* ---------- Estados y etiquetas ---------- */
+  .status, .tag, .task-status, .project-state, .task-stage {
+    @apply inline-flex items-center gap-1.5 rounded-[20px] px-2 py-1 text-[11px] font-extrabold leading-tight;
+  }
+  .status::before {
+    @apply h-1.5 w-1.5 rounded-full bg-current content-[''];
+  }
+  /* Se aceptan las dos nomenclaturas que ya usaba el JS: progress/done e in-progress/completed. */
+  .status-pending, .task-status.is-pending { @apply bg-[#f0f2f7] text-[#788196]; }
+  .status-progress, .status-in-progress, .task-status.is-progress { @apply bg-primary-soft text-primary; }
+  .status-done, .status-completed, .task-status.is-completed { @apply bg-success-soft text-success; }
+  .status-late, .task-status.is-late { @apply bg-danger-soft text-danger; }
+  .task-stage, .project-state { @apply bg-[#f4f5fa] text-[#5c6883]; }
+
+  /* ---------- Progreso ---------- */
+  .progress-track {
+    @apply h-2 overflow-hidden rounded-[12px] bg-[#edf0f6];
+  }
+  .progress-bar, .progress-fill {
+    @apply block h-full min-w-[4px] rounded-[inherit] transition-[width] duration-300;
+    width: var(--progress, 0%);
+    background: linear-gradient(90deg, #6d6cec, #4cbaac);
+  }
+
+  /* ---------- Formularios ---------- */
+  .form-grid { @apply grid grid-cols-2 gap-4 max-[620px]:grid-cols-1; }
+  .form-grid-two { @apply grid grid-cols-2 gap-3.5 max-[620px]:grid-cols-1; }
+  .form-group, .form-field, .edit-field { @apply grid gap-[7px]; }
+  .form-group.full, .form-field--full, .field-span-2, .full-width { @apply col-span-full max-[620px]:col-auto; }
+  label { @apply text-xs font-extrabold text-[#4b566e]; }
+  .field-help, .field-hint, small { @apply text-[11px] text-muted; }
+
+  .input, input:not([type='checkbox']):not([type='radio']):not([type='file']), select, textarea {
+    @apply w-full min-h-[43px] rounded-[10px] border border-[#dfe4ef] bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all
+           focus:border-[#8e8fec] focus:shadow-[0_0_0_3px_rgba(91,92,226,.11)];
+  }
+  textarea { @apply min-h-[105px] resize-y; }
+
+  .input-wrap {
+    @apply relative flex items-center;
+  }
+  .input-wrap > i {
+    @apply pointer-events-none absolute left-3 text-muted;
+  }
+  .input-wrap input { @apply pl-10; }
+  .password-toggle {
+    @apply absolute right-2 grid h-8 w-8 place-items-center rounded-lg border-0 bg-transparent text-muted hover:text-primary;
+  }
+  .label-row { @apply flex items-center justify-between; }
+  .check-label {
+    @apply flex items-center gap-2 text-[13px] font-semibold text-muted;
+  }
+  .check-label input { @apply h-4 w-4 accent-[#5b5ce2]; }
+  .form-feedback {
+    @apply hidden rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-danger;
+  }
+  .form-feedback.is-visible { @apply block; }
+  .form-feedback.is-success { @apply bg-success-soft text-success; }
+  .form-actions, .dialog-actions {
+    @apply flex flex-wrap items-center justify-end gap-2.5;
+  }
+
+  /* Filas dinámicas de integrantes y tareas (crear-proyecto / proyecto) */
+  .member-input-row, .dialog-member-row {
+    @apply grid items-center gap-2.5 rounded-sm border border-line bg-[#fcfdff] p-2.5;
+    grid-template-columns: 31px minmax(0, 1fr) minmax(0, 1.05fr) 28px;
+  }
+  .task-input-row {
+    @apply grid items-center gap-2.5 rounded-sm border border-line bg-[#fcfdff] p-2.5;
+    grid-template-columns: minmax(0, 1.3fr) minmax(130px, .8fr) 132px 28px;
+  }
+  @media (max-width: 700px) {
+    .member-input-row, .dialog-member-row, .task-input-row { grid-template-columns: 1fr; }
+  }
+  .members-input-list, .tasks-input-list, .dialog-members-list, .subject-list { @apply grid gap-2.5; }
+  .member-row-avatar {
+    @apply grid h-[31px] w-[31px] place-items-center rounded-full bg-primary-soft text-[11px] font-extrabold text-primary;
+  }
+
+  /* ---------- Avatares de equipo ---------- */
+  .member-stack, .avatar-stack, .detail-member-stack { @apply flex items-center; }
+  .member-avatar, .avatar-stack b {
+    @apply -ml-2 grid h-[30px] w-[30px] place-items-center rounded-full border-2 border-white text-[11px] font-extrabold not-italic text-white first:ml-0;
+    background: var(--member-color, #5b5ce2);
+  }
+  .member-overflow { @apply bg-[#8b93ab]; }
+
+  /* ---------- Tarjetas de proyecto ---------- */
+  .projects-grid, .profile-project-grid, .task-cards-grid {
+    @apply grid gap-4;
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  }
+  .project-card, .profile-project-card {
+    @apply relative block overflow-hidden rounded border border-[#e0e4ef]/90 bg-white p-5 shadow-sm transition-all duration-200
+           hover:-translate-y-1 hover:shadow;
+  }
+  .project-card::before, .profile-project-card::before {
+    @apply absolute inset-x-0 top-0 h-1 content-[''];
+    background: var(--card-color, var(--project-color, #5b5ce2));
+  }
+  .project-card-topline, .project-card-top { @apply mb-3 flex items-center gap-2; }
+  .project-card-topline i, .project-card-menu { @apply ml-auto text-muted; }
+  .project-color-dot, .project-dot, .legend-dot, .legend-member-dot {
+    @apply inline-block h-2 w-2 flex-none rounded-full;
+    background: var(--card-color, var(--project-color, var(--legend-color, #5b5ce2)));
+  }
+  .legend-due { background: #f29d52; }
+  .project-name { @apply text-[17px]; }
+  .project-description {
+    @apply mt-1.5 line-clamp-2 text-[13px] text-muted;
+  }
+  .project-meta, .project-progress-row, .project-progress-copy {
+    @apply mt-3 flex items-center justify-between gap-3 text-xs text-muted;
+  }
+  .project-meta span { @apply inline-flex items-center gap-1.5; }
+  .project-progress-copy strong, .project-progress-row strong { @apply text-ink; }
+  .project-card-footer { @apply mt-4 flex items-center justify-between gap-3; }
+  .open-project { @apply inline-flex items-center gap-1.5 text-xs font-bold text-primary; }
+  .project-deadline { @apply inline-flex items-center gap-1.5 text-xs text-muted; }
+  .project-tag { @apply inline-flex items-center gap-1.5 text-[11px] font-bold text-muted; }
+  .project-progress { @apply mt-2 h-2 overflow-hidden rounded-[12px] bg-[#edf0f6]; }
+  .project-progress > span {
+    @apply block h-full rounded-[inherit];
+    width: var(--progress, 0%);
+    background: var(--project-color, #5b5ce2);
+  }
+  .empty-projects, .empty-tasks, .empty-state, .subjects-empty, .profile-empty {
+    @apply grid min-h-[190px] place-items-center rounded border border-dashed border-line bg-white/60 p-7 text-center text-[13px] text-muted;
+  }
+  .empty-projects h3, .empty-state h3 { @apply mb-2 text-ink; }
+  .empty-icon {
+    @apply mx-auto mb-3 grid h-12 w-12 place-items-center rounded-[14px] bg-primary-soft text-[22px] text-primary;
+  }
+
+  /* ---------- Tarjetas de tarea (proyecto.html) ---------- */
+  .task-card {
+    @apply grid gap-2.5 rounded border border-[#e0e4ef]/90 bg-white p-4 shadow-sm transition-all hover:shadow;
+  }
+  .task-card.is-completed { @apply bg-[#fbfdfc]; }
+  .task-card.is-completed .task-title { @apply text-muted line-through; }
+  .task-card-top { @apply flex items-center gap-2; }
+  .task-check {
+    @apply grid h-6 w-6 flex-none place-items-center rounded-full border-2 border-line bg-white text-xs text-transparent transition-colors
+           hover:border-success;
+  }
+  .task-card.is-completed .task-check { @apply border-success bg-success text-white; }
+  .task-menu-button { @apply ml-auto border-0 bg-transparent text-muted hover:text-primary; }
+  .task-title { @apply text-[15px]; }
+  .task-description { @apply line-clamp-2 text-[13px] text-muted; }
+  .task-card-meta { @apply flex flex-wrap items-center gap-2 text-[11px] text-muted; }
+  .task-date { @apply inline-flex items-center gap-1.5; }
+  .task-card-footer { @apply mt-1 flex items-center justify-between gap-2 border-t border-line pt-2.5; }
+  .task-assignee { @apply inline-flex items-center gap-1.5 text-xs font-bold text-ink; }
+  .assignee-dot {
+    @apply inline-block h-2.5 w-2.5 rounded-full;
+    background: var(--assignee-color, #5b5ce2);
+  }
+  .file-control {
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#f4f5fa] px-2 py-1.5 text-[11px] font-bold text-muted hover:bg-primary-soft hover:text-primary;
+  }
+  .file-control input { @apply hidden; }
+  .task-filter-wrap select { @apply min-h-[38px] w-auto text-[13px]; }
+
+  /* ---------- Calendario semanal (dashboard) ---------- */
+  .calendar-shell { @apply overflow-hidden rounded border border-[#e4e8f1] bg-white; }
+  .calendar-toolbar { @apply flex items-center justify-between gap-3 border-b border-line px-[18px] py-4; }
+  .calendar-toolbar h2 { @apply text-base; }
+  .calendar-actions { @apply flex gap-1.5; }
+  .calendar-button {
+    @apply grid h-[30px] w-[30px] place-items-center rounded-lg border border-line bg-white text-muted hover:bg-primary-soft hover:text-primary;
+  }
+  .week-calendar, .detail-calendar-wrap, .schedule-calendar-wrap { @apply overflow-x-auto; }
+  .detail-calendar-wrap { @apply rounded border border-line bg-white; }
+  .calendar-grid {
+    @apply grid min-w-[720px];
+    grid-template-columns: 62px repeat(5, minmax(115px, 1fr));
+  }
+  .detail-calendar {
+    @apply grid min-w-[760px];
+    grid-template-columns: 105px repeat(7, minmax(88px, 1fr));
+  }
+  .calendar-corner, .calendar-day-head {
+    @apply min-h-[53px] border-b border-line p-2.5;
+  }
+  .calendar-day-head {
+    @apply border-l border-line text-center text-[11px] font-bold uppercase text-muted;
+  }
+  .calendar-day-head strong { @apply mt-0.5 block font-display text-[17px] text-ink; }
+  .calendar-day-head.today strong, .calendar-day-head.is-today strong {
+    @apply inline-grid h-[27px] w-[27px] place-items-center rounded-full bg-primary text-white;
+  }
+  .calendar-hour, .calendar-time-label {
+    @apply h-16 border-b border-[#eef0f5] px-[7px] py-1 text-right text-[10px] text-muted-light;
+  }
+  .calendar-time-label { @apply h-auto min-h-[76px] text-left; }
+  .calendar-slot, .calendar-cell {
+    @apply relative h-16 border-b border-[#eef0f5] border-l border-[#f1f2f6];
+  }
+  .calendar-cell { @apply h-auto min-h-[76px] p-1.5; }
+  .calendar-cell.is-due-date { @apply bg-[#fffaf5]; }
+  .calendar-cell.is-today { @apply bg-primary-soft/40; }
+  .calendar-event, .calendar-task {
+    @apply relative z-[2] block min-h-[34px] overflow-hidden rounded-md border-l-[3px] border-current px-1.5 py-1
+           text-[10px] font-extrabold leading-tight transition-transform;
+    color: var(--event-color, var(--task-color, #5b5ce2));
+    background: color-mix(in srgb, currentColor 14%, white);
+  }
+  .calendar-event { @apply absolute inset-x-1; }
+  .calendar-task { @apply mb-1 w-full text-left; }
+  .calendar-event:hover, .calendar-event:focus,
+  .calendar-task:hover, .calendar-task:focus-visible {
+    @apply z-10 scale-[1.02] shadow-[0_5px_13px_rgba(35,43,76,.16)];
+  }
+  .calendar-event small {
+    @apply block overflow-hidden text-ellipsis whitespace-nowrap text-[9px] font-semibold text-[#657087];
+  }
+  .calendar-due-marker {
+    @apply inline-flex items-center gap-1 rounded-md bg-[#fff1e4] px-1.5 py-1 text-[10px] font-bold text-[#bd6b25];
+  }
+  .calendar-legend, .legend-members, .project-legend {
+    @apply flex flex-wrap items-center gap-3 text-xs text-muted;
+  }
+  .calendar-legend > span, .legend-item { @apply inline-flex items-center gap-1.5; }
+  .calendar-helper { @apply inline-flex items-center gap-1.5 text-xs text-muted; }
+
+  /* Ventanas flotantes de tarea */
+  .calendar-popover, .task-popover {
+    @apply fixed z-[500] grid w-[230px] gap-1 rounded-[10px] border border-line bg-white p-3 text-xs text-ink shadow;
+  }
+  .calendar-popover strong, .task-popover strong { @apply text-[13px]; }
+  .calendar-popover p, .task-popover span { @apply m-0 flex items-center gap-1.5 text-muted; }
+  .task-popover { @apply absolute left-0 top-[calc(100%+6px)] hidden w-[205px] font-normal; }
+  .calendar-task:hover .task-popover, .calendar-task:focus-visible .task-popover { @apply grid; }
+
+  /* Mini calendario mensual (crear-proyecto) */
+  .mini-calendar-header { @apply mb-2.5 flex items-center justify-between gap-2 text-[13px] font-bold; }
+  .mini-calendar-weekdays, .planning-calendar {
+    @apply grid grid-cols-7 gap-[3px] text-center;
+  }
+  .mini-calendar-weekdays { @apply mb-1 text-[10px] font-extrabold uppercase text-muted-light; }
+  .calendar-day {
+    @apply grid aspect-square place-items-center rounded-lg border border-transparent bg-[#f7f8fc] text-[11px] font-semibold text-muted;
+  }
+  .calendar-day.is-empty { @apply bg-transparent; }
+  .calendar-day.is-today { @apply border-primary text-primary; }
+  .calendar-day.is-filled { @apply bg-primary-soft font-extrabold text-primary; }
+  .calendar-day.is-due { @apply bg-warning-soft text-[#bd6b25]; }
+  .calendar-task-marker { @apply mt-0.5 h-1 w-1 rounded-full bg-current; }
+  .preview-legend { @apply mt-3 flex flex-wrap gap-3 text-[11px] text-muted; }
+  .preview-legend span { @apply inline-flex items-center gap-1.5; }
+  .preview-legend i { @apply h-2 w-2 rounded-full bg-primary; }
+  .preview-legend span:last-child i { @apply bg-warning; }
+  .task-counter { @apply rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-extrabold text-primary; }
+  .ai-hint {
+    @apply mt-4 flex gap-2.5 rounded-sm bg-primary-soft/70 p-3 text-xs text-[#4b4bb5];
+  }
+
+  /* ---------- Calendario de horarios (crear-horario) ---------- */
+  .schedule-calendar {
+    @apply grid min-w-[730px];
+    grid-template-columns: 64px repeat(5, minmax(126px, 1fr));
+    grid-template-rows: 45px 624px;
+  }
+  .schedule-calendar__header-time, .schedule-calendar__day-name {
+    @apply flex items-center justify-center border-b border-line text-[11px] font-bold uppercase tracking-wide text-muted;
+  }
+  .schedule-calendar__header-time { @apply justify-end pr-2.5; }
+  .schedule-calendar__day-name { @apply border-l border-[#edf0f5] text-[#4b5874]; }
+  .schedule-calendar__time-axis { @apply relative border-r border-line; }
+  .schedule-time-label { @apply absolute right-2 -translate-y-1/2 text-[11px] leading-none text-muted-light; }
+  .schedule-time-label--last { @apply -translate-y-full; }
+  .schedule-calendar__day {
+    @apply relative border-r border-[#edf0f5];
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(8.333333% - 1px), #edf0f5 calc(8.333333% - 1px), #edf0f5 8.333333%);
+  }
+  .schedule-calendar__day--today { @apply bg-primary-soft/25; }
+  .schedule-calendar__empty {
+    @apply col-span-full grid place-items-center p-6 text-[13px] text-muted;
+  }
+  .schedule-event {
+    @apply absolute inset-x-1 overflow-hidden rounded-lg border-l-[3px] border-current px-2 py-1.5 text-[11px] font-bold leading-tight;
+    background: color-mix(in srgb, currentColor 14%, white);
+  }
+  .schedule-event__name { @apply block overflow-hidden text-ellipsis whitespace-nowrap; }
+  .schedule-event__time { @apply block text-[10px] font-semibold text-[#657087]; }
+  .schedule-color-0 { color: #5b5ce2; }
+  .schedule-color-1 { color: #19a7bd; }
+  .schedule-color-2 { color: #ee8a54; }
+  .schedule-color-3 { color: #36aa8a; }
+  .schedule-color-4 { color: #d7639d; }
+  .schedule-color-5 { color: #5b91b4; }
+
+  .subject-item {
+    @apply grid items-center gap-2.5 rounded-sm border border-[#edf0f6] bg-[#fcfdff] py-2.5 pl-2.5 pr-[7px];
+    grid-template-columns: 8px minmax(0, 1fr) 30px;
+  }
+  .subject-item__marker { @apply h-8 w-2 rounded-full bg-current; }
+  .subject-item__content { @apply min-w-0 text-ink; }
+  .subject-item__name { @apply overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-bold text-[#3b4865]; }
+  .subject-item__meta { @apply mt-0.5 flex gap-2 text-[11px] text-[#8a95aa]; }
+  .subject-remove { @apply grid h-[30px] w-[30px] place-items-center rounded-lg border-0 bg-transparent text-muted hover:bg-danger-soft hover:text-danger; }
+
+  .schedule-options { @apply grid gap-3.5; grid-template-columns: repeat(auto-fill, minmax(275px, 1fr)); }
+  .schedule-option {
+    @apply relative grid cursor-pointer gap-2.5 rounded border border-line bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow;
+  }
+  .schedule-option.is-selected { @apply border-primary ring-2 ring-primary/20; }
+  .schedule-option__top { @apply flex items-center justify-between gap-2; }
+  .schedule-option__name { @apply font-display text-[15px] font-bold; }
+  .schedule-option__type { @apply rounded-full bg-primary-soft px-2 py-1 text-[10px] font-extrabold uppercase text-primary; }
+  .schedule-option__score { @apply font-display text-lg font-extrabold text-primary; }
+  .schedule-option__description { @apply text-xs text-muted; }
+  .schedule-option__metrics { @apply flex flex-wrap gap-3 text-[11px] font-semibold text-muted; }
+  .schedule-option__selected { @apply absolute right-3 top-3 text-primary; }
+  .schedule-mini-week { @apply grid grid-cols-5 gap-1; }
+  .schedule-mini-day { @apply grid min-h-[54px] gap-0.5 rounded-md bg-[#f7f8fc] p-1; }
+  .schedule-mini-event { @apply h-1.5 rounded-full bg-current; }
+  .schedule-icon-badge {
+    @apply grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-primary;
+  }
+
+  /* ---------- Toasts y modales ---------- */
+  .toast-stack { @apply fixed bottom-5 right-5 z-[5000] grid w-[min(370px,calc(100vw-32px))] gap-2.5; }
+  .toast {
+    @apply flex animate-slide-in items-start gap-2.5 rounded-sm border border-line bg-white p-3 shadow;
+  }
+  .toast.out { @apply animate-slide-out; }
+  .toast i { @apply text-lg text-success; }
+  .toast strong { @apply block text-[13px]; }
+  .toast span { @apply mt-0.5 block text-xs text-muted; }
+
+  .modal-backdrop {
+    @apply fixed inset-0 z-[1000] grid place-items-center bg-[#1a223c]/40 p-5;
+  }
+  .modal, .dialog-form {
+    @apply max-h-[calc(100vh-40px)] w-[min(550px,100%)] overflow-auto rounded bg-white shadow-pop;
+  }
+  .modal-header, .dialog-header {
+    @apply flex items-center justify-between gap-3 px-[22px] pb-3.5 pt-5;
+  }
+  .modal-body { @apply px-[22px] pb-[22px] pt-1; }
+  .modal-footer { @apply flex justify-end gap-2 border-t border-line px-[22px] py-4; }
+  .modal-close { @apply grid h-[31px] w-[31px] place-items-center rounded-lg border-0 bg-[#f3f4f8] text-muted; }
+  .app-dialog {
+    @apply w-[min(560px,calc(100vw-32px))] rounded border-0 bg-white p-0 shadow-pop backdrop:bg-[#1a223c]/40;
+  }
+  .dialog-form { @apply grid gap-3.5 p-6 shadow-none; }
+  .dialog-intro { @apply -mt-2 text-[13px] text-muted; }
+
+  /* ---------- Autenticación (login / registro) ---------- */
+  .auth-layout {
+    @apply grid min-h-screen;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+  @media (max-width: 940px) {
+    .auth-layout { grid-template-columns: 1fr; }
+  }
+  .auth-showcase {
+    @apply relative hidden flex-col justify-between gap-8 overflow-hidden p-12 text-white min-[941px]:flex;
+    background: linear-gradient(150deg, #4a4bcf 0%, #5b5ce2 45%, #19a7bd 120%);
+  }
+  .auth-showcase .eyebrow { @apply text-white/70; }
+  .auth-showcase h1 { @apply text-white; }
+  .auth-showcase p { @apply text-white/80; }
+  .auth-brand { @apply inline-flex items-center gap-2.5 font-display text-lg font-extrabold; }
+  .auth-panel { @apply grid place-items-center p-6 max-[620px]:p-4; }
+  .auth-card { @apply grid w-[min(430px,100%)] gap-5; }
+  .register-card { @apply w-[min(560px,100%)]; }
+  .mobile-brand { @apply text-ink min-[941px]:hidden; }
+  .auth-heading h2 { @apply text-[26px] tracking-[-1px]; }
+  .auth-heading p { @apply mt-1.5 text-sm text-muted; }
+  .auth-form { @apply grid gap-3.5; }
+  .two-columns { @apply grid grid-cols-2 gap-3.5 max-[620px]:grid-cols-1; }
+  .auth-divider { @apply relative text-center text-xs font-semibold text-muted before:absolute before:left-0 before:top-1/2 before:h-px before:w-[calc(50%-70px)] before:bg-line before:content-[''] after:absolute after:right-0 after:top-1/2 after:h-px after:w-[calc(50%-70px)] after:bg-line after:content-['']; }
+  .social-actions { @apply grid grid-cols-3 gap-2.5 max-[420px]:grid-cols-1; }
+  .social-button {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] border border-line bg-white text-[13px] font-bold text-ink transition-all hover:-translate-y-px hover:border-[#cfd4e4];
+  }
+  .auth-switch { @apply text-center text-[13px] text-muted; }
+  .auth-switch a { @apply font-bold text-primary; }
+  .mini-agenda { @apply grid gap-2.5 rounded-lg border border-white/20 bg-white/10 p-5 backdrop-blur; }
+  .mini-agenda-header { @apply flex items-center justify-between text-xs font-bold text-white/75; }
+  .agenda-item { @apply flex items-start gap-3 rounded-sm bg-white/95 p-3 text-ink; }
+  .agenda-item strong { @apply block text-[13px]; }
+  .agenda-item small { @apply block text-[11px] text-muted; }
+  .agenda-time { @apply text-xs font-extrabold text-primary; }
+  .agenda-item-cyan .agenda-time { @apply text-cyan; }
+  .agenda-team { @apply flex items-center gap-2.5 text-xs text-white/85; }
+  .benefit-list { @apply m-0 grid list-none gap-3.5 p-0; }
+  .benefit-list li { @apply flex items-start gap-3; }
+  .benefit-list li > span { @apply grid h-9 w-9 flex-none place-items-center rounded-sm bg-white/15 text-white; }
+  .benefit-list strong { @apply block text-sm; }
+  .benefit-list small { @apply block text-xs text-white/75; }
+  .showcase-note { @apply inline-flex items-center gap-2 text-xs text-white/70; }
+
+  /* ---------- Perfil ---------- */
+  .profile-cover {
+    @apply relative h-[150px] overflow-hidden rounded-t;
+    background: linear-gradient(120deg, #5b5ce2, #19a7bd);
+  }
+  .cover-orb { @apply absolute rounded-full bg-white/15; }
+  .cover-orb-one { @apply -left-6 -top-10 h-40 w-40; }
+  .cover-orb-two { @apply -bottom-16 right-10 h-52 w-52; }
+  .profile-identity {
+    @apply -mt-12 flex flex-wrap items-end gap-5 px-7 pb-6;
+  }
+  .avatar-frame {
+    @apply h-[104px] w-[104px] flex-none overflow-hidden rounded-[26px] border-4 border-white bg-primary-soft shadow;
+  }
+  .avatar-frame img { @apply h-full w-full object-cover; }
+  .identity-copy { @apply min-w-[240px] flex-1; }
+  .profile-headline { @apply mt-1.5 max-w-[52ch] text-sm text-muted; }
+  .profile-meta { @apply mt-3 flex flex-wrap gap-4 text-[13px] text-muted; }
+  .profile-meta span { @apply inline-flex items-center gap-1.5; }
+  .profile-stat-grid { @apply grid gap-4; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .profile-stat, .summary-card {
+    @apply flex items-center gap-3.5 rounded border border-[#e0e4ef]/90 bg-white p-4 shadow-sm;
+  }
+  .profile-stat strong, .summary-card strong { @apply block font-display text-2xl; }
+  .profile-stat span:last-child, .summary-card span:last-child { @apply text-xs text-muted; }
+  .stat-icon, .summary-icon, .overview-icon, .empty-icon, .complete-icon, .focus-icon, .edit-header-icon {
+    @apply grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-primary;
+  }
+  .stat-icon.cyan, .summary-card--blue .summary-icon { @apply bg-[#e4f6f9] text-cyan; }
+  .stat-icon.orange, .summary-card--orange .summary-icon { @apply bg-warning-soft text-warning; }
+  .profile-details { @apply m-0 grid gap-3.5 p-0; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .profile-details dt { @apply inline-flex items-center gap-1.5 text-xs font-extrabold text-muted; }
+  .profile-details dd { @apply m-0 mt-1 text-sm; }
+  .focus-card {
+    @apply grid content-start gap-2 rounded border border-primary/20 bg-primary-soft/60 p-5;
+  }
+  .upload-button {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-[10px] bg-primary-soft px-3.5 py-2.5 text-[13px] font-bold text-primary hover:bg-[#e2e2ff];
+  }
+  #avatar-file { @apply hidden; }
+
+  /* ---------- Dashboard ---------- */
+  .upcoming-list, .project-snapshot-list { @apply grid gap-2.5; }
+  .upcoming-task, .snapshot-row { @apply flex items-center gap-2.5; }
+  .upcoming-task a, .snapshot-row a { @apply block text-[13px] font-bold hover:text-primary; }
+  .upcoming-task span, .snapshot-row small { @apply block text-[11px] text-muted; }
+  .upcoming-color, .snapshot-line {
+    @apply h-8 w-1 flex-none rounded-full;
+    background: var(--task-color, var(--project-color, #5b5ce2));
+  }
+  .snapshot-percent { @apply ml-auto font-display text-[13px] font-extrabold text-primary; }
+  .rhythm-score { @apply flex items-baseline gap-1.5; }
+  .rhythm-score span { @apply font-display text-[32px] font-extrabold tracking-tight; }
+  .rhythm-score small { @apply text-xs text-muted; }
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Iniciar sesión', 'Inicia sesión en StudyFlow, tu espacio para organizar la vida académica.')}"></head>
+  <body data-page="login">
+    <main class="auth-layout">
+      <section class="auth-showcase" aria-labelledby="auth-showcase-title">
+        <a class="auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow, inicio de sesión">
+          <span class="brand-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
+          <span>StudyFlow</span>
+        </a>
+
+        <div class="max-w-[30ch]">
+          <p class="eyebrow">Tu semestre, en orden</p>
+          <h1 id="auth-showcase-title">Haz espacio para aprender, no para perseguir pendientes.</h1>
+          <p class="mt-3">Reúne tus clases, proyectos y tareas en una sola vista creada para la vida universitaria.</p>
+        </div>
+
+        <div class="mini-agenda" aria-label="Vista previa de una agenda académica">
+          <div class="mini-agenda-header">
+            <span>Hoy, martes 12</span>
+            <i class="bi bi-three-dots" aria-hidden="true"></i>
+          </div>
+          <div class="agenda-item">
+            <span class="agenda-time">09:00</span>
+            <span><strong>Arquitectura de software</strong><small>Edificio B · Aula 204</small></span>
+          </div>
+          <div class="agenda-item agenda-item-cyan">
+            <span class="agenda-time">14:30</span>
+            <span><strong>Revisar prototipo</strong><small>Proyecto Campus Verde</small></span>
+          </div>
+          <div class="agenda-team">
+            <span class="avatar-stack" aria-hidden="true"><b>VA</b><b>JM</b><b>+2</b></span>
+            <span>Tu equipo ya avanzó <strong>72%</strong></span>
+          </div>
+        </div>
+
+        <p class="showcase-note"><i class="bi bi-shield-check" aria-hidden="true"></i> Tu planificación siempre a tu alcance.</p>
+      </section>
+
+      <section class="auth-panel" aria-labelledby="login-title">
+        <div class="auth-card">
+          <a class="mobile-brand auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow">
+            <span class="brand-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
+            <span>StudyFlow</span>
+          </a>
+
+          <div class="auth-heading">
+            <p class="eyebrow">Bienvenido de nuevo</p>
+            <h2 id="login-title">Continúa con tu planificación</h2>
+            <p>Ingresa para ver tu calendario y los avances de tu equipo.</p>
+          </div>
+
+          <form id="login-form" class="auth-form" novalidate>
+            <div class="form-field">
+              <label for="login-email">Correo institucional</label>
+              <span class="input-wrap">
+                <i class="bi bi-envelope" aria-hidden="true"></i>
+                <input id="login-email" name="email" type="email" autocomplete="email" placeholder="tu.correo@universidad.edu" required>
+              </span>
+            </div>
+
+            <div class="form-field">
+              <span class="label-row">
+                <label for="login-password">Contraseña</label>
+                <a href="#" class="subtle-link" data-demo-action="recover">¿La olvidaste?</a>
+              </span>
+              <span class="input-wrap">
+                <i class="bi bi-lock" aria-hidden="true"></i>
+                <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Tu contraseña" minlength="4" required>
+                <button class="password-toggle" type="button" data-password-toggle="login-password" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button>
+              </span>
+            </div>
+
+            <label class="check-label" for="remember-session">
+              <input id="remember-session" type="checkbox" name="remember" checked>
+              <span>Recordar mi sesión</span>
+            </label>
+
+            <p id="login-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+            <button class="btn btn-primary w-full" type="submit">Iniciar sesión <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+          </form>
+
+          <div class="auth-divider"><span>o continúa con</span></div>
+          <div class="social-actions" aria-label="Opciones de inicio de sesión social">
+            <button class="social-button" type="button" data-provider="Google"><i class="bi bi-google" aria-hidden="true"></i><span>Google</span></button>
+            <button class="social-button" type="button" data-provider="GitHub"><i class="bi bi-github" aria-hidden="true"></i><span>GitHub</span></button>
+            <button class="social-button" type="button" data-provider="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i><span>Facebook</span></button>
+          </div>
+
+          <p class="auth-switch">¿Aún no tienes una cuenta? <a th:href="@{/registro}" href="/registro">Crea una gratis</a></p>
+        </div>
+      </section>
+    </main>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/login.js}" src="/js/login.js" defer></script>
+  </body>
+</html>

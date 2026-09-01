@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Proyecto', 'Espacio de trabajo del proyecto en StudyFlow.')}"></head>
+  <body data-page="project" th:attr="data-project-id=${projectId}">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell">
+      <a class="back-link" th:href="@{/proyectos}" href="/proyectos"><i class="bi bi-arrow-left"></i> Todos los proyectos</a>
+      <div id="project-content" aria-live="polite">
+        <section class="empty-state"><i class="bi bi-arrow-repeat text-2xl text-primary"></i><p>Cargando espacio de trabajo…</p></section>
+      </div>
+    </main>
+
+    <dialog id="task-dialog" class="app-dialog">
+      <form id="task-form" method="dialog" class="dialog-form" novalidate>
+        <div class="dialog-header">
+          <div><p class="eyebrow" id="task-dialog-kicker">Nueva tarea</p><h2 id="task-dialog-title">Añadir tarea</h2></div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <input id="editing-task-id" type="hidden">
+        <label class="form-field">Nombre de la tarea<input id="task-title-input" required maxlength="100" placeholder="Ej. Preparar el análisis de usuarios"></label>
+        <label class="form-field">Descripción<textarea id="task-description-input" rows="3" maxlength="400" placeholder="Añade detalles o criterios de entrega."></textarea></label>
+        <div class="form-grid-two">
+          <label class="form-field">Responsable<select id="task-assignee-input"></select></label>
+          <label class="form-field">Fecha límite<input id="task-date-input" type="date"></label>
+        </div>
+        <div class="form-grid-two">
+          <label class="form-field">Etapa<select id="task-stage-input"><option>Planeación</option><option>Investigación</option><option>Diseño</option><option>Desarrollo</option><option>Entrega</option></select></label>
+          <label class="form-field">Estado<select id="task-status-input"><option value="pending">Pendiente</option><option value="in-progress">En curso</option><option value="completed">Completada</option></select></label>
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
+          <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar tarea</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="members-dialog" class="app-dialog">
+      <form id="members-form" method="dialog" class="dialog-form" novalidate>
+        <div class="dialog-header">
+          <div><p class="eyebrow">Equipo</p><h2>Modificar integrantes</h2></div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <p class="dialog-intro">Los cambios se reflejarán al crear o editar las tareas.</p>
+        <div id="dialog-members-list" class="dialog-members-list"></div>
+        <button id="dialog-add-member" type="button" class="btn btn-secondary btn-sm w-fit"><i class="bi bi-plus"></i> Añadir integrante</button>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
+          <button class="btn btn-primary" type="submit">Guardar equipo</button>
+        </div>
+      </form>
+    </dialog>
+
+    <template id="project-detail-template">
+      <section class="page-heading" aria-labelledby="detail-project-title">
+        <div>
+          <div class="mb-1 flex items-center gap-2">
+            <span class="project-color-mark inline-block h-2.5 w-2.5 rounded-full"></span>
+            <p class="eyebrow project-stage-label m-0"></p>
+          </div>
+          <h1 id="detail-project-title" class="detail-project-name"></h1>
+          <p class="detail-project-description mt-2 max-w-[64ch] text-muted"></p>
+        </div>
+        <div class="flex flex-wrap gap-2.5">
+          <a class="btn btn-secondary" href="/proyectos"><i class="bi bi-grid"></i> Ver proyectos</a>
+          <button class="btn btn-primary" type="button" data-new-task><i class="bi bi-plus-lg"></i> Nueva tarea</button>
+        </div>
+      </section>
+
+      <section class="mb-6 grid gap-4 md:grid-cols-3" aria-label="Resumen del proyecto">
+        <article class="panel">
+          <span class="overview-label text-xs font-extrabold uppercase text-muted">Avance general</span>
+          <strong class="detail-progress-value my-1.5 block font-display text-3xl"></strong>
+          <div class="progress-track" aria-hidden="true"><span class="progress-fill"></span></div>
+          <span class="progress-caption mt-2 block text-xs text-muted"></span>
+        </article>
+        <article class="panel flex items-center gap-3.5">
+          <span class="overview-icon"><i class="bi bi-calendar-event"></i></span>
+          <div>
+            <span class="overview-label text-xs font-extrabold uppercase text-muted">Entrega final</span>
+            <strong class="detail-due-date block font-display text-lg"></strong>
+            <span class="detail-days-left text-xs text-muted"></span>
+          </div>
+        </article>
+        <article class="panel flex items-center gap-3.5">
+          <span class="overview-icon"><i class="bi bi-people"></i></span>
+          <div>
+            <span class="overview-label text-xs font-extrabold uppercase text-muted">Equipo</span>
+            <div class="detail-member-stack member-stack mt-1.5"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="mb-6" aria-labelledby="project-calendar-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">Planificación</p><h2 id="project-calendar-title">Calendario del proyecto</h2></div>
+          <span class="calendar-helper"><i class="bi bi-cursor"></i> Pasa sobre una tarea para verla</span>
+        </div>
+        <div class="detail-calendar-wrap"><div id="detail-calendar" class="detail-calendar"></div></div>
+        <div class="calendar-legend"><span><i class="legend-dot legend-due"></i> Entrega</span><span id="calendar-member-legend" class="legend-members"></span></div>
+      </section>
+
+      <section class="mb-6" aria-labelledby="tasks-list-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">Tablero de tareas</p><h2 id="tasks-list-title">Tareas del proyecto</h2></div>
+          <div class="task-filter-wrap">
+            <label class="sr-only" for="task-status-filter">Filtrar por estado</label>
+            <select id="task-status-filter">
+              <option value="all">Todas las tareas</option>
+              <option value="pending">Pendientes</option>
+              <option value="in-progress">En curso</option>
+              <option value="completed">Completadas</option>
+            </select>
+          </div>
+        </div>
+        <div id="project-tasks" class="task-cards-grid"></div>
+      </section>
+
+      <section class="panel flex flex-wrap items-center justify-between gap-4" aria-label="Administrar proyecto">
+        <div>
+          <p class="eyebrow">Ajustes rápidos</p>
+          <h2>Mantén tu proyecto al día</h2>
+          <p class="mt-1 text-[13px] text-muted">Actualiza el equipo o amplía la planificación cuando lo necesites.</p>
+        </div>
+        <div class="flex flex-wrap gap-2.5">
+          <button class="btn btn-secondary" type="button" data-manage-members><i class="bi bi-people"></i> Modificar integrantes</button>
+          <button class="btn btn-primary" type="button" data-new-task><i class="bi bi-plus-lg"></i> Crear nueva tarea</button>
+        </div>
+      </section>
+    </template>
+
+    <template id="task-card-template">
+      <article class="task-card">
+        <div class="task-card-top">
+          <button class="task-check" type="button" aria-label="Marcar tarea como completada"><i class="bi bi-check"></i></button>
+          <span class="task-status"></span>
+          <button class="task-menu-button" type="button" aria-label="Editar tarea"><i class="bi bi-pencil"></i></button>
+        </div>
+        <h3 class="task-title"></h3>
+        <p class="task-description"></p>
+        <div class="task-card-meta"><span class="task-stage"></span><span class="task-date"><i class="bi bi-calendar3"></i><time></time></span></div>
+        <div class="task-card-footer">
+          <span class="task-assignee"><i class="assignee-dot"></i><span></span></span>
+          <label class="file-control"><input class="task-file-input" type="file"><i class="bi bi-paperclip"></i><span class="file-name">Adjuntar</span></label>
+        </div>
+      </article>
+    </template>
+
+    <template id="dialog-member-row-template">
+      <div class="dialog-member-row">
+        <span class="member-row-avatar"></span>
+        <label class="form-field"><span class="sr-only">Nombre del integrante</span><input class="dialog-member-name" required maxlength="60" placeholder="Nombre"></label>
+        <label class="form-field"><span class="sr-only">Contacto</span><input class="dialog-member-contact" maxlength="100" placeholder="Correo o @usuario"></label>
+        <button class="icon-button remove-dialog-member" type="button" aria-label="Eliminar integrante"><i class="bi bi-trash3"></i></button>
+      </div>
+    </template>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/proyecto.js}" src="/js/proyecto.js" defer></script>
+  </body>
+</html>

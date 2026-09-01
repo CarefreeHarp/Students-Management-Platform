@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Crear horario', 'Crea y compara alternativas de horario de clases en StudyFlow.')}"></head>
+  <body data-page="schedule">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell">
+      <section class="page-heading" aria-labelledby="schedule-page-title">
+        <div>
+          <p class="eyebrow"><i class="bi bi-calendar3"></i> Planificador académico</p>
+          <h1 id="schedule-page-title">Construye el horario que mejor se adapta a ti</h1>
+          <p class="mt-2 max-w-[62ch] text-muted">
+            Registra tus materias disponibles y deja que StudyFlow organice alternativas para comparar tu semana.
+          </p>
+        </div>
+        <a class="text-action" th:href="@{/}" href="/"><i class="bi bi-arrow-left"></i> Volver al panel</a>
+      </section>
+
+      <div class="grid items-start gap-5 lg:grid-cols-[minmax(285px,345px)_minmax(0,1fr)]">
+        <aside class="panel grid gap-4" aria-labelledby="subject-form-title">
+          <div class="flex items-center gap-3">
+            <span class="schedule-icon-badge"><i class="bi bi-journal-plus"></i></span>
+            <div>
+              <h2 id="subject-form-title">Materias disponibles</h2>
+              <p class="text-[13px] text-muted">Agrega las secciones que podrías cursar este semestre.</p>
+            </div>
+          </div>
+
+          <form id="subject-form" class="form-grid" novalidate>
+            <div class="form-field form-field--full">
+              <label for="subject-name">Nombre de la materia</label>
+              <input id="subject-name" name="name" type="text" placeholder="Ej. Arquitectura de software" maxlength="80" required>
+            </div>
+
+            <div class="form-field">
+              <label for="subject-day">Día</label>
+              <select id="subject-day" name="day" required>
+                <option value="lunes">Lunes</option>
+                <option value="martes">Martes</option>
+                <option value="miercoles">Miércoles</option>
+                <option value="jueves">Jueves</option>
+                <option value="viernes">Viernes</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="subject-credits">Créditos</label>
+              <input id="subject-credits" name="credits" type="number" min="1" max="12" placeholder="3" inputmode="numeric">
+            </div>
+
+            <div class="form-field">
+              <label for="subject-start">Hora de inicio</label>
+              <input id="subject-start" name="start" type="time" min="07:00" max="19:00" step="900" value="08:00" required>
+            </div>
+
+            <div class="form-field">
+              <label for="subject-end">Hora de finalización</label>
+              <input id="subject-end" name="end" type="time" min="07:00" max="19:00" step="900" value="10:00" required>
+            </div>
+
+            <div class="form-field form-field--full">
+              <label for="subject-professor">Profesor <span class="font-normal text-muted">(opcional)</span></label>
+              <input id="subject-professor" name="professor" type="text" placeholder="Ej. Prof. Andrea Torres" maxlength="70">
+            </div>
+
+            <!-- crear-horario.js alterna el atributo hidden, por eso no usa .form-feedback -->
+            <p id="subject-form-error" class="field-span-2 rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-danger" role="alert" hidden></p>
+            <button class="btn btn-primary field-span-2" type="submit">
+              <i class="bi bi-plus-lg"></i> Añadir materia
+            </button>
+          </form>
+
+          <div class="grid gap-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <h3>Registradas <span id="subject-count" class="text-primary">0</span></h3>
+              <button id="clear-subjects" type="button" class="btn btn-ghost btn-sm">Limpiar</button>
+            </div>
+            <div id="subject-list" class="subject-list" aria-live="polite"></div>
+          </div>
+        </aside>
+
+        <section class="panel" aria-labelledby="draft-calendar-title">
+          <div class="section-head flex-wrap">
+            <div>
+              <p class="eyebrow">Vista previa</p>
+              <h2 id="draft-calendar-title">Tu semana actual</h2>
+              <p id="draft-calendar-caption">Añade materias para visualizar tu horario.</p>
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+              <button id="save-schedule" class="btn btn-secondary" type="button" disabled>
+                <i class="bi bi-bookmark-check"></i> Guardar opción
+              </button>
+              <button id="generate-schedules" class="btn btn-ai" type="button">
+                <i class="bi bi-stars"></i> Generar horarios con IA
+              </button>
+            </div>
+          </div>
+
+          <div class="schedule-calendar-wrap rounded border border-line">
+            <div id="draft-calendar" class="schedule-calendar" aria-label="Calendario semanal de materias"></div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+            <span><i class="bi bi-info-circle"></i> La IA puede proponer secciones alternativas con base en tus preferencias.</span>
+            <span id="draft-credit-count" class="font-bold text-primary">0 créditos</span>
+          </div>
+        </section>
+      </div>
+
+      <section id="ai-results" class="mt-6" aria-labelledby="ai-results-title" hidden>
+        <div class="section-heading flex-wrap">
+          <div>
+            <p class="eyebrow"><i class="bi bi-stars"></i> Recomendaciones de IA</p>
+            <h2 id="ai-results-title">Compara tus alternativas</h2>
+            <p id="ai-results-summary">Selecciona una propuesta para verla en el calendario principal.</p>
+          </div>
+          <span class="tag bg-primary-soft text-primary"><i class="bi bi-lightning-charge-fill"></i> Simulación inteligente</span>
+        </div>
+        <div id="schedule-options" class="schedule-options" role="list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/crear-horario.js}" src="/js/crear-horario.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Editar perfil', 'Actualiza tu información académica en StudyFlow.')}"></head>
+  <body data-page="editar-perfil">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell max-w-[880px]">
+      <a class="back-link" th:href="@{/perfil}" href="/perfil"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mi perfil</a>
+
+      <section class="panel" aria-labelledby="edit-profile-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Configuración personal</p>
+            <h1 id="edit-profile-title">Edita tu perfil</h1>
+            <p>Mantén actualizada tu información para que tu espacio se sienta más tuyo.</p>
+          </div>
+          <span class="edit-header-icon" aria-hidden="true"><i class="bi bi-person-gear"></i></span>
+        </div>
+
+        <form id="edit-profile-form" class="grid gap-5" novalidate>
+          <section class="flex flex-wrap items-center gap-5 rounded border border-line bg-canvas/60 p-4" aria-labelledby="photo-title">
+            <div class="avatar-frame"><img id="edit-profile-avatar" src="" alt="Vista previa de la foto de perfil"></div>
+            <div class="grid gap-1.5">
+              <h2 id="photo-title">Foto de perfil</h2>
+              <p class="text-[13px] text-muted">Usa una imagen clara para que tu equipo te reconozca más fácil.</p>
+              <label class="upload-button w-fit" for="avatar-file"><i class="bi bi-image" aria-hidden="true"></i> Cambiar foto</label>
+              <input id="avatar-file" name="avatar" type="file" accept="image/png,image/jpeg,image/webp">
+              <small>PNG, JPG o WEBP · máximo 2 MB</small>
+            </div>
+          </section>
+
+          <div>
+            <h2>Datos personales</h2>
+            <p class="text-[13px] text-muted">Esta información aparecerá en tu perfil.</p>
+          </div>
+          <div class="form-grid">
+            <div class="edit-field"><label for="edit-first-name">Nombre</label><input id="edit-first-name" name="firstName" type="text" autocomplete="given-name" required></div>
+            <div class="edit-field"><label for="edit-last-name">Apellido</label><input id="edit-last-name" name="lastName" type="text" autocomplete="family-name" required></div>
+            <div class="edit-field full-width"><label for="edit-email">Correo institucional</label><input id="edit-email" name="email" type="email" autocomplete="email" required></div>
+            <div class="edit-field full-width">
+              <label for="edit-description">Descripción</label>
+              <textarea id="edit-description" name="description" rows="3" maxlength="180" placeholder="Cuéntale a tu equipo qué te interesa o en qué estás trabajando."></textarea>
+              <span class="field-hint"><span id="description-count">0</span>/180 caracteres</span>
+            </div>
+          </div>
+
+          <div>
+            <h2>Información académica</h2>
+            <p class="text-[13px] text-muted">Nos ayuda a contextualizar tus horarios y proyectos.</p>
+          </div>
+          <div class="form-grid">
+            <div class="edit-field full-width"><label for="edit-university">Universidad</label><input id="edit-university" name="university" type="text" autocomplete="organization" required></div>
+            <div class="edit-field"><label for="edit-career">Programa</label><input id="edit-career" name="career" type="text" required></div>
+            <div class="edit-field"><label for="edit-semester">Semestre</label><input id="edit-semester" name="semester" type="number" min="1" max="20" required></div>
+            <div class="edit-field"><label for="edit-age">Edad</label><input id="edit-age" name="age" type="number" min="15" max="99" required></div>
+          </div>
+
+          <p id="edit-profile-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+          <div class="form-actions">
+            <a th:href="@{/perfil}" href="/perfil" class="btn btn-ghost">Cancelar</a>
+            <button class="btn btn-primary" type="submit">Guardar cambios <i class="bi bi-check2" aria-hidden="true"></i></button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/perfil.js}" src="/js/perfil.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Fragmentos compartidos de la capa Vista.
+  head   -> metadatos, fuentes, iconos y la hoja Tailwind compilada
+  nav    -> barra superior (se hidrata además desde main.js)
+  scripts-> scripts comunes
+-->
+<head th:fragment="head(titulo, descripcion)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" th:content="${descripcion}">
+  <title th:text="${titulo} + ' · StudyFlow'">StudyFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+
+<body>
+<!-- Contenedor de la navegación: main.js inyecta el marcado según data-page -->
+<header th:fragment="nav" id="main-nav" class="app-nav"></header>
+
+<th:block th:fragment="scripts">
+  <script th:src="@{/js/main.js}" src="/js/main.js" defer></script>
+</th:block>
+</body>
+</html>
