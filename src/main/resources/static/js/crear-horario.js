@@ -260,42 +260,52 @@
     renderCalendar(subjects);
   }
 
+  /*
+   * Las alternativas SELECCIONAN materias, nunca las mueven de hora.
+   * La versión anterior recolocaba las clases a horas inventadas: un horario
+   * no se puede reubicar, la hora la fija la universidad. Lo único que puede
+   * variar es qué materias entran en cada propuesta y cuáles se descartan por
+   * chocar entre sí.
+   */
+
+  /** Dos materias chocan si comparten día y sus franjas se solapan. */
+  function chocan(primera, segunda) {
+    return primera.day === segunda.day
+      && timeToMinutes(primera.start) < timeToMinutes(segunda.end)
+      && timeToMinutes(segunda.start) < timeToMinutes(primera.end);
+  }
+
+  /** Recorre las materias en el orden dado y descarta las que chocan con las ya elegidas. */
+  function seleccionarSinChoques(ordenadas) {
+    const elegidas = [];
+    ordenadas.forEach((materia) => {
+      if (!elegidas.some((elegida) => chocan(elegida, materia))) {
+        elegidas.push({ ...materia });
+      }
+    });
+    return elegidas;
+  }
+
+  /** Orden de registro: intenta conservar todo lo que el estudiante añadió. */
   function createBalancedCourses() {
-    return subjects.map((subject) => ({ ...subject }));
+    return seleccionarSinChoques(subjects);
   }
 
+  /** Da preferencia a las materias que empiezan temprano. */
   function createMorningCourses() {
-    return DAYS.flatMap((day) => {
-      const daySubjects = subjects
-        .filter((subject) => subject.day === day.id)
-        .sort((first, second) => timeToMinutes(first.start) - timeToMinutes(second.start));
-      let cursor = 7 * 60 + 30;
-
-      return daySubjects.map((subject) => {
-        const duration = timeToMinutes(subject.end) - timeToMinutes(subject.start);
-        const preferredStart = Math.max(7 * 60 + 30, timeToMinutes(subject.start) - 60);
-        const start = Math.max(cursor, preferredStart);
-        const safeStart = start + duration <= 14 * 60 ? start : timeToMinutes(subject.start);
-        cursor = safeStart + duration + 30;
-        return { ...subject, start: minutesToTime(safeStart), end: minutesToTime(safeStart + duration) };
-      });
-    });
+    return seleccionarSinChoques(
+      [...subjects].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start)));
   }
 
+  /** Da preferencia a las materias con más créditos. */
   function createCompactCourses() {
-    return DAYS.flatMap((day) => {
-      const daySubjects = subjects
-        .filter((subject) => subject.day === day.id)
-        .sort((first, second) => timeToMinutes(first.start) - timeToMinutes(second.start));
-      let cursor = 8 * 60;
+    return seleccionarSinChoques(
+      [...subjects].sort((a, b) => (Number(b.credits) || 0) - (Number(a.credits) || 0)));
+  }
 
-      return daySubjects.map((subject) => {
-        const duration = timeToMinutes(subject.end) - timeToMinutes(subject.start);
-        const start = cursor + duration <= CALENDAR_END ? cursor : timeToMinutes(subject.start);
-        cursor = start + duration + 15;
-        return { ...subject, start: minutesToTime(start), end: minutesToTime(start + duration) };
-      });
-    });
+  /** Porcentaje de materias registradas que la propuesta consigue incluir. */
+  function cobertura(courses) {
+    return subjects.length ? Math.round((courses.length / subjects.length) * 100) : 0;
   }
 
   function longestGap(courses) {
@@ -326,25 +336,25 @@
       {
         id: "balanced",
         type: "Recomendada",
-        name: "Semana equilibrada",
-        description: "Respeta tus horarios registrados y conserva pausas para estudiar.",
-        score: 96,
+        name: "Todo lo que registraste",
+        description: `Mantiene tus materias en su horario real. Incluye ${balanced.length} de ${subjects.length}.`,
+        score: cobertura(balanced),
         courses: balanced,
       },
       {
         id: "morning",
         type: "Alternativa",
-        name: "Tardes libres",
-        description: "Prioriza grupos de mañana para que tengas las tardes disponibles.",
-        score: 91,
+        name: "Empezar temprano",
+        description: `Ante un choque, se queda con la materia que empieza antes. Incluye ${morning.length} de ${subjects.length}.`,
+        score: cobertura(morning),
         courses: morning,
       },
       {
         id: "compact",
         type: "Alternativa",
-        name: "Días más compactos",
-        description: "Reduce tiempos muertos agrupando tus materias por día.",
-        score: 88,
+        name: "Más créditos",
+        description: `Ante un choque, se queda con la materia de más créditos. Incluye ${compact.length} de ${subjects.length}.`,
+        score: cobertura(compact),
         courses: compact,
       },
     ];

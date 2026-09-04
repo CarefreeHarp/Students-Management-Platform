@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Canales', 'Canales del proyecto: conversación, archivos y resúmenes.')}"></head>
+  <body data-page="canales" th:attr="data-project-id=${projectId}">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell">
+      <a class="back-link" id="back-to-project" href="/proyectos"><i class="bi bi-arrow-left"></i> Volver al proyecto</a>
+
+      <section class="page-heading" aria-labelledby="canales-title">
+        <div>
+          <p class="eyebrow" id="project-label">Espacio de equipo</p>
+          <h1 id="canales-title">Canales</h1>
+          <p class="mt-2 text-muted">Divide la conversación por temas: uno general y uno por tarea.</p>
+        </div>
+        <button id="new-channel" class="btn btn-primary" type="button"><i class="bi bi-plus-lg"></i> Nuevo canal</button>
+      </section>
+
+      <div class="grid items-start gap-4 lg:grid-cols-[220px_minmax(0,1fr)_300px]">
+
+        <!-- Barra lateral de canales -->
+        <aside class="panel-morado p-2.5" aria-label="Lista de canales">
+          <p class="px-2 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-muted">Canales</p>
+          <nav id="channel-list" class="grid gap-0.5"></nav>
+        </aside>
+
+        <!-- Conversación -->
+        <section class="panel-morado flex flex-col overflow-hidden p-0" aria-labelledby="channel-title">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#c9c4ef] px-4 py-3">
+            <div>
+              <h2 id="channel-title" class="font-display text-base">#general</h2>
+              <p id="channel-description" class="text-xs text-muted"></p>
+            </div>
+            <div class="flex gap-1.5">
+              <button id="summarize" class="btn btn-sm btn-soft" type="button"><i class="bi bi-stars"></i> Resumir</button>
+              <button id="delete-channel" class="btn btn-sm btn-ghost" type="button" hidden aria-label="Eliminar canal"><i class="bi bi-trash3"></i></button>
+            </div>
+          </div>
+
+          <div id="messages" class="flex max-h-[58vh] min-h-[320px] flex-col gap-3.5 overflow-y-auto p-4" aria-live="polite"></div>
+
+          <form id="message-form" class="grid gap-2 border-t border-[#c9c4ef] p-3.5" novalidate>
+            <div id="pending-file" class="hidden items-center gap-2 rounded-sm bg-primary-soft px-2.5 py-1.5 text-xs text-primary"></div>
+            <div class="flex items-end gap-2">
+              <label class="file-control" title="Adjuntar archivo">
+                <input id="file-input" type="file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip">
+                <i class="bi bi-paperclip"></i>
+              </label>
+              <label class="sr-only" for="message-input">Escribe un mensaje</label>
+              <textarea id="message-input" class="min-h-[44px] flex-1 resize-none" rows="1" maxlength="2000"
+                        placeholder="Escribe en #general…"></textarea>
+              <button class="btn btn-primary btn-icon" type="submit" aria-label="Enviar mensaje"><i class="bi bi-send"></i></button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Archivos y resumen -->
+        <aside class="grid content-start gap-4">
+          <section class="panel-morado" aria-labelledby="gallery-title">
+            <div class="section-head">
+              <h2 id="gallery-title" class="text-base">Imágenes</h2>
+              <span id="image-count" class="text-[11px] text-muted">0</span>
+            </div>
+            <div id="gallery" class="grid grid-cols-3 gap-1.5"></div>
+          </section>
+
+          <section class="panel-morado" aria-labelledby="docs-title">
+            <div class="section-head">
+              <h2 id="docs-title" class="text-base">Documentos</h2>
+              <span id="doc-count" class="text-[11px] text-muted">0</span>
+            </div>
+            <div id="documents" class="grid gap-2"></div>
+          </section>
+
+          <section class="panel-morado" aria-labelledby="summary-title">
+            <div class="section-head">
+              <h2 id="summary-title" class="text-base">Resumen</h2>
+              <span id="summary-model" class="tag bg-primary-soft text-primary">simulado</span>
+            </div>
+            <div id="summary-body"></div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Selector de emoji para reaccionar -->
+    <div id="emoji-picker" class="fixed z-[600] hidden gap-1 rounded-sm border border-line bg-white p-1.5 shadow" role="menu"></div>
+
+    <dialog id="channel-dialog" class="app-dialog">
+      <form id="channel-form" method="dialog" class="dialog-form" novalidate>
+        <div class="dialog-header">
+          <div><p class="eyebrow">Equipo</p><h2>Crear canal</h2></div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <label class="form-field">Nombre del canal
+          <input id="channel-name" required maxlength="80" placeholder="tarea 1">
+          <span class="field-hint">Se mostrará como <span id="slug-preview">#tarea-1</span></span>
+        </label>
+        <label class="form-field">Descripción <span class="font-normal text-muted">(opcional)</span>
+          <input id="channel-description-input" maxlength="300" placeholder="¿De qué se habla aquí?">
+        </label>
+        <label class="form-field">Tarea asociada <span class="font-normal text-muted">(opcional)</span>
+          <select id="channel-task"><option value="">Sin tarea</option></select>
+        </label>
+        <p id="channel-feedback" class="form-feedback" role="alert"></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
+          <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Crear canal</button>
+        </div>
+      </form>
+    </dialog>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/canales.js}" src="/js/canales.js" defer></script>
+  </body>
+</html>

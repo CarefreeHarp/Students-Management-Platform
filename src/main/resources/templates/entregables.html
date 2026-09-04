@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Entregables', 'Registro de documentos y entregables del trabajo grupal.')}"></head>
+  <body data-page="entregables" th:attr="data-project-id=${projectId}">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell">
+      <a class="back-link" id="back-to-project" href="/proyectos"><i class="bi bi-arrow-left"></i> Volver al proyecto</a>
+
+      <section class="page-heading" aria-labelledby="entregables-title">
+        <div>
+          <p class="eyebrow" id="project-label">Trabajo grupal</p>
+          <h1 id="entregables-title">Documentos y entregables</h1>
+          <p class="mt-2 max-w-[62ch] text-muted">
+            El índice de dónde vive cada parte del trabajo: el documento de Word, el diseño de
+            Canva, el repositorio… con su responsable y su estado.
+          </p>
+        </div>
+        <button id="new-deliverable" class="btn btn-primary" type="button"><i class="bi bi-plus-lg"></i> Registrar documento</button>
+      </section>
+
+      <section class="mb-5 grid gap-4 sm:grid-cols-3" aria-label="Resumen">
+        <article class="summary-card tarjeta-color tono-indigo">
+          <span class="summary-icon"><i class="bi bi-collection"></i></span>
+          <div><strong id="total-deliverables">0</strong><span>documentos</span></div>
+        </article>
+        <article class="summary-card tarjeta-color tono-cian">
+          <span class="summary-icon"><i class="bi bi-hourglass-split"></i></span>
+          <div><strong id="in-review">0</strong><span>en revisión</span></div>
+        </article>
+        <article class="summary-card tarjeta-color tono-ambar">
+          <span class="summary-icon"><i class="bi bi-check2-circle"></i></span>
+          <div><strong id="finals">0</strong><span>finales</span></div>
+        </article>
+      </section>
+
+      <section aria-labelledby="list-title">
+        <div class="section-heading">
+          <h2 id="list-title">Registro del equipo</h2>
+          <a class="text-action" id="link-phases" href="#">Ver fases <i class="bi bi-arrow-up-right"></i></a>
+        </div>
+        <div id="deliverables" class="grid gap-2.5" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <dialog id="deliverable-dialog" class="app-dialog">
+      <form id="deliverable-form" method="dialog" class="dialog-form" novalidate>
+        <div class="dialog-header">
+          <div><p class="eyebrow">Registro</p><h2 id="dialog-title">Registrar documento</h2></div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <input id="deliverable-id" type="hidden">
+
+        <label class="form-field">Enlace al documento
+          <input id="deliverable-url" type="url" required maxlength="600" placeholder="https://docs.google.com/document/…">
+          <span class="field-hint">El tipo se deduce del enlace (Canva, Google Docs, GitHub…).</span>
+        </label>
+        <label class="form-field">Nombre
+          <input id="deliverable-name" required maxlength="150" placeholder="Informe final">
+        </label>
+        <label class="form-field">Descripción <span class="font-normal text-muted">(opcional)</span>
+          <textarea id="deliverable-description" rows="2" maxlength="400" placeholder="Qué contiene y qué falta."></textarea>
+        </label>
+
+        <div class="form-grid-two">
+          <label class="form-field">Tipo
+            <select id="deliverable-type">
+              <option value="">Detectar del enlace</option>
+              <option value="DOCUMENTO">Documento</option>
+              <option value="PRESENTACION">Presentación</option>
+              <option value="DISENO">Diseño</option>
+              <option value="HOJA_CALCULO">Hoja de cálculo</option>
+              <option value="CODIGO">Repositorio</option>
+              <option value="VIDEO">Video</option>
+              <option value="OTRO">Otro</option>
+            </select>
+          </label>
+          <label class="form-field">Estado
+            <select id="deliverable-state">
+              <option value="BORRADOR">Borrador</option>
+              <option value="EN_REVISION">En revisión</option>
+              <option value="FINAL">Final</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="form-field">Responsable
+          <select id="deliverable-owner"><option value="">Sin asignar</option></select>
+        </label>
+
+        <p id="deliverable-feedback" class="form-feedback" role="alert"></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
+          <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/entregables.js}" src="/js/entregables.js" defer></script>
+  </body>
+</html>

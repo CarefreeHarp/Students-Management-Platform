@@ -7,8 +7,23 @@
 
     <main id="contenido" class="page-shell">
       <a class="back-link" th:href="@{/proyectos}" href="/proyectos"><i class="bi bi-arrow-left"></i> Todos los proyectos</a>
+
+      <!-- Secciones del espacio de trabajo. Los enlaces los resuelve Thymeleaf
+           con el código del proyecto, sin depender del JavaScript de la página. -->
+      <nav class="mb-5 flex flex-wrap gap-2.5" aria-label="Secciones del proyecto">
+        <a class="btn btn-secondary btn-sm" th:href="@{'/proyectos/' + ${projectId} + '/canales'}" href="#">
+          <i class="bi bi-chat-dots"></i> Canales
+        </a>
+        <a class="btn btn-secondary btn-sm" th:href="@{'/proyectos/' + ${projectId} + '/fases'}" href="#">
+          <i class="bi bi-diagram-3"></i> Fases y dependencias
+        </a>
+        <a class="btn btn-secondary btn-sm" th:href="@{'/proyectos/' + ${projectId} + '/entregables'}" href="#">
+          <i class="bi bi-folder2-open"></i> Documentos y entregables
+        </a>
+      </nav>
+
       <div id="project-content" aria-live="polite">
-        <section class="empty-state"><i class="bi bi-arrow-repeat text-2xl text-primary"></i><p>Cargando espacio de trabajo…</p></section>
+        <section class="empty-state"><div><i class="bi bi-arrow-repeat text-2xl text-primary"></i><p>Cargando el proyecto…</p></div></section>
       </div>
     </main>
 
@@ -27,7 +42,7 @@
         </div>
         <div class="form-grid-two">
           <label class="form-field">Etapa<select id="task-stage-input"><option>Planeación</option><option>Investigación</option><option>Diseño</option><option>Desarrollo</option><option>Entrega</option></select></label>
-          <label class="form-field">Estado<select id="task-status-input"><option value="pending">Pendiente</option><option value="in-progress">En curso</option><option value="completed">Completada</option></select></label>
+          <label class="form-field">Estado<select id="task-status-input"><option value="sin-empezar">Sin empezar</option><option value="en-proceso">En proceso</option><option value="en-revision">En revisión</option><option value="terminada">Terminada</option></select></label>
         </div>
         <div class="dialog-actions">
           <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
@@ -69,13 +84,13 @@
       </section>
 
       <section class="mb-6 grid gap-4 md:grid-cols-3" aria-label="Resumen del proyecto">
-        <article class="panel">
+        <article class="tarjeta-color tono-indigo">
           <span class="overview-label text-xs font-extrabold uppercase text-muted">Avance general</span>
           <strong class="detail-progress-value my-1.5 block font-display text-3xl"></strong>
           <div class="progress-track" aria-hidden="true"><span class="progress-fill"></span></div>
           <span class="progress-caption mt-2 block text-xs text-muted"></span>
         </article>
-        <article class="panel flex items-center gap-3.5">
+        <article class="tarjeta-color tono-ambar flex items-center gap-3.5">
           <span class="overview-icon"><i class="bi bi-calendar-event"></i></span>
           <div>
             <span class="overview-label text-xs font-extrabold uppercase text-muted">Entrega final</span>
@@ -83,7 +98,7 @@
             <span class="detail-days-left text-xs text-muted"></span>
           </div>
         </article>
-        <article class="panel flex items-center gap-3.5">
+        <article class="tarjeta-color tono-verde flex items-center gap-3.5">
           <span class="overview-icon"><i class="bi bi-people"></i></span>
           <div>
             <span class="overview-label text-xs font-extrabold uppercase text-muted">Equipo</span>
@@ -108,16 +123,17 @@
             <label class="sr-only" for="task-status-filter">Filtrar por estado</label>
             <select id="task-status-filter">
               <option value="all">Todas las tareas</option>
-              <option value="pending">Pendientes</option>
-              <option value="in-progress">En curso</option>
-              <option value="completed">Completadas</option>
+              <option value="sin-empezar">Sin empezar</option>
+              <option value="en-proceso">En proceso</option>
+              <option value="en-revision">En revisión</option>
+              <option value="terminada">Terminadas</option>
             </select>
           </div>
         </div>
         <div id="project-tasks" class="task-cards-grid"></div>
       </section>
 
-      <section class="panel flex flex-wrap items-center justify-between gap-4" aria-label="Administrar proyecto">
+      <section class="tarjeta-color tono-indigo flex flex-wrap items-center justify-between gap-4" aria-label="Administrar proyecto">
         <div>
           <p class="eyebrow">Ajustes rápidos</p>
           <h2>Mantén tu proyecto al día</h2>
@@ -142,7 +158,10 @@
         <div class="task-card-meta"><span class="task-stage"></span><span class="task-date"><i class="bi bi-calendar3"></i><time></time></span></div>
         <div class="task-card-footer">
           <span class="task-assignee"><i class="assignee-dot"></i><span></span></span>
-          <label class="file-control"><input class="task-file-input" type="file"><i class="bi bi-paperclip"></i><span class="file-name">Adjuntar</span></label>
+          <a class="file-control" th:href="@{'/proyectos/' + ${projectId} + '/canales'}" href="#"
+             title="Los archivos del equipo se comparten en los canales del proyecto">
+            <i class="bi bi-paperclip"></i><span>Archivos</span>
+          </a>
         </div>
       </article>
     </template>

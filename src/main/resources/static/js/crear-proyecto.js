@@ -210,6 +210,53 @@
     showToast("Plan inicial generado con IA. Revísalo y ajústalo a tu equipo.", "success");
   }
 
+  /*
+   * Organizador de proyectos.
+   * Pide al backend un plan con el número de tareas indicado; el servicio
+   * reparte las fases y calcula el plazo de cada tarea hasta la entrega.
+   */
+  async function organizeWithAI() {
+    const button = document.querySelector("#organize-button");
+    const requested = Number(document.querySelector("#task-count").value) || 5;
+    const original = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Organizando…';
+
+    try {
+      const response = await fetch(window.App.ROUTES.api.organizadorPlan, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombreProyecto: document.querySelector("#project-name").value.trim(),
+          descripcion: document.querySelector("#project-description").value.trim(),
+          fechaEntrega: document.querySelector("#project-due-date").value || null,
+          numeroTareas: requested,
+          integrantes: currentMembers().map((member) => member.name).filter(Boolean)
+        })
+      });
+      if (!response.ok) throw new Error("El organizador no respondió correctamente.");
+      const plan = await response.json();
+
+      document.querySelector("#tasks-list").replaceChildren();
+      const members = currentMembers();
+      plan.tareas.forEach((task) => {
+        const member = members.find((item) => item.name === task.responsable);
+        addTask({ title: task.titulo, dueDate: task.fechaLimite, assigneeId: member?.id, stage: task.etapa });
+      });
+
+      const hint = document.querySelector("#ai-hint");
+      hint.classList.add("is-filled");
+      hint.querySelector("p").textContent = plan.resumen;
+      renderCalendar();
+      showToast(`Proyecto organizado en ${plan.numeroTareas} tareas repartidas en ${plan.diasDisponibles} días.`, "success");
+    } catch (error) {
+      showToast(error.message, "error");
+    } finally {
+      button.disabled = false;
+      button.innerHTML = original;
+    }
+  }
+
   function updateProjectProgress(project) {
     if (typeof app.updateProjectProgress === "function") {
       const result = app.updateProjectProgress(project);
@@ -219,7 +266,13 @@
     project.progress = 0;
   }
 
-  function createProject(event) {
+  /*
+   * Crea el proyecto en el servidor. Antes se guardaba solo en localStorage y
+   * la redirección apuntaba a un identificador que la base no conocía: la
+   * página del proyecto se quedaba cargando. Ahora se usa el código que
+   * devuelve la API, que es el mismo que aparece en la URL.
+   */
+  async function createProject(event) {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.checkValidity()) {
@@ -236,22 +289,51 @@
       showToast("Añade por lo menos una tarea inicial.", "warning");
       return;
     }
-    const project = {
-      id: uid(),
-      name: document.querySelector("#project-name").value.trim(),
-      description: document.querySelector("#project-description").value.trim(),
-      dueDate: document.querySelector("#project-due-date").value,
-      stage: document.querySelector("#project-stage").value,
-      color: COLORS[getProjects().length % COLORS.length],
-      members,
-      tasks,
-      progress: 0,
-      createdAt: new Date().toISOString()
-    };
-    updateProjectProgress(project);
-    saveProjects([...getProjects(), project]);
-    showToast("Proyecto creado. Tu planificación inicial ya está lista.", "success");
-    window.location.assign(`/proyectos/${encodeURIComponent(project.id)}`);
+
+    const boton = form.querySelector("button[type='submit']");
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<i class="bi bi-hourglass-split"></i> Creando…';
+
+    try {
+      const respuesta = await fetch("/api/proyectos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: document.querySelector("#project-name").value.trim(),
+          descripcion: document.querySelector("#project-description").value.trim(),
+          fechaEntrega: document.querySelector("#project-due-date").value || null,
+          etapaInicial: document.querySelector("#project-stage").value,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          // El primer integrante es siempre quien crea: el servidor lo añade solo.
+          integrantes: members.slice(1).map((member) => ({
+            nombre: member.name,
+            contacto: member.contact || null
+          })),
+          tareas: tasks.map((task) => ({
+            titulo: task.title,
+            descripcion: null,
+            responsable: task.assignee === "Sin asignar" ? null : task.assignee,
+            etapa: task.stage,
+            fechaLimite: task.dueDate || null,
+            horaLimite: "09:00",
+            estado: "sin-empezar"
+          }))
+        })
+      });
+
+      if (!respuesta.ok) {
+        const detalle = await respuesta.json().catch(() => ({}));
+        throw new Error(detalle.detail || "No se pudo crear el proyecto.");
+      }
+      const proyecto = await respuesta.json();
+      showToast("Proyecto creado. Abriendo su espacio de trabajo…", "success");
+      window.location.assign(`/proyectos/${encodeURIComponent(proyecto.codigo)}`);
+    } catch (error) {
+      showToast(error.message, "error");
+      boton.disabled = false;
+      boton.innerHTML = textoOriginal;
+    }
   }
 
   function init() {
@@ -262,6 +344,7 @@
     document.querySelector("#add-member").addEventListener("click", () => addMember());
     document.querySelector("#add-task").addEventListener("click", () => addTask());
     document.querySelector("#ai-fill-button").addEventListener("click", fillWithAI);
+    document.querySelector("#organize-button")?.addEventListener("click", organizeWithAI);
     document.querySelector("#create-project-form").addEventListener("submit", createProject);
     addMember({ name: "Tú" });
     addTask();

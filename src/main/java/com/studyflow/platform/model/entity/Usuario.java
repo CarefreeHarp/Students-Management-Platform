@@ -31,8 +31,12 @@ public class Usuario {
     @Column(nullable = false, length = 80)
     private String nombre;
 
-    @NotBlank
-    @Column(nullable = false, length = 80)
+    /**
+     * Opcional a propósito: se puede entrar escribiendo solo un nombre, y hay
+     * personas con un único apellido o con uno solo. Exigirlo rompía el acceso
+     * rápido con un error de validación.
+     */
+    @Column(length = 80)
     private String apellido;
 
     @Email
@@ -72,6 +76,6 @@ public class Usuario {
     private LocalDateTime fechaRegistro = LocalDateTime.now();
 
     public String getNombreCompleto() {
-        return (nombre + " " + apellido).trim();
+        return (nombre + " " + (apellido == null ? "" : apellido)).trim();
     }
 }

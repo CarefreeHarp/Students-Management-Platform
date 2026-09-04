@@ -1,164 +1,162 @@
+/*
+ * Listado de proyectos. Consume la API REST, de modo que los códigos de los
+ * proyectos coinciden con los de la base y los enlaces abren el proyecto real.
+ */
 (() => {
   "use strict";
 
-  const COLORS = ["#7259e9", "#4d89f8", "#ee8a54", "#36aa8a", "#d7639d", "#5b91b4"];
   const app = window.App || {};
-  let selectedFilter = "all";
-  let searchTerm = "";
+  const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
 
-  const memberName = (member) => {
-    if (typeof member === "string") return member;
-    return member?.name || member?.username || member?.email || "Sin asignar";
-  };
+  let proyectos = [];
+  let filtro = "all";
+  let busqueda = "";
 
-  const dateFromValue = (value) => {
-    if (!value) return null;
-    const normalized = String(value).length === 10 ? `${value}T12:00:00` : value;
-    const date = new Date(normalized);
-    return Number.isNaN(date.getTime()) ? null : date;
-  };
+  const $ = (selector) => document.querySelector(selector);
 
-  const formatDate = (value, fallback = "Sin fecha") => {
-    if (!value) return fallback;
-    if (typeof app.formatDate === "function") return app.formatDate(value);
-    const date = dateFromValue(value);
-    return date ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(date) : fallback;
-  };
-
-  const getProjects = () => {
-    const projects = typeof app.getProjects === "function" ? app.getProjects() : [];
-    return Array.isArray(projects) ? projects : [];
-  };
-
-  const tasksOf = (project) => Array.isArray(project?.tasks) ? project.tasks : [];
-  const isTaskCompleted = (task) => ["completed", "complete", "done", "completada", "terminada"].includes(String(task?.status || "").toLowerCase());
-
-  const progressOf = (project) => {
-    const numericProgress = Number(project?.progress);
-    if (Number.isFinite(numericProgress)) return Math.max(0, Math.min(100, Math.round(numericProgress)));
-    const tasks = tasksOf(project);
-    return tasks.length ? Math.round((tasks.filter(isTaskCompleted).length / tasks.length) * 100) : 0;
-  };
-
-  const showToast = (message, type = "info") => {
-    if (typeof app.showToast === "function") app.showToast(message, type);
-  };
-
-  function renderNavigation() {
-    if (typeof app.renderNavigation === "function") app.renderNavigation();
-  }
-
-  function renderMemberStack(target, members) {
-    target.replaceChildren();
-    const visibleMembers = members.slice(0, 4);
-    visibleMembers.forEach((member, index) => {
-      const avatar = document.createElement("span");
-      const name = memberName(member);
-      avatar.className = "member-avatar";
-      avatar.style.setProperty("--member-color", member?.color || COLORS[index % COLORS.length]);
-      avatar.title = name;
-      avatar.textContent = name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("").toUpperCase() || "?";
-      target.append(avatar);
-    });
-    if (members.length > visibleMembers.length) {
-      const rest = document.createElement("span");
-      rest.className = "member-avatar member-overflow";
-      rest.title = `${members.length - visibleMembers.length} integrantes más`;
-      rest.textContent = `+${members.length - visibleMembers.length}`;
-      target.append(rest);
+  async function pedir(url) {
+    const respuesta = await fetch(url, { headers: { "Content-Type": "application/json" } });
+    // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
+    if (respuesta.status === 401) {
+      window.location.assign("/login");
+      throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
+    if (!respuesta.ok) {
+      const detalle = await respuesta.json().catch(() => ({}));
+      throw new Error(detalle.detail || `Error ${respuesta.status}`);
+    }
+    return respuesta.json();
   }
 
-  function renderSummary(projects) {
-    const activeProjects = projects.filter((project) => progressOf(project) < 100);
-    const allTasks = projects.flatMap(tasksOf);
-    document.querySelector("#total-projects").textContent = String(activeProjects.length);
-    document.querySelector("#completed-tasks").textContent = String(allTasks.filter(isTaskCompleted).length);
-
-    const next = activeProjects
-      .filter((project) => dateFromValue(project.dueDate))
-      .sort((a, b) => dateFromValue(a.dueDate) - dateFromValue(b.dueDate))[0];
-    document.querySelector("#next-deadline").textContent = next ? formatDate(next.dueDate) : "—";
+  function fechaCorta(iso) {
+    if (!iso) return "Sin fecha";
+    const fecha = new Date(`${iso}T12:00:00`);
+    return Number.isNaN(fecha.getTime())
+      ? iso
+      : new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(fecha).replace(".", "");
   }
 
-  function projectMatches(project) {
-    const progress = progressOf(project);
-    const isCompleted = progress >= 100;
-    if (selectedFilter === "active" && isCompleted) return false;
-    if (selectedFilter === "completed" && !isCompleted) return false;
-    if (!searchTerm) return true;
-    const haystack = [project.name, project.description, ...(Array.isArray(project.members) ? project.members.map(memberName) : [])]
-      .join(" ")
-      .toLocaleLowerCase("es");
-    return haystack.includes(searchTerm);
+  function coincide(proyecto) {
+    const terminado = proyecto.progreso >= 100;
+    if (filtro === "active" && terminado) return false;
+    if (filtro === "completed" && !terminado) return false;
+    if (!busqueda) return true;
+    return [proyecto.nombre, proyecto.descripcion,
+            ...proyecto.integrantes.map((integrante) => integrante.nombre)]
+      .join(" ").toLocaleLowerCase("es").includes(busqueda);
   }
 
-  function renderProjects() {
-    const projects = getProjects();
-    const displayed = projects.filter(projectMatches);
-    const grid = document.querySelector("#projects-grid");
-    const countLabel = document.querySelector("#project-count-label");
-    countLabel.textContent = `${displayed.length} proyecto${displayed.length === 1 ? "" : "s"}`;
-    grid.replaceChildren();
+  function pintarResumen() {
+    const activos = proyectos.filter((proyecto) => proyecto.progreso < 100);
+    const tareas = proyectos.flatMap((proyecto) => proyecto.tareas);
 
-    if (!displayed.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty-projects";
-      empty.innerHTML = "<div><i class=\"bi bi-folder2-open\" aria-hidden=\"true\"></i><h3>No encontramos proyectos</h3><p>Ajusta la búsqueda o crea un nuevo espacio para tu próxima entrega.</p><a class=\"btn btn-primary\" href=\"/proyectos/nuevo\"><i class=\"bi bi-plus-lg\"></i> Crear proyecto</a></div>";
-      grid.append(empty);
+    $("#total-projects").textContent = String(activos.length);
+    $("#completed-tasks").textContent =
+      String(tareas.filter((tarea) => tarea.estado === "terminada").length);
+
+    const proxima = activos
+      .filter((proyecto) => proyecto.fechaEntrega)
+      .sort((a, b) => a.fechaEntrega.localeCompare(b.fechaEntrega))[0];
+    $("#next-deadline").textContent = proxima ? fechaCorta(proxima.fechaEntrega) : "—";
+  }
+
+  function pintarProyectos() {
+    const visibles = proyectos.filter(coincide);
+    const rejilla = $("#projects-grid");
+
+    $("#project-count-label").textContent =
+      `${visibles.length} proyecto${visibles.length === 1 ? "" : "s"}`;
+
+    if (!visibles.length) {
+      // Se distingue "no hay nada" de "el filtro no encuentra nada": una cuenta
+      // recién creada no participa en ningún proyecto, y eso confunde si no se
+      // explica.
+      const cuentaVacia = !proyectos.length && !busqueda && filtro === "all";
+      rejilla.innerHTML = cuentaVacia
+        ? `<div class="empty-projects"><div>
+             <i class="bi bi-folder2-open text-2xl text-primary"></i>
+             <h3>Tu cuenta todavía no tiene proyectos</h3>
+             <p>Crea el primero, o entra con la cuenta de ejemplo si quieres ver la
+                aplicación con proyectos, canales y tareas ya cargados.</p>
+             <div class="mt-3 flex flex-wrap justify-center gap-2.5">
+               <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> Crear proyecto</a>
+               <button class="btn btn-secondary" type="button" id="ver-ejemplo">
+                 <i class="bi bi-box-seam"></i> Ver datos de ejemplo
+               </button>
+             </div>
+           </div></div>`
+        : `<div class="empty-projects"><div>
+             <i class="bi bi-search text-2xl text-primary"></i>
+             <h3>Ningún proyecto coincide</h3>
+             <p>Ajusta la búsqueda o cambia el filtro.</p>
+           </div></div>`;
+
+      document.querySelector("#ver-ejemplo")?.addEventListener("click", async () => {
+        await fetch("/api/sesion/demostracion", { method: "POST" });
+        window.location.reload();
+      });
       return;
     }
 
-    const template = document.querySelector("#project-card-template");
-    displayed.forEach((project, index) => {
-      const fragment = template.content.cloneNode(true);
-      const card = fragment.querySelector(".project-card");
-      const link = fragment.querySelector(".project-card-link");
-      const progress = progressOf(project);
-      const members = Array.isArray(project.members) ? project.members : [];
-      const color = project.color || COLORS[index % COLORS.length];
-      const state = progress >= 100 ? "Finalizado" : (project.stage || "En curso");
+    const plantilla = $("#project-card-template");
+    rejilla.replaceChildren();
 
-      card.style.setProperty("--card-color", color);
-      if (progress >= 100) {
-        card.style.setProperty("--state-bg", "#e8f8ef");
-        card.style.setProperty("--state-color", "#27865a");
-      }
-      link.href = `/proyectos/${encodeURIComponent(project.id)}`;
-      link.setAttribute("aria-label", `Abrir proyecto ${project.name || "sin nombre"}`);
-      fragment.querySelector(".project-name").textContent = project.name || "Proyecto sin nombre";
-      fragment.querySelector(".project-description").textContent = project.description || "Sin descripción todavía.";
-      fragment.querySelector(".project-state").textContent = state;
-      fragment.querySelector(".project-deadline").textContent = formatDate(project.dueDate);
-      fragment.querySelector(".project-task-count").textContent = `${tasksOf(project).length} tarea${tasksOf(project).length === 1 ? "" : "s"}`;
-      fragment.querySelector(".project-progress-value").textContent = `${progress}%`;
-      fragment.querySelector(".progress-fill").style.setProperty("--progress", `${progress}%`);
-      renderMemberStack(fragment.querySelector(".member-stack"), members);
-      grid.append(fragment);
+    visibles.forEach((proyecto) => {
+      const fragmento = plantilla.content.cloneNode(true);
+      const tarjeta = fragmento.querySelector(".project-card");
+      const enlace = fragmento.querySelector(".project-card-link");
+
+      tarjeta.style.setProperty("--card-color", proyecto.color || "#5b5ce2");
+      enlace.href = `/proyectos/${encodeURIComponent(proyecto.codigo)}`;
+      enlace.setAttribute("aria-label", `Abrir proyecto ${proyecto.nombre}`);
+
+      fragmento.querySelector(".project-name").textContent = proyecto.nombre;
+      fragmento.querySelector(".project-description").textContent =
+        proyecto.descripcion || "Sin descripción todavía.";
+      fragmento.querySelector(".project-state").textContent =
+        proyecto.progreso >= 100 ? "Finalizado" : proyecto.etapaActual || "En curso";
+      fragmento.querySelector(".project-deadline").textContent = fechaCorta(proyecto.fechaEntrega);
+      fragmento.querySelector(".project-task-count").textContent =
+        `${proyecto.tareas.length} tarea${proyecto.tareas.length === 1 ? "" : "s"}`;
+      fragmento.querySelector(".project-progress-value").textContent = `${proyecto.progreso}%`;
+      fragmento.querySelector(".progress-fill").style.setProperty("--progress", `${proyecto.progreso}%`);
+
+      fragmento.querySelector(".member-stack").innerHTML = proyecto.integrantes.slice(0, 4)
+        .map((integrante) =>
+          `<span class="member-avatar" style="--member-color:${esc(integrante.color)}" title="${esc(integrante.nombre)}">${esc(integrante.iniciales || "?")}</span>`)
+        .join("")
+        + (proyecto.integrantes.length > 4
+            ? `<span class="member-avatar member-overflow">+${proyecto.integrantes.length - 4}</span>`
+            : "");
+
+      rejilla.append(fragmento);
     });
   }
 
-  function bindControls() {
-    document.querySelector("#project-search").addEventListener("input", (event) => {
-      searchTerm = event.target.value.trim().toLocaleLowerCase("es");
-      renderProjects();
+  async function init() {
+    if (typeof app.renderNavigation === "function") app.renderNavigation();
+
+    $("#project-search").addEventListener("input", (evento) => {
+      busqueda = evento.target.value.trim().toLocaleLowerCase("es");
+      pintarProyectos();
     });
-    document.querySelectorAll(".filter-button").forEach((button) => {
-      button.addEventListener("click", () => {
-        selectedFilter = button.dataset.filter || "all";
-        document.querySelectorAll(".filter-button").forEach((item) => item.classList.toggle("is-active", item === button));
-        renderProjects();
+    document.querySelectorAll(".filter-button").forEach((boton) => {
+      boton.addEventListener("click", () => {
+        filtro = boton.dataset.filter || "all";
+        document.querySelectorAll(".filter-button")
+          .forEach((otro) => otro.classList.toggle("is-active", otro === boton));
+        pintarProyectos();
       });
     });
-  }
 
-  function init() {
-    renderNavigation();
-    const projects = getProjects();
-    renderSummary(projects);
-    renderProjects();
-    bindControls();
-    if (!projects.length) showToast("Aún no tienes proyectos. Crea el primero para empezar.");
+    try {
+      proyectos = await pedir("/api/proyectos");
+      pintarResumen();
+      pintarProyectos();
+    } catch (error) {
+      $("#projects-grid").innerHTML =
+        `<div class="empty-projects"><div><p class="text-danger">No se pudieron cargar los proyectos.</p><p>${esc(error.message)}</p></div></div>`;
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

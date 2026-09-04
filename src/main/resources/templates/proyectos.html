@@ -18,15 +18,15 @@
       </section>
 
       <section class="mb-6 grid gap-4 sm:grid-cols-3" aria-label="Resumen de proyectos">
-        <article class="summary-card">
+        <article class="summary-card tarjeta-color tono-indigo">
           <span class="summary-icon"><i class="bi bi-collection"></i></span>
           <div><strong id="total-projects">0</strong><span>proyectos activos</span></div>
         </article>
-        <article class="summary-card summary-card--blue">
+        <article class="summary-card tarjeta-color tono-cian">
           <span class="summary-icon"><i class="bi bi-check2-circle"></i></span>
           <div><strong id="completed-tasks">0</strong><span>tareas completadas</span></div>
         </article>
-        <article class="summary-card summary-card--orange">
+        <article class="summary-card tarjeta-color tono-ambar">
           <span class="summary-icon"><i class="bi bi-calendar-event"></i></span>
           <div><strong id="next-deadline">—</strong><span>próxima entrega</span></div>
         </article>
@@ -39,9 +39,9 @@
           <input id="project-search" type="search" autocomplete="off" placeholder="Buscar por nombre o integrante">
         </label>
         <div class="flex gap-1.5 rounded-[12px] border border-line bg-white p-1" role="group" aria-label="Filtrar proyectos">
-          <button class="filter-button btn btn-sm btn-ghost is-active" type="button" data-filter="all">Todos</button>
-          <button class="filter-button btn btn-sm btn-ghost" type="button" data-filter="active">En curso</button>
-          <button class="filter-button btn btn-sm btn-ghost" type="button" data-filter="completed">Finalizados</button>
+          <button class="filter-button is-active" type="button" data-filter="all">Todos</button>
+          <button class="filter-button" type="button" data-filter="active">En curso</button>
+          <button class="filter-button" type="button" data-filter="completed">Finalizados</button>
         </div>
       </section>
 

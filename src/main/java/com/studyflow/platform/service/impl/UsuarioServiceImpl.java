@@ -7,6 +7,7 @@ import com.studyflow.platform.model.entity.Universidad;
 import com.studyflow.platform.model.entity.Usuario;
 import com.studyflow.platform.repository.UniversidadRepository;
 import com.studyflow.platform.repository.UsuarioRepository;
+import com.studyflow.platform.service.SesionService;
 import com.studyflow.platform.service.UsuarioService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,21 +23,24 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UniversidadRepository universidadRepository;
     private final UsuarioMapper usuarioMapper;
+    private final SesionService sesionService;
 
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
                               UniversidadRepository universidadRepository,
-                              UsuarioMapper usuarioMapper) {
+                              UsuarioMapper usuarioMapper,
+                              SesionService sesionService) {
         this.usuarioRepository = usuarioRepository;
         this.universidadRepository = universidadRepository;
         this.usuarioMapper = usuarioMapper;
+        this.sesionService = sesionService;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Usuario obtenerActual() {
-        return usuarioRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new RecursoNoEncontradoException("usuario", "actual"));
+        // Delegado en la sesión: antes devolvía siempre el primer usuario, lo que
+        // atribuía todos los mensajes y tareas a la misma persona.
+        return sesionService.usuarioActual();
     }
 
     @Override
@@ -50,6 +54,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario obtenerPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("usuario", id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario obtenerPorCorreo(String correo) {
+        return usuarioRepository.findByCorreoIgnoreCase(correo)
+                .orElseThrow(() -> new RecursoNoEncontradoException("usuario", correo));
     }
 
     @Override

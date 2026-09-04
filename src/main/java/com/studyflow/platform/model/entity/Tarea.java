@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Tarea de un proyecto, con responsable, fecha, etapa, estado y archivos adjuntos. */
 @Entity
@@ -54,9 +56,23 @@ public class Tarea {
     @Column(name = "hora_limite")
     private LocalTime horaLimite;
 
-    @Enumerated(EnumType.STRING)
+    /**
+     * Se usa un convertidor en lugar de {@code @Enumerated} para que una base
+     * creada con los estados anteriores se siga pudiendo leer.
+     */
+    @Convert(converter = com.studyflow.platform.model.enums.EstadoTareaConverter.class)
     @Column(nullable = false, length = 20)
-    private EstadoTarea estado = EstadoTarea.PENDIENTE;
+    private EstadoTarea estado = EstadoTarea.SIN_EMPEZAR;
+
+    /**
+     * Tareas que deben terminarse antes que esta. Alimentan el diagrama de fases
+     * y determinan si una tarea esta disponible para que alguien la reclame.
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "tarea_dependencia",
+            joinColumns = @JoinColumn(name = "tarea_id"),
+            inverseJoinColumns = @JoinColumn(name = "depende_de_id"))
+    private Set<Tarea> dependencias = new LinkedHashSet<>();
 
     @Column(name = "fecha_completada")
     private LocalDateTime fechaCompletada;
@@ -69,6 +85,21 @@ public class Tarea {
     private List<ArchivoTarea> archivos = new ArrayList<>();
 
     public boolean estaCompletada() {
-        return estado == EstadoTarea.COMPLETADA;
+        return estado == EstadoTarea.TERMINADA;
+    }
+
+    /**
+     * Una tarea esta disponible para reclamarse cuando nadie la ha tomado
+     * y todas sus dependencias estan terminadas.
+     */
+    public boolean estaDisponible() {
+        return responsable == null
+                && estado.estaAbierta()
+                && dependencias.stream().allMatch(Tarea::estaCompletada);
+    }
+
+    /** Dependencias que aun bloquean el arranque de esta tarea. */
+    public List<Tarea> bloqueantes() {
+        return dependencias.stream().filter(dependencia -> !dependencia.estaCompletada()).toList();
     }
 }

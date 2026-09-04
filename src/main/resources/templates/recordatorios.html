@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Recordatorios', 'Configura tus recordatorios de WhatsApp y anota lo importante de cada clase.')}"></head>
+  <body data-page="recordatorios">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell">
+      <section class="page-heading" aria-labelledby="recordatorios-title">
+        <div>
+          <p class="eyebrow"><i class="bi bi-whatsapp"></i> Avisos por WhatsApp</p>
+          <h1 id="recordatorios-title">Recordatorios</h1>
+          <p class="mt-2 max-w-[62ch] text-muted">
+            Decide con cuánta antelación quieres recibir el aviso de cada tipo de vencimiento.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2.5">
+          <button id="test-message" class="btn btn-secondary" type="button"><i class="bi bi-send"></i> Enviar prueba</button>
+          <button id="reprogram" class="btn btn-primary" type="button"><i class="bi bi-arrow-repeat"></i> Recalcular agenda</button>
+        </div>
+      </section>
+
+      <!-- Estado de la pasarela: avisa si aún se está en modo simulación -->
+      <div id="gateway-status" class="mb-5 hidden items-start gap-3 rounded border p-4 text-[13px]" role="status"></div>
+
+      <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+        <!-- Configuración -->
+        <section class="panel grid gap-4" aria-labelledby="config-title">
+          <div class="flex items-center gap-3">
+            <span class="schedule-icon-badge"><i class="bi bi-sliders"></i></span>
+            <div>
+              <h2 id="config-title">Configuración</h2>
+              <p class="text-[13px] text-muted">Canal, número y antelación de cada aviso.</p>
+            </div>
+          </div>
+
+          <form id="preferences-form" class="cuadro-formulario grid gap-3.5" novalidate>
+            <label class="check-label" for="reminders-active">
+              <input id="reminders-active" name="activo" type="checkbox" checked>
+              <span>Recibir recordatorios</span>
+            </label>
+
+            <div class="form-field">
+              <label for="whatsapp-phone">Número de WhatsApp</label>
+              <span class="input-wrap">
+                <i class="bi bi-whatsapp" aria-hidden="true"></i>
+                <input id="whatsapp-phone" name="telefonoWhatsapp" type="tel" placeholder="573001112233" maxlength="15">
+              </span>
+              <span class="field-hint">Formato internacional, solo números (indicativo del país + número).</span>
+            </div>
+
+            <div class="form-field">
+              <label for="advance-task">Tareas · avisar con</label>
+              <select id="advance-task" name="minutosAntesTarea">
+                <option value="60">1 hora antes</option>
+                <option value="180">3 horas antes</option>
+                <option value="720">12 horas antes</option>
+                <option value="1440" selected>1 día antes</option>
+                <option value="2880">2 días antes</option>
+                <option value="4320">3 días antes</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="advance-delivery">Entregas de proyecto · avisar con</label>
+              <select id="advance-delivery" name="minutosAntesEntrega">
+                <option value="1440">1 día antes</option>
+                <option value="2880">2 días antes</option>
+                <option value="4320" selected>3 días antes</option>
+                <option value="10080">1 semana antes</option>
+                <option value="20160">2 semanas antes</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="advance-note">Pendientes de clase · avisar con</label>
+              <select id="advance-note" name="minutosAntesApunte">
+                <option value="60">1 hora antes</option>
+                <option value="120" selected>2 horas antes</option>
+                <option value="720">12 horas antes</option>
+                <option value="1440">1 día antes</option>
+              </select>
+            </div>
+
+            <div class="form-grid-two">
+              <div class="form-field">
+                <label for="quiet-from">No molestar desde</label>
+                <input id="quiet-from" name="silencioDesde" type="time" value="22:00">
+              </div>
+              <div class="form-field">
+                <label for="quiet-to">Hasta</label>
+                <input id="quiet-to" name="silencioHasta" type="time" value="07:00">
+              </div>
+            </div>
+            <span class="field-hint">Los avisos que caigan en esa franja se envían al terminar.</span>
+
+            <p id="preferences-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar configuración</button>
+          </form>
+        </section>
+
+        <div class="grid gap-5">
+          <!-- Apuntes de clase -->
+          <section class="panel" aria-labelledby="notes-title">
+            <div class="section-head flex-wrap">
+              <div>
+                <p class="eyebrow">Después de clase</p>
+                <h2 id="notes-title">Lo importante de hoy</h2>
+                <p>Anota lo que anunciaron en clase; si tiene fecha, se convierte en recordatorio.</p>
+              </div>
+            </div>
+
+            <form id="note-form" class="cuadro-formulario form-grid mb-4" novalidate>
+              <div class="form-field field-span-2">
+                <label for="note-title">¿Qué hay que recordar?</label>
+                <input id="note-title" name="titulo" type="text" maxlength="150" placeholder="Ej. Entregar el informe de laboratorio" required>
+              </div>
+              <div class="form-field">
+                <label for="note-subject">Materia</label>
+                <select id="note-subject" name="materiaId"><option value="">Sin materia</option></select>
+              </div>
+              <div class="form-field">
+                <label for="note-deadline">Fecha límite</label>
+                <input id="note-deadline" name="fechaLimite" type="date">
+              </div>
+              <div class="form-field field-span-2">
+                <label for="note-content">Detalle <span class="font-normal text-muted">(opcional)</span></label>
+                <textarea id="note-content" name="contenido" rows="2" maxlength="800" placeholder="Condiciones de la entrega, páginas, formato…"></textarea>
+              </div>
+              <label class="check-label field-span-2" for="note-important">
+                <input id="note-important" name="importante" type="checkbox">
+                <span>Marcar como prioritario</span>
+              </label>
+              <button class="btn btn-primary field-span-2" type="submit"><i class="bi bi-plus-lg"></i> Guardar apunte</button>
+            </form>
+
+            <div id="notes-list" class="grid gap-2.5" aria-live="polite"></div>
+          </section>
+
+          <!-- Agenda de avisos -->
+          <section class="panel" aria-labelledby="scheduled-title">
+            <div class="section-head flex-wrap">
+              <div>
+                <p class="eyebrow">Agenda</p>
+                <h2 id="scheduled-title">Recordatorios programados</h2>
+                <p id="scheduled-count">Sin recordatorios todavía.</p>
+              </div>
+            </div>
+            <div id="reminders-list" class="grid gap-2.5" aria-live="polite"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/recordatorios.js}" src="/js/recordatorios.js" defer></script>
+  </body>
+</html>

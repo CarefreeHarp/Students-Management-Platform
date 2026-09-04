@@ -69,7 +69,7 @@ public class TareaServiceImpl implements TareaService {
     @Override
     public TareaDTO marcarCompletada(Long tareaId, String nota) {
         Tarea tarea = obtener(tareaId);
-        tarea.setEstado(EstadoTarea.COMPLETADA);
+        tarea.setEstado(EstadoTarea.TERMINADA);
         tarea.setFechaCompletada(LocalDateTime.now());
         if (nota != null && !nota.isBlank()) {
             registroRepository.save(new RegistroAvance(
@@ -104,7 +104,7 @@ public class TareaServiceImpl implements TareaService {
                 ? LocalTime.parse(peticion.horaLimite())
                 : LocalTime.of(9, 0));
         tarea.setEstado(EstadoTarea.desdeClave(peticion.estado()));
-        if (tarea.getEstado() == EstadoTarea.COMPLETADA && tarea.getFechaCompletada() == null) {
+        if (tarea.getEstado() == EstadoTarea.TERMINADA && tarea.getFechaCompletada() == null) {
             tarea.setFechaCompletada(LocalDateTime.now());
         }
         proyecto.getIntegrantes().stream()

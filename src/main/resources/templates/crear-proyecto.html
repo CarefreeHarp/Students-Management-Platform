@@ -14,7 +14,14 @@
           <h1 id="create-project-title">Crea un nuevo proyecto</h1>
           <p class="mt-2 text-muted">Cuéntanos sobre tu entrega y construye un plan claro para tu equipo.</p>
         </div>
-        <button id="ai-fill-button" class="btn btn-ai" type="button"><i class="bi bi-magic"></i> Rellenar con IA</button>
+        <div class="flex flex-wrap items-end gap-2.5">
+          <div class="form-field">
+            <label for="task-count">Nº de tareas</label>
+            <input id="task-count" type="number" min="1" max="20" value="5" class="w-[92px]">
+          </div>
+          <button id="organize-button" class="btn btn-ai" type="button"><i class="bi bi-diagram-3"></i> Organizar con IA</button>
+          <button id="ai-fill-button" class="btn btn-secondary" type="button"><i class="bi bi-magic"></i> Rellenar con IA</button>
+        </div>
       </section>
 
       <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1.38fr)_minmax(310px,0.84fr)]">

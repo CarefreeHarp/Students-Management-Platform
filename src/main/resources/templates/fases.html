@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Fases del proyecto', 'Diagrama de fases, dependencias entre tareas y reparto del trabajo.')}"></head>
+  <body data-page="fases" th:attr="data-project-id=${projectId}">
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+
+    <main id="contenido" class="page-shell">
+      <a class="back-link" id="back-to-project" href="/proyectos"><i class="bi bi-arrow-left"></i> Volver al proyecto</a>
+
+      <section class="page-heading" aria-labelledby="fases-title">
+        <div>
+          <p class="eyebrow" id="project-label">Planificación</p>
+          <h1 id="fases-title">Diagrama de fases</h1>
+          <p class="mt-2 max-w-[62ch] text-muted">
+            Cada columna es una etapa. Las flechas indican qué tarea depende de cuál.
+          </p>
+        </div>
+        <a class="btn btn-secondary" id="link-deliverables" href="#"><i class="bi bi-folder2-open"></i> Entregables</a>
+      </section>
+
+      <!-- Tareas libres: cada persona elige la suya -->
+      <section class="tarjeta-color tono-cian mb-5 hover:translate-y-0" aria-labelledby="available-title">
+        <div class="section-head flex-wrap">
+          <div>
+            <p class="eyebrow">Reparto del trabajo</p>
+            <h2 id="available-title">Tareas disponibles</h2>
+            <p>Sin responsable y con sus dependencias ya terminadas. Elige la que quieras hacer.</p>
+          </div>
+          <span id="available-count" class="tag bg-primary-soft text-primary">0</span>
+        </div>
+        <div id="available-list" class="grid gap-2.5 md:grid-cols-2" aria-live="polite"></div>
+      </section>
+
+      <!-- Diagrama -->
+      <section class="tarjeta-color tono-indigo hover:translate-y-0" aria-labelledby="diagram-title">
+        <div class="section-head flex-wrap">
+          <div>
+            <p class="eyebrow">Mapa del proyecto</p>
+            <h2 id="diagram-title">Fases y dependencias</h2>
+            <p>Una tarea bloqueada muestra de qué depende.</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto rounded-sm border border-[#cdd3e6] bg-white/70 p-4">
+          <div id="diagram" class="flex min-w-max items-start gap-4"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Panel de una tarea -->
+    <dialog id="task-dialog" class="app-dialog">
+      <div class="dialog-form">
+        <div class="dialog-header">
+          <div><p class="eyebrow" id="task-stage">Etapa</p><h2 id="task-title">Tarea</h2></div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <p id="task-description" class="text-[13px] text-muted"></p>
+
+        <div class="form-field">
+          <label for="task-state">Estado</label>
+          <select id="task-state">
+            <option value="sin-empezar">Sin empezar</option>
+            <option value="en-proceso">En proceso</option>
+            <option value="en-revision">En revisión</option>
+            <option value="terminada">Terminada</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="task-dependency">Depende de</label>
+          <div class="flex gap-2">
+            <select id="task-dependency" class="flex-1"></select>
+            <button id="add-dependency" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus"></i></button>
+          </div>
+          <div id="dependency-list" class="mt-2 flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <p id="task-blocked" class="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] font-semibold text-[#8a5a12]" hidden></p>
+        <p id="task-feedback" class="form-feedback" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="release-task" class="btn btn-ghost" type="button">Liberar tarea</button>
+          <button id="claim-task" class="btn btn-primary" type="button"><i class="bi bi-hand-index"></i> Tomar esta tarea</button>
+        </div>
+      </div>
+    </dialog>
+
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/fases.js}" src="/js/fases.js" defer></script>
+  </body>
+</html>

@@ -17,6 +17,25 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+  <!--
+    El tema se aplica aquí, antes de pintar nada y de forma síncrona. Si se
+    dejara a main.js (que va con defer) la página se vería un instante en claro
+    antes de cambiar a oscuro: el clásico fogonazo blanco al cargar.
+    Sin preferencia guardada se sigue la del sistema.
+  -->
+  <script>
+    (function () {
+      try {
+        var guardado = localStorage.getItem('studyflow-tema');
+        var oscuro = guardado
+          ? guardado === 'oscuro'
+          : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', oscuro);
+      } catch (e) {
+        /* Sin almacenamiento (modo privado) se queda en claro, que es el defecto. */
+      }
+    })();
+  </script>
 </head>
 
 <body>

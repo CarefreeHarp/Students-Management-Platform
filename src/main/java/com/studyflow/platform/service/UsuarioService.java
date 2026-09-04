@@ -13,6 +13,8 @@ public interface UsuarioService {
 
     Usuario obtenerPorId(Long id);
 
+    Usuario obtenerPorCorreo(String correo);
+
     UsuarioDTO registrar(Usuario usuario, String universidad, String contrasena);
 
     UsuarioDTO actualizarPerfil(Long id, Usuario datos, String universidad);

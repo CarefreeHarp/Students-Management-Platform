@@ -1,519 +1,373 @@
+/*
+ * Espacio de trabajo de un proyecto.
+ *
+ * Lee y escribe contra la API REST. Antes usaba localStorage, donde los
+ * proyectos de ejemplo tenían identificadores propios ("proy-cogni") que no
+ * coincidían con los códigos de la base ("cognitiva"): al abrir un proyecto por
+ * su URL no se encontraba nada y la página se quedaba cargando para siempre.
+ */
 (() => {
   "use strict";
 
-  const COLORS = ["#7259e9", "#4d89f8", "#ee8a54", "#36aa8a", "#d7639d", "#5b91b4"];
   const app = window.App || {};
-  const state = { project: null, taskFilter: "all" };
+  const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
+  const codigo = document.body.dataset.projectId
+    || decodeURIComponent(window.location.pathname.split("/").filter(Boolean).pop() || "");
 
-  const uid = () => typeof app.uid === "function" ? app.uid() : `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  const showToast = (message, type = "info") => typeof app.showToast === "function" && app.showToast(message, type);
-  const getProjects = () => {
-    const projects = typeof app.getProjects === "function" ? app.getProjects() : [];
-    return Array.isArray(projects) ? projects : [];
+  const COLOR_ESTADO = {
+    "sin-empezar": "bg-[#f0f2f7] text-[#788196]",
+    "en-proceso": "bg-primary-soft text-primary",
+    "en-revision": "bg-warning-soft text-[#8a5a12]",
+    "terminada": "bg-success-soft text-success"
   };
-  const saveProjects = (projects) => {
-    if (typeof app.saveProjects === "function") app.saveProjects(projects);
-    else localStorage.setItem("studyflow_projects", JSON.stringify(projects));
-  };
-  const dateFromValue = (value) => {
-    if (!value) return null;
-    const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
-    return Number.isNaN(date.getTime()) ? null : date;
-  };
-  const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  const todayKey = () => dateKey(new Date());
-  const initials = (name) => String(name || "?").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?";
-  const formatDate = (value, fallback = "Sin fecha") => {
-    if (!value) return fallback;
-    if (typeof app.formatDate === "function") return app.formatDate(value);
-    const date = dateFromValue(value);
-    return date ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", year: "numeric" }).format(date) : fallback;
-  };
+  /* Bandas horarias del calendario del proyecto. */
+  const BANDAS = ["08:00", "10:00", "12:00", "14:00", "16:00"];
+  const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
-  const canonicalStatus = (status) => {
-    const value = String(status || "pending").toLowerCase();
-    if (["completed", "complete", "done", "completada", "terminada"].includes(value)) return "completed";
-    if (["in-progress", "in_progress", "progress", "doing", "en curso"].includes(value)) return "in-progress";
-    return "pending";
-  };
-  const isTaskCompleted = (task) => canonicalStatus(task?.status) === "completed";
-  const tasksOf = (project) => Array.isArray(project?.tasks) ? project.tasks : [];
+  const estado = { proyecto: null, filtro: "all" };
+  const $ = (selector) => document.querySelector(selector);
 
-  function normalizeMembers(project) {
-    const source = Array.isArray(project.members) ? project.members : [];
-    project.members = source.map((member, index) => {
-      if (typeof member === "string") {
-        return { id: `member-${project.id || "project"}-${index}`, name: member, color: COLORS[index % COLORS.length] };
-      }
-      return {
-        ...member,
-        id: member?.id || `member-${project.id || "project"}-${index}`,
-        name: member?.name || member?.username || member?.email || "Sin nombre",
-        color: member?.color || COLORS[index % COLORS.length]
-      };
-    });
-    return project.members;
-  }
-
-  function prepareProject(project) {
-    if (!project) return null;
-    normalizeMembers(project);
-    project.tasks = tasksOf(project).map((task, index) => ({
-      ...task,
-      id: task?.id || `task-${project.id || "project"}-${index}`,
-      title: task?.title || task?.name || "Tarea sin título",
-      status: canonicalStatus(task?.status),
-      stage: task?.stage || "Planeación"
-    }));
-    return project;
-  }
-
-  function projectProgress(project) {
-    const saved = Number(project?.progress);
-    if (Number.isFinite(saved)) return Math.max(0, Math.min(100, Math.round(saved)));
-    const tasks = tasksOf(project);
-    return tasks.length ? Math.round((tasks.filter(isTaskCompleted).length / tasks.length) * 100) : 0;
-  }
-
-  function updateProjectProgress(project) {
-    if (typeof app.updateProjectProgress === "function") {
-      const result = app.updateProjectProgress(project);
-      if (typeof result === "number") project.progress = result;
+  async function pedir(url, opciones = {}) {
+    const respuesta = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opciones });
+    // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
+    if (respuesta.status === 401) {
+      window.location.assign("/login");
+      throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
-    if (!Number.isFinite(Number(project.progress))) {
-      const tasks = tasksOf(project);
-      project.progress = tasks.length ? Math.round((tasks.filter(isTaskCompleted).length / tasks.length) * 100) : 0;
+    if (!respuesta.ok) {
+      const detalle = await respuesta.json().catch(() => ({}));
+      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
     }
+    return respuesta.status === 204 ? null : respuesta.json();
   }
 
-  function getAssignee(task, project) {
-    const members = normalizeMembers(project);
-    const raw = task?.assignee;
-    if (raw && typeof raw === "object") {
-      const matching = members.find((member) => member.id === raw.id || member.name === raw.name);
-      if (matching) return matching;
-      return { name: raw.name || raw.username || "Sin asignar", color: raw.color || "#a5abbc" };
-    }
-    const matching = members.find((member) => member.id === task?.assigneeId || member.name === raw || member.email === raw);
-    return matching || { name: raw || "Sin asignar", color: "#a5abbc" };
+  const avisar = (mensaje, tipo = "info") => {
+    if (typeof app.showToast === "function") app.showToast(mensaje, tipo);
+  };
+
+  const iniciales = (nombre) => String(nombre || "?").trim().split(/\s+/).slice(0, 2)
+    .map((parte) => parte[0]).join("").toUpperCase();
+
+  function fechaCorta(iso) {
+    if (!iso) return "Sin fecha";
+    const fecha = new Date(`${iso}T12:00:00`);
+    return Number.isNaN(fecha.getTime())
+      ? iso
+      : new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(fecha).replace(".", "");
   }
 
-  function statusPresentation(status) {
-    const normalized = canonicalStatus(status);
-    const defaults = {
-      pending: { label: "Pendiente", background: "#f2f3f7", color: "#737a91" },
-      "in-progress": { label: "En curso", background: "#eaf2ff", color: "#3976d5" },
-      completed: { label: "Completada", background: "#e8f8ef", color: "#27865a" }
-    };
-    const statusClass = typeof app.statusClass === "function" ? app.statusClass(normalized) : `status-${normalized}`;
-    const label = typeof app.statusLabel === "function" ? app.statusLabel(normalized) : defaults[normalized].label;
-    return { normalized, label, className: statusClass, ...defaults[normalized] };
+  function diasRestantes(iso) {
+    if (!iso) return "";
+    const dias = Math.ceil((new Date(`${iso}T12:00:00`) - new Date()) / 86400000);
+    if (dias < 0) return `Hace ${Math.abs(dias)} día${Math.abs(dias) === 1 ? "" : "s"}`;
+    if (dias === 0) return "Es hoy";
+    return `Faltan ${dias} día${dias === 1 ? "" : "s"}`;
   }
 
-  function renderNavigation() {
-    if (typeof app.renderNavigation === "function") app.renderNavigation();
+  /* ------------------------------------------------------------ cabecera */
+
+  function pintarCabecera(proyecto) {
+    $(".project-color-mark").style.background = proyecto.color || "#5b5ce2";
+    $(".project-stage-label").textContent = proyecto.etapaActual || "En curso";
+    $(".detail-project-name").textContent = proyecto.nombre;
+    $(".detail-project-description").textContent = proyecto.descripcion || "Sin descripción todavía.";
+
+    $(".detail-progress-value").textContent = `${proyecto.progreso}%`;
+    $(".progress-fill").style.setProperty("--progress", `${proyecto.progreso}%`);
+    const terminadas = proyecto.tareas.filter((tarea) => tarea.estado === "terminada").length;
+    $(".progress-caption").textContent =
+      `${terminadas} de ${proyecto.tareas.length} tarea${proyecto.tareas.length === 1 ? "" : "s"} terminada${terminadas === 1 ? "" : "s"}`;
+
+    $(".detail-due-date").textContent = fechaCorta(proyecto.fechaEntrega);
+    $(".detail-days-left").textContent = diasRestantes(proyecto.fechaEntrega);
+
+    $(".detail-member-stack").innerHTML = proyecto.integrantes.map((integrante) =>
+      `<span class="member-avatar" style="--member-color:${esc(integrante.color)}" title="${esc(integrante.nombre)}">${esc(integrante.iniciales || iniciales(integrante.nombre))}</span>`
+    ).join("");
   }
 
-  function renderMemberStack(target, members, limit = 5) {
-    target.replaceChildren();
-    members.slice(0, limit).forEach((member) => {
-      const avatar = document.createElement("span");
-      avatar.className = "member-avatar";
-      avatar.style.setProperty("--member-color", member.color || "#a5abbc");
-      avatar.title = member.name;
-      avatar.textContent = initials(member.name);
-      target.append(avatar);
+  /* ------------------------------------------------------------ calendario */
+
+  /** Lunes de la semana donde cae la primera tarea, o la de hoy si no hay. */
+  function inicioSemana(proyecto) {
+    const fechas = proyecto.tareas.map((tarea) => tarea.fechaLimite).filter(Boolean).sort();
+    const referencia = fechas.length ? new Date(`${fechas[0]}T12:00:00`) : new Date();
+    const desplazamiento = (referencia.getDay() + 6) % 7;
+    referencia.setDate(referencia.getDate() - desplazamiento);
+    return referencia;
+  }
+
+  function pintarCalendario(proyecto) {
+    const contenedor = $("#detail-calendar");
+    const lunes = inicioSemana(proyecto);
+    const dias = Array.from({ length: 7 }, (_, i) => {
+      const fecha = new Date(lunes);
+      fecha.setDate(lunes.getDate() + i);
+      return fecha;
     });
-    if (members.length > limit) {
-      const remaining = document.createElement("span");
-      remaining.className = "member-avatar member-overflow";
-      remaining.textContent = `+${members.length - limit}`;
-      target.append(remaining);
-    }
-  }
+    const iso = (fecha) => fecha.toISOString().slice(0, 10);
+    const hoy = iso(new Date());
 
-  function daysLeft(dueDate) {
-    const due = dateFromValue(dueDate);
-    if (!due) return "Sin fecha programada";
-    const current = dateFromValue(todayKey());
-    const diff = Math.round((due - current) / 86400000);
-    if (diff < 0) return `${Math.abs(diff)} día${Math.abs(diff) === 1 ? "" : "s"} de retraso`;
-    if (diff === 0) return "Entrega hoy";
-    return `Faltan ${diff} día${diff === 1 ? "" : "s"}`;
-  }
-
-  function calendarStart(project) {
-    const current = dateFromValue(todayKey());
-    const dates = tasksOf(project).map((task) => dateFromValue(task.dueDate)).filter(Boolean).sort((a, b) => a - b);
-    const next = dates.find((date) => date >= current) || dates[0] || dateFromValue(project.dueDate) || current;
-    const start = new Date(next);
-    const weekday = (start.getDay() + 6) % 7;
-    start.setDate(start.getDate() - weekday);
-    return start;
-  }
-
-  function makeCalendarTask(task, project) {
-    const assignee = getAssignee(task, project);
-    const status = statusPresentation(task.status);
-    const node = document.createElement("button");
-    node.type = "button";
-    node.className = "calendar-task";
-    node.dataset.taskId = task.id;
-    node.style.setProperty("--task-color", assignee.color || "#a5abbc");
-    node.textContent = task.title;
-    node.setAttribute("aria-label", `Abrir detalles de la tarea ${task.title}`);
-
-    const popover = document.createElement("span");
-    popover.className = "task-popover";
-    const title = document.createElement("strong");
-    title.textContent = task.title;
-    const projectName = document.createElement("span");
-    projectName.textContent = project.name || "Proyecto";
-    const person = document.createElement("span");
-    person.textContent = `${assignee.name} · ${status.label}`;
-    const date = document.createElement("span");
-    date.textContent = formatDate(task.dueDate);
-    const edit = document.createElement("span");
-    edit.className = "calendar-quick-edit";
-    edit.textContent = "Editar tarea";
-    popover.append(title, projectName, person, date, edit);
-    node.append(popover);
-    node.addEventListener("click", () => openTaskDialog(task.id));
-    return node;
-  }
-
-  function renderCalendar(project) {
-    const container = document.querySelector("#detail-calendar");
-    const start = calendarStart(project);
-    const days = Array.from({ length: 7 }, (_, index) => {
-      const day = new Date(start);
-      day.setDate(start.getDate() + index);
-      return day;
+    let html = '<div class="calendar-corner"></div>';
+    dias.forEach((fecha, i) => {
+      html += `<div class="calendar-day-head${iso(fecha) === hoy ? " is-today" : ""}">${DIAS[i]}<strong>${fecha.getDate()}</strong></div>`;
     });
-    const slots = ["09:00", "12:00", "15:00"];
-    container.replaceChildren();
-    const corner = document.createElement("div");
-    corner.className = "calendar-corner";
-    container.append(corner);
-    days.forEach((day) => {
-      const header = document.createElement("div");
-      header.className = "calendar-day-head";
-      if (dateKey(day) === todayKey()) header.classList.add("is-today");
-      const weekday = document.createElement("span");
-      weekday.textContent = new Intl.DateTimeFormat("es-CO", { weekday: "short" }).format(day).replace(".", "");
-      const dayNumber = document.createElement("strong");
-      dayNumber.textContent = String(day.getDate());
-      header.append(weekday, dayNumber);
-      container.append(header);
-    });
-    slots.forEach((slot, row) => {
-      const label = document.createElement("div");
-      label.className = "calendar-time-label";
-      label.textContent = slot;
-      container.append(label);
-      days.forEach((day) => {
-        const cell = document.createElement("div");
-        cell.className = "calendar-cell";
-        const key = dateKey(day);
-        if (key === project.dueDate) {
-          cell.classList.add("is-due-date");
-          if (row === 0) {
-            const due = document.createElement("span");
-            due.className = "calendar-due-marker";
-            due.innerHTML = "<i class=\"bi bi-flag\" aria-hidden=\"true\"></i> Entrega";
-            cell.append(due);
-          }
-        }
-        tasksOf(project).filter((task, taskIndex) => task.dueDate === key && taskIndex % slots.length === row).forEach((task) => cell.append(makeCalendarTask(task, project)));
-        container.append(cell);
+
+    BANDAS.forEach((banda, indiceBanda) => {
+      const siguiente = BANDAS[indiceBanda + 1] || "23:59";
+      html += `<div class="calendar-time-label">${banda}</div>`;
+      dias.forEach((fecha) => {
+        const dia = iso(fecha);
+        const enBanda = proyecto.tareas.filter((tarea) => {
+          if (tarea.fechaLimite !== dia) return false;
+          const hora = tarea.horaLimite || "09:00";
+          return hora >= banda && hora < siguiente;
+        });
+        const esEntrega = proyecto.fechaEntrega === dia && indiceBanda === 0;
+        html += `<div class="calendar-cell${esEntrega ? " is-due-date" : ""}">
+          ${esEntrega ? '<span class="calendar-due-marker"><i class="bi bi-flag"></i> Entrega</span>' : ""}
+          ${enBanda.map((tarea) => tarjetaCalendario(tarea)).join("")}
+        </div>`;
       });
     });
 
-    const legend = document.querySelector("#calendar-member-legend");
-    legend.replaceChildren();
-    normalizeMembers(project).forEach((member) => {
-      const item = document.createElement("span");
-      const dot = document.createElement("i");
-      dot.className = "legend-member-dot";
-      dot.style.setProperty("--legend-color", member.color);
-      const name = document.createElement("span");
-      name.textContent = member.name;
-      item.append(dot, name);
-      legend.append(item);
+    contenedor.innerHTML = html;
+
+    $("#calendar-member-legend").innerHTML = proyecto.integrantes.map((integrante) =>
+      `<span><i class="legend-member-dot" style="--legend-color:${esc(integrante.color)}"></i> ${esc(integrante.nombre)}</span>`
+    ).join("");
+  }
+
+  function tarjetaCalendario(tarea) {
+    return `<button class="calendar-task" type="button" data-task="${tarea.id}"
+              style="--task-color:${esc(tarea.colorResponsable || "#5b5ce2")}">
+        ${esc(tarea.titulo)}
+        <span class="task-popover">
+          <strong>${esc(tarea.titulo)}</strong>
+          <span><i class="bi bi-person"></i> ${esc(tarea.responsable || "Sin responsable")}</span>
+          <span><i class="bi bi-calendar3"></i> ${esc(fechaCorta(tarea.fechaLimite))} · ${esc(tarea.horaLimite || "09:00")}</span>
+          <span><i class="bi bi-flag"></i> ${esc(tarea.estadoEtiqueta)}</span>
+        </span>
+      </button>`;
+  }
+
+  /* ------------------------------------------------------------ tareas */
+
+  function pintarTareas(proyecto) {
+    const contenedor = $("#project-tasks");
+    const visibles = proyecto.tareas.filter((tarea) =>
+      estado.filtro === "all" || tarea.estado === estado.filtro);
+
+    if (!visibles.length) {
+      contenedor.innerHTML = `<div class="empty-tasks"><div>
+          <i class="bi bi-list-check text-2xl text-primary"></i>
+          <h3>No hay tareas que mostrar</h3>
+          <p>Cambia el filtro o crea una tarea nueva.</p>
+        </div></div>`;
+      return;
+    }
+
+    const plantilla = $("#task-card-template");
+    contenedor.replaceChildren();
+
+    visibles.forEach((tarea) => {
+      const fragmento = plantilla.content.cloneNode(true);
+      const tarjeta = fragmento.querySelector(".task-card");
+      tarjeta.dataset.taskId = tarea.id;
+      tarjeta.classList.toggle("is-completed", tarea.estado === "terminada");
+
+      const chip = fragmento.querySelector(".task-status");
+      chip.textContent = tarea.estadoEtiqueta;
+      (COLOR_ESTADO[tarea.estado] || "").split(" ").filter(Boolean)
+        .forEach((clase) => chip.classList.add(clase));
+
+      fragmento.querySelector(".task-title").textContent = tarea.titulo;
+      fragmento.querySelector(".task-description").textContent = tarea.descripcion || "Sin descripción.";
+      fragmento.querySelector(".task-stage").textContent = tarea.etapa || "Sin etapa";
+      fragmento.querySelector(".task-date time").textContent = fechaCorta(tarea.fechaLimite);
+
+      // El color va en la tarjeta, no solo en el punto: pinta también el
+      // borde izquierdo, que es lo que permite reconocer de quién es de un vistazo.
+      const color = tarea.colorResponsable || "#c9cfe0";
+      tarjeta.style.setProperty("--assignee-color", color);
+      const responsable = fragmento.querySelector(".task-assignee");
+      responsable.querySelector(".assignee-dot").style.setProperty("--assignee-color", color);
+      responsable.querySelector("span").textContent = tarea.responsable || "Sin responsable";
+
+      fragmento.querySelector(".task-check")
+        .addEventListener("click", () => alternarTerminada(tarea));
+      fragmento.querySelector(".task-menu-button")
+        .addEventListener("click", () => abrirDialogoTarea(tarea.id));
+
+      contenedor.append(fragmento);
     });
   }
 
-  function renderTasks(project) {
-    const container = document.querySelector("#project-tasks");
-    const tasks = tasksOf(project).filter((task) => state.taskFilter === "all" || canonicalStatus(task.status) === state.taskFilter);
-    container.replaceChildren();
-    if (!tasks.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty-tasks";
-      empty.innerHTML = "<i class=\"bi bi-clipboard-plus\" aria-hidden=\"true\"></i><p>No hay tareas en esta vista.</p><button type=\"button\" class=\"btn btn-secondary\" data-empty-new-task>Crear una tarea</button>";
-      empty.querySelector("button").addEventListener("click", () => openTaskDialog());
-      container.append(empty);
+  async function alternarTerminada(tarea) {
+    const nuevo = tarea.estado === "terminada" ? "sin-empezar" : "terminada";
+    try {
+      await pedir(`/api/tareas/${tarea.id}/estado`, {
+        method: "PATCH",
+        body: JSON.stringify({ estado: nuevo })
+      });
+      await cargar();
+    } catch (error) {
+      avisar(error.message, "error");
+    }
+  }
+
+  /* ------------------------------------------------------------ diálogos */
+
+  function opcionesResponsable(select, seleccionado) {
+    select.innerHTML = '<option value="">Sin asignar</option>'
+      + estado.proyecto.integrantes.map((integrante) =>
+          `<option value="${esc(integrante.nombre)}"${integrante.nombre === seleccionado ? " selected" : ""}>${esc(integrante.nombre)}</option>`
+        ).join("");
+  }
+
+  function abrirDialogoTarea(tareaId) {
+    const tarea = tareaId ? estado.proyecto.tareas.find((item) => item.id === tareaId) : null;
+
+    $("#task-dialog-kicker").textContent = tarea ? "Editar tarea" : "Nueva tarea";
+    $("#task-dialog-title").textContent = tarea ? tarea.titulo : "Añadir tarea";
+    $("#editing-task-id").value = tarea ? tarea.id : "";
+    $("#task-title-input").value = tarea ? tarea.titulo : "";
+    $("#task-description-input").value = tarea ? tarea.descripcion || "" : "";
+    $("#task-date-input").value = tarea ? tarea.fechaLimite || "" : "";
+    $("#task-stage-input").value = tarea ? tarea.etapa || "Planeación" : "Planeación";
+    $("#task-status-input").value = tarea ? tarea.estado : "sin-empezar";
+    opcionesResponsable($("#task-assignee-input"), tarea ? tarea.responsable : "");
+    $("#task-dialog").showModal();
+  }
+
+  async function guardarTarea(evento) {
+    evento.preventDefault();
+    const titulo = $("#task-title-input").value.trim();
+    if (!titulo) {
+      avisar("La tarea necesita un nombre.", "error");
       return;
     }
-    const template = document.querySelector("#task-card-template");
-    tasks.forEach((task) => {
-      const fragment = template.content.cloneNode(true);
-      const card = fragment.querySelector(".task-card");
-      const status = statusPresentation(task.status);
-      const assignee = getAssignee(task, project);
-      card.dataset.taskId = task.id;
-      card.style.setProperty("--task-color", assignee.color || "#a5abbc");
-      card.classList.toggle("is-completed", status.normalized === "completed");
-      const statusElement = fragment.querySelector(".task-status");
-      statusElement.textContent = status.label;
-      if (status.className) statusElement.classList.add(status.className);
-      statusElement.style.setProperty("--status-bg", status.background);
-      statusElement.style.setProperty("--status-color", status.color);
-      fragment.querySelector(".task-title").textContent = task.title;
-      fragment.querySelector(".task-description").textContent = task.description || "Sin detalles adicionales.";
-      fragment.querySelector(".task-stage").textContent = task.stage || "Planeación";
-      fragment.querySelector(".task-date time").textContent = formatDate(task.dueDate);
-      fragment.querySelector(".task-assignee > span").textContent = assignee.name;
-      fragment.querySelector(".assignee-dot").style.setProperty("--task-color", assignee.color || "#a5abbc");
-      const fileName = fragment.querySelector(".file-name");
-      fileName.textContent = task.fileName || "Adjuntar";
-      fragment.querySelector(".task-check").addEventListener("click", () => toggleTaskCompleted(task.id));
-      fragment.querySelector(".task-menu-button").addEventListener("click", () => openTaskDialog(task.id));
-      fragment.querySelector(".task-file-input").addEventListener("change", (event) => saveTaskFile(task.id, event.target.files?.[0]));
-      container.append(fragment);
-    });
-  }
-
-  function bindDetailControls() {
-    document.querySelectorAll("[data-new-task]").forEach((button) => button.addEventListener("click", () => openTaskDialog()));
-    document.querySelector("[data-manage-members]").addEventListener("click", openMembersDialog);
-    document.querySelector("#task-status-filter").value = state.taskFilter;
-    document.querySelector("#task-status-filter").addEventListener("change", (event) => {
-      state.taskFilter = event.target.value;
-      renderTasks(state.project);
-    });
-  }
-
-  function renderProject() {
-    const target = document.querySelector("#project-content");
-    const project = state.project;
-    if (!project) {
-      target.innerHTML = "<section class=\"empty-tasks\"><i class=\"bi bi-folder-x\" aria-hidden=\"true\"></i><h1>Proyecto no encontrado</h1><p>Puede que se haya eliminado o que el enlace ya no sea válido.</p><a class=\"btn btn-primary\" href=\"/proyectos\">Volver a proyectos</a></section>";
-      return;
-    }
-    const fragment = document.querySelector("#project-detail-template").content.cloneNode(true);
-    const color = project.color || COLORS[0];
-    const progress = projectProgress(project);
-    const completed = tasksOf(project).filter(isTaskCompleted).length;
-    document.title = `${project.name || "Proyecto"} · Atempo`;
-    fragment.querySelector(".project-header").style.setProperty("--project-color", color);
-    fragment.querySelector(".detail-project-name").textContent = project.name || "Proyecto sin nombre";
-    fragment.querySelector(".detail-project-description").textContent = project.description || "Sin descripción todavía.";
-    fragment.querySelector(".project-stage-label").textContent = project.stage || "Espacio de trabajo";
-    fragment.querySelector(".project-color-mark").style.setProperty("--project-color", color);
-    fragment.querySelector(".detail-progress-value").textContent = `${progress}%`;
-    fragment.querySelector(".progress-fill").style.setProperty("--progress", `${progress}%`);
-    fragment.querySelector(".progress-fill").style.setProperty("--project-color", color);
-    fragment.querySelector(".progress-caption").textContent = `${completed} de ${tasksOf(project).length} tareas completadas`;
-    fragment.querySelector(".detail-due-date").textContent = formatDate(project.dueDate);
-    fragment.querySelector(".detail-days-left").textContent = daysLeft(project.dueDate);
-    renderMemberStack(fragment.querySelector(".detail-member-stack"), normalizeMembers(project));
-    target.replaceChildren(fragment);
-    renderCalendar(project);
-    renderTasks(project);
-    bindDetailControls();
-  }
-
-  function persistProject() {
-    const projects = getProjects();
-    const index = projects.findIndex((project) => String(project.id) === String(state.project.id));
-    if (index >= 0) projects[index] = state.project;
-    else projects.push(state.project);
-    saveProjects(projects);
-  }
-
-  function findTask(id) {
-    return tasksOf(state.project).find((task) => String(task.id) === String(id));
-  }
-
-  function toggleTaskCompleted(id) {
-    const task = findTask(id);
-    if (!task) return;
-    task.status = isTaskCompleted(task) ? "in-progress" : "completed";
-    updateProjectProgress(state.project);
-    persistProject();
-    renderProject();
-    showToast(isTaskCompleted(task) ? "Tarea marcada como completada." : "Tarea reabierta.", "success");
-  }
-
-  function saveTaskFile(id, file) {
-    if (!file) return;
-    const task = findTask(id);
-    if (!task) return;
-    task.fileName = file.name;
-    persistProject();
-    renderTasks(state.project);
-    showToast(`Archivo “${file.name}” asociado a la tarea.`, "success");
-  }
-
-  function openDialog(dialog) {
-    if (typeof dialog.showModal === "function") dialog.showModal();
-    else dialog.setAttribute("open", "");
-  }
-
-  function closeDialog(dialog) {
-    if (typeof dialog.close === "function") dialog.close();
-    else dialog.removeAttribute("open");
-  }
-
-  function fillAssigneeOptions(select, selected = "") {
-    select.replaceChildren(new Option("Sin asignar", ""));
-    normalizeMembers(state.project).forEach((member) => select.add(new Option(member.name, member.id)));
-    const matching = [...select.options].find((option) => option.value === selected || option.text === selected);
-    if (matching) select.value = matching.value;
-  }
-
-  function openTaskDialog(taskId) {
-    const dialog = document.querySelector("#task-dialog");
-    const form = document.querySelector("#task-form");
-    const task = taskId ? findTask(taskId) : null;
-    form.reset();
-    document.querySelector("#editing-task-id").value = task?.id || "";
-    document.querySelector("#task-dialog-kicker").textContent = task ? "Editar tarea" : "Nueva tarea";
-    document.querySelector("#task-dialog-title").textContent = task ? "Actualiza la tarea" : "Añade una tarea";
-    document.querySelector("#task-title-input").value = task?.title || "";
-    document.querySelector("#task-description-input").value = task?.description || "";
-    fillAssigneeOptions(document.querySelector("#task-assignee-input"), task?.assigneeId || task?.assignee || "");
-    document.querySelector("#task-date-input").value = task?.dueDate || state.project.dueDate || "";
-    document.querySelector("#task-stage-input").value = task?.stage || state.project.stage || "Planeación";
-    document.querySelector("#task-status-input").value = canonicalStatus(task?.status);
-    openDialog(dialog);
-    window.setTimeout(() => document.querySelector("#task-title-input").focus(), 40);
-  }
-
-  function saveTaskFromDialog(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-    const taskId = document.querySelector("#editing-task-id").value;
-    const selectedMember = normalizeMembers(state.project).find((member) => member.id === document.querySelector("#task-assignee-input").value);
-    const payload = {
-      id: taskId || uid(),
-      title: document.querySelector("#task-title-input").value.trim(),
-      description: document.querySelector("#task-description-input").value.trim(),
-      assignee: selectedMember?.name || "Sin asignar",
-      assigneeId: selectedMember?.id || "",
-      dueDate: document.querySelector("#task-date-input").value,
-      stage: document.querySelector("#task-stage-input").value,
-      status: canonicalStatus(document.querySelector("#task-status-input").value)
+    const cuerpo = {
+      titulo,
+      descripcion: $("#task-description-input").value.trim(),
+      responsable: $("#task-assignee-input").value || null,
+      etapa: $("#task-stage-input").value,
+      fechaLimite: $("#task-date-input").value || null,
+      horaLimite: "09:00",
+      estado: $("#task-status-input").value
     };
-    const existingIndex = tasksOf(state.project).findIndex((task) => String(task.id) === String(taskId));
-    if (existingIndex >= 0) state.project.tasks[existingIndex] = { ...state.project.tasks[existingIndex], ...payload };
-    else state.project.tasks.push(payload);
-    updateProjectProgress(state.project);
-    persistProject();
-    closeDialog(document.querySelector("#task-dialog"));
-    renderProject();
-    showToast(existingIndex >= 0 ? "Tarea actualizada." : "Nueva tarea creada.", "success");
-  }
+    const id = $("#editing-task-id").value;
 
-  function addDialogMember(member = {}) {
-    const fragment = document.querySelector("#dialog-member-row-template").content.cloneNode(true);
-    const row = fragment.querySelector(".dialog-member-row");
-    const existingRows = document.querySelectorAll(".dialog-member-row").length;
-    row.dataset.memberId = member.id || uid();
-    row.dataset.color = member.color || COLORS[existingRows % COLORS.length];
-    const avatar = fragment.querySelector(".member-row-avatar");
-    const nameInput = fragment.querySelector(".dialog-member-name");
-    const contactInput = fragment.querySelector(".dialog-member-contact");
-    nameInput.value = member.name || "";
-    contactInput.value = member.contact || member.email || "";
-    const paint = () => {
-      avatar.style.setProperty("--member-color", row.dataset.color);
-      avatar.textContent = initials(nameInput.value);
-    };
-    nameInput.addEventListener("input", paint);
-    fragment.querySelector(".remove-dialog-member").addEventListener("click", () => {
-      if (document.querySelectorAll(".dialog-member-row").length === 1) {
-        showToast("El proyecto necesita al menos un integrante.", "warning");
-        return;
-      }
-      row.remove();
-    });
-    document.querySelector("#dialog-members-list").append(fragment);
-    paint();
-  }
-
-  function openMembersDialog() {
-    const list = document.querySelector("#dialog-members-list");
-    list.replaceChildren();
-    normalizeMembers(state.project).forEach(addDialogMember);
-    openDialog(document.querySelector("#members-dialog"));
-  }
-
-  function saveMembersFromDialog(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-    const members = [...document.querySelectorAll(".dialog-member-row")].map((row, index) => ({
-      id: row.dataset.memberId || uid(),
-      color: row.dataset.color || COLORS[index % COLORS.length],
-      name: row.querySelector(".dialog-member-name").value.trim(),
-      contact: row.querySelector(".dialog-member-contact").value.trim()
-    })).filter((member) => member.name);
-    if (!members.length) {
-      showToast("Conserva al menos un integrante.", "warning");
-      return;
-    }
-    state.project.members = members;
-    state.project.tasks.forEach((task) => {
-      const retained = members.find((member) => member.id === task.assigneeId || member.name === task.assignee);
-      if (!retained) {
-        task.assignee = "Sin asignar";
-        task.assigneeId = "";
+    try {
+      if (id) {
+        await pedir(`/api/tareas/${id}`, { method: "PUT", body: JSON.stringify(cuerpo) });
       } else {
-        task.assignee = retained.name;
-        task.assigneeId = retained.id;
+        await pedir(`/api/proyectos/${codigo}/tareas`, { method: "POST", body: JSON.stringify(cuerpo) });
       }
-    });
-    persistProject();
-    closeDialog(document.querySelector("#members-dialog"));
-    renderProject();
-    showToast("Equipo actualizado.", "success");
-  }
-
-  function bindDialogs() {
-    document.querySelectorAll("[data-close-dialog]").forEach((button) => button.addEventListener("click", () => closeDialog(button.closest("dialog"))));
-    document.querySelector("#task-form").addEventListener("submit", saveTaskFromDialog);
-    document.querySelector("#members-form").addEventListener("submit", saveMembersFromDialog);
-    document.querySelector("#dialog-add-member").addEventListener("click", () => addDialogMember());
-  }
-
-  function loadProject() {
-    // El identificador llega por la ruta /proyectos/{id} (lo inyecta el controlador
-    // de la capa Vista en data-project-id); se conservan las variantes antiguas.
-    const requestedId = document.body.dataset.projectId
-      || new URLSearchParams(window.location.search).get("id")
-      || decodeURIComponent(window.location.pathname.split("/").filter(Boolean).pop() || "");
-    let project = requestedId && typeof app.getProject === "function" ? app.getProject(requestedId) : null;
-    if (!project) {
-      const projects = getProjects();
-      project = requestedId ? projects.find((item) => String(item.id) === String(requestedId)) : projects[0];
+      $("#task-dialog").close();
+      await cargar();
+      avisar(id ? "Tarea actualizada." : "Tarea creada.", "success");
+    } catch (error) {
+      avisar(error.message, "error");
     }
-    state.project = prepareProject(project);
   }
 
-  function init() {
-    renderNavigation();
-    bindDialogs();
-    loadProject();
-    renderProject();
+  function filaIntegrante(integrante = {}) {
+    const plantilla = $("#dialog-member-row-template");
+    const fila = plantilla.content.firstElementChild.cloneNode(true);
+    fila.querySelector(".member-row-avatar").textContent = iniciales(integrante.nombre) || "?";
+    fila.querySelector(".dialog-member-name").value = integrante.nombre || "";
+    fila.querySelector(".dialog-member-contact").value = integrante.contacto || "";
+    fila.querySelector(".dialog-member-name").addEventListener("input", (evento) => {
+      fila.querySelector(".member-row-avatar").textContent = iniciales(evento.target.value) || "?";
+    });
+    fila.querySelector(".remove-dialog-member").addEventListener("click", () => fila.remove());
+    $("#dialog-members-list").append(fila);
+  }
+
+  function abrirDialogoEquipo() {
+    $("#dialog-members-list").replaceChildren();
+    // El líder es el propietario y no se edita desde aquí.
+    estado.proyecto.integrantes
+      .filter((integrante) => integrante.rol !== "LIDER")
+      .forEach(filaIntegrante);
+    $("#members-dialog").showModal();
+  }
+
+  async function guardarEquipo(evento) {
+    evento.preventDefault();
+    const integrantes = [...$("#dialog-members-list").querySelectorAll(".dialog-member-row")]
+      .map((fila) => ({
+        nombre: fila.querySelector(".dialog-member-name").value.trim(),
+        contacto: fila.querySelector(".dialog-member-contact").value.trim()
+      }))
+      .filter((integrante) => integrante.nombre);
+
+    try {
+      await pedir(`/api/proyectos/${codigo}/integrantes`, {
+        method: "PUT",
+        body: JSON.stringify(integrantes)
+      });
+      $("#members-dialog").close();
+      await cargar();
+      avisar("Equipo actualizado.", "success");
+    } catch (error) {
+      avisar(error.message, "error");
+    }
+  }
+
+  /* ------------------------------------------------------------ carga */
+
+  function enlazarDetalle() {
+    document.querySelectorAll("[data-new-task]").forEach((boton) =>
+      boton.addEventListener("click", () => abrirDialogoTarea(null)));
+    $("[data-manage-members]").addEventListener("click", abrirDialogoEquipo);
+    $("#task-status-filter").addEventListener("change", (evento) => {
+      estado.filtro = evento.target.value;
+      pintarTareas(estado.proyecto);
+    });
+    $("#detail-calendar").addEventListener("click", (evento) => {
+      const boton = evento.target.closest("[data-task]");
+      if (boton) abrirDialogoTarea(Number(boton.dataset.task));
+    });
+  }
+
+  async function cargar() {
+    const proyecto = await pedir(`/api/proyectos/${codigo}`);
+    estado.proyecto = proyecto;
+
+    const contenido = $("#project-content");
+    const primeraVez = !contenido.querySelector(".detail-project-name");
+    if (primeraVez) {
+      contenido.replaceChildren($("#project-detail-template").content.cloneNode(true));
+      enlazarDetalle();
+      $("#task-status-filter").value = estado.filtro;
+    }
+
+    pintarCabecera(proyecto);
+    pintarCalendario(proyecto);
+    pintarTareas(proyecto);
+  }
+
+  async function init() {
+    if (typeof app.renderNavigation === "function") app.renderNavigation();
+
+    $("#task-form").addEventListener("submit", guardarTarea);
+    $("#members-form").addEventListener("submit", guardarEquipo);
+    $("#dialog-add-member").addEventListener("click", () => filaIntegrante());
+    document.querySelectorAll("[data-close-dialog]").forEach((boton) =>
+      boton.addEventListener("click", () => boton.closest("dialog").close()));
+
+    try {
+      await cargar();
+    } catch (error) {
+      $("#project-content").innerHTML = `<section class="empty-tasks"><div>
+          <i class="bi bi-folder-x text-2xl text-danger"></i>
+          <h3>No encontramos este proyecto</h3>
+          <p>${esc(error.message)}</p>
+          <a class="btn btn-primary mt-3" href="/proyectos">Volver a proyectos</a>
+        </div></section>`;
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

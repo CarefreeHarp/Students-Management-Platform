@@ -31,14 +31,14 @@
         </div>
 
         <aside class="grid content-start gap-4">
-          <section class="card p-5">
+          <section class="tarjeta-color tono-cian">
             <div class="section-head"><h2>Tu ritmo</h2><i class="bi bi-activity text-primary"></i></div>
             <div class="rhythm-score mb-2.5"><span id="completion-score">0%</span><small>completado</small></div>
             <div class="progress-track"><div id="completion-progress" class="progress-bar" style="--progress:0%"></div></div>
             <p id="completion-caption" class="mt-2.5 text-[13px] text-muted">Vamos paso a paso.</p>
           </section>
 
-          <section class="panel">
+          <section class="tarjeta-color tono-indigo">
             <div class="section-head">
               <div><h2>Próximamente</h2><p>Prioridades de la semana</p></div>
               <a th:href="@{/proyectos}" href="/proyectos" class="text-action" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right"></i></a>
@@ -49,7 +49,7 @@
       </section>
 
       <section class="mt-4 grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <section class="panel flex flex-col items-start gap-3" aria-labelledby="complete-title">
+        <section class="tarjeta-color tono-rosa flex flex-col items-start gap-3" aria-labelledby="complete-title">
           <div class="complete-icon"><i class="bi bi-check2"></i></div>
           <div>
             <h2 id="complete-title">¿Terminaste algo?</h2>
@@ -58,10 +58,10 @@
           <button id="open-complete-task" class="btn btn-soft" type="button">Marcar tarea terminada <i class="bi bi-arrow-right"></i></button>
         </section>
 
-        <section class="panel" aria-labelledby="projects-snapshot-title">
+        <section class="tarjeta-color tono-verde" aria-labelledby="projects-snapshot-title">
           <div class="section-head">
             <div><h2 id="projects-snapshot-title">Tus proyectos</h2><p>Estado general</p></div>
-            <a class="btn btn-secondary btn-sm" th:href="@{/proyectos}" href="/proyectos">Ver todos</a>
+            <a class="btn btn-primary btn-sm" th:href="@{/proyectos}" href="/proyectos">Ver todos <i class="bi bi-arrow-right"></i></a>
           </div>
           <div id="project-snapshot-list" class="project-snapshot-list"></div>
         </section>

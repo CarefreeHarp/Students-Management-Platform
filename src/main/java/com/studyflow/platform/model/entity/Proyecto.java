@@ -69,6 +69,21 @@ public class Proyecto {
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RegistroAvance> registros = new ArrayList<>();
 
+    /** Canales de conversación del proyecto, uno por tema o tarea. */
+    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orden ASC, nombre ASC")
+    private List<Canal> canales = new ArrayList<>();
+
+    /** Registro de documentos y entregables del trabajo grupal. */
+    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("fechaRegistro DESC")
+    private List<Entregable> entregables = new ArrayList<>();
+
+    public void agregarCanal(Canal canal) {
+        canal.setProyecto(this);
+        canales.add(canal);
+    }
+
     public void agregarIntegrante(Integrante integrante) {
         integrante.setProyecto(this);
         integrantes.add(integrante);

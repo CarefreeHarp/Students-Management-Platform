@@ -217,6 +217,19 @@
     if (input && counter) counter.textContent = String(input.value.length);
   }
 
+  /** Resalta en rojo los campos indicados y limpia el resto. */
+  function marcarCampos(ids) {
+    const todos = ["edit-first-name", "edit-last-name", "edit-email", "edit-university",
+                   "edit-career", "edit-semester", "edit-age"];
+    todos.forEach((id) => {
+      const campo = document.getElementById(id);
+      if (!campo) return;
+      const falla = ids.includes(id);
+      campo.classList.toggle("campo-con-error", falla);
+      campo.setAttribute("aria-invalid", falla ? "true" : "false");
+    });
+  }
+
   function setEditFeedback(message, type) {
     const feedback = document.getElementById("edit-profile-feedback");
     if (!feedback) return;
@@ -290,14 +303,36 @@
       const semester = String(formData.get("semester") || "").trim();
       const age = String(formData.get("age") || "").trim();
 
-      if (!firstName || !lastName || !university || !career || !semester || !age) {
-        setEditFeedback("Completa todos los campos requeridos.", "error");
+      // Se nombran los campos que faltan y se marcan en el formulario: decir
+      // solo "completa los campos requeridos" obliga a buscarlos a ojo.
+      const faltantes = [
+        ["edit-first-name", "Nombre", firstName],
+        ["edit-last-name", "Apellido", lastName],
+        ["edit-university", "Universidad", university],
+        ["edit-career", "Programa", career],
+        ["edit-semester", "Semestre", semester],
+        ["edit-age", "Edad", age]
+      ].filter(([, , valor]) => !valor);
+
+      marcarCampos(faltantes.map(([id]) => id));
+
+      if (faltantes.length) {
+        const nombres = faltantes.map(([, etiqueta]) => etiqueta);
+        const lista = nombres.length === 1
+          ? nombres[0]
+          : `${nombres.slice(0, -1).join(", ")} y ${nombres[nombres.length - 1]}`;
+        setEditFeedback(
+          `Falta ${nombres.length === 1 ? "el campo" : "rellenar"} ${lista}.`, "error");
+        document.getElementById(faltantes[0][0])?.focus();
         return;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setEditFeedback("Ingresa un correo electrónico válido.", "error");
+        marcarCampos(["edit-email"]);
+        setEditFeedback("El correo no tiene un formato válido. Debe parecerse a nombre@universidad.edu.", "error");
+        document.getElementById("edit-email")?.focus();
         return;
       }
+      marcarCampos([]);
 
       const updatedUser = {
         ...user,
