@@ -92,6 +92,9 @@ public class Canal {
     }
 
     /** El canal general no se puede borrar: es el hilo principal del proyecto. */
+    /** Nombre y slug reservados del canal que cada proyecto crea consigo. */
+    public static final String NOMBRE_GENERAL = "general";
+
     public boolean esBorrable() {
         return tipo != TipoCanal.GENERAL;
     }

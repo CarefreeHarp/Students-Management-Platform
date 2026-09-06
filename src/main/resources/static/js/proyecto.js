@@ -15,10 +15,10 @@
     || decodeURIComponent(window.location.pathname.split("/").filter(Boolean).pop() || "");
 
   const COLOR_ESTADO = {
-    "sin-empezar": "bg-[#f0f2f7] text-[#788196]",
-    "en-proceso": "bg-primary-soft text-primary",
-    "en-revision": "bg-warning-soft text-[#8a5a12]",
-    "terminada": "bg-success-soft text-success"
+    "sin-empezar": "bg-[var(--chip-neutro)] text-muted",
+    "en-proceso": "bg-primary-soft text-[var(--estado-primary)]",
+    "en-revision": "bg-warning-soft text-[var(--estado-warning)]",
+    "terminada": "bg-success-soft text-[var(--estado-success)]"
   };
   /* Bandas horarias del calendario del proyecto. */
   const BANDAS = ["08:00", "10:00", "12:00", "14:00", "16:00"];

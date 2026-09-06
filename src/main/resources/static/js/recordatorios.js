@@ -49,11 +49,11 @@
     caja.classList.remove("hidden");
     caja.classList.add("flex");
     if (preferencias.pasarelaConectada) {
-      caja.className = "mb-5 flex items-start gap-3 rounded border border-success/30 bg-success-soft p-4 text-[13px] text-success";
+      caja.className = "mb-5 flex items-start gap-3 rounded border border-success/30 bg-success-soft p-4 text-[13px] text-[var(--estado-success)]";
       caja.innerHTML = '<i class="bi bi-check-circle-fill text-lg"></i><div><strong>WhatsApp conectado.</strong> Los recordatorios se envían a tu número real.</div>';
       return;
     }
-    caja.className = "mb-5 flex items-start gap-3 rounded border border-warning/30 bg-warning-soft p-4 text-[13px] text-[#8a5a12]";
+    caja.className = "mb-5 flex items-start gap-3 rounded border border-warning/30 bg-warning-soft p-4 text-[13px] text-[var(--estado-warning)]";
     caja.innerHTML = '<i class="bi bi-info-circle-fill text-lg text-warning"></i><div><strong>Modo simulación.</strong> '
       + 'La programación de avisos funciona por completo, pero los mensajes se escriben en la consola del servidor en lugar de enviarse. '
       + 'Para activar el envío real, configura <code>studyflow.whatsapp.token</code> y <code>phone-number-id</code> en application.properties.</div>';
@@ -117,8 +117,8 @@
           <h3 class="text-sm ${apunte.resuelto ? "line-through text-muted" : ""}">${esc(apunte.titulo)}</h3>
           ${apunte.contenido ? `<p class="mt-1 text-xs text-muted">${esc(apunte.contenido)}</p>` : ""}
           <div class="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-muted">
-            ${apunte.materia ? `<span class="tag bg-primary-soft text-primary">${esc(apunte.materia)}</span>` : ""}
-            ${apunte.importante ? '<span class="tag bg-danger-soft text-danger">Prioritario</span>' : ""}
+            ${apunte.materia ? `<span class="tag bg-primary-soft text-[var(--estado-primary)]">${esc(apunte.materia)}</span>` : ""}
+            ${apunte.importante ? '<span class="tag bg-danger-soft text-[var(--estado-danger)]">Prioritario</span>' : ""}
             ${vencimiento}
           </div>
         </div>
@@ -180,23 +180,23 @@
   /* ------------------------------------------------------------ recordatorios */
 
   const COLOR_ESTADO = {
-    PROGRAMADO: "bg-primary-soft text-primary",
-    ENVIADO: "bg-success-soft text-success",
-    FALLIDO: "bg-danger-soft text-danger",
-    CANCELADO: "bg-[#f0f2f7] text-[#788196]"
+    PROGRAMADO: "bg-primary-soft text-[var(--estado-primary)]",
+    ENVIADO: "bg-success-soft text-[var(--estado-success)]",
+    FALLIDO: "bg-danger-soft text-[var(--estado-danger)]",
+    CANCELADO: "bg-[var(--chip-neutro)] text-muted"
   };
 
   function tarjetaRecordatorio(recordatorio) {
     return `
       <article class="tarjeta-lista flex items-start gap-3">
-        <span class="grid h-9 w-9 flex-none place-items-center rounded-sm bg-primary-soft text-primary">
+        <span class="grid h-9 w-9 flex-none place-items-center rounded-sm bg-primary-soft text-[var(--estado-primary)]">
           <i class="bi bi-whatsapp"></i>
         </span>
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
             <h3 class="text-sm">${esc(recordatorio.titulo)}</h3>
             <span class="tag ${COLOR_ESTADO[recordatorio.estado] || ""}">${esc(recordatorio.estado)}</span>
-            <span class="tag bg-[#f4f5fa] text-[#5c6883]">${esc(recordatorio.tipoEtiqueta)}</span>
+            <span class="tag bg-[var(--chip-neutro)] text-muted">${esc(recordatorio.tipoEtiqueta)}</span>
           </div>
           <p class="mt-1 text-xs text-muted">${esc(recordatorio.mensaje || "")}</p>
           <p class="mt-1 text-[11px] text-muted-light">

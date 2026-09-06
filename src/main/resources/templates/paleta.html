@@ -36,7 +36,7 @@
             <h2 id="nombrados-title">Colores con nombre</h2>
             <p>Se usan como <code>bg-primary</code>, <code>text-muted</code>, <code>border-line</code>…</p>
           </div>
-          <span class="tag bg-primary-soft text-primary">15 tokens</span>
+          <span class="tag bg-primary-soft text-[var(--estado-primary)]">15 tokens</span>
         </div>
 
         <div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
@@ -142,62 +142,59 @@
             <p class="eyebrow">Escritos directamente en tailwind.css</p>
             <h2 id="superficies-title">Superficies y bordes</h2>
             <p class="max-w-[70ch]">
-              Estos grises azulados son los que separan una tarjeta del fondo y un campo de
-              su panel. No tienen nombre en la configuración: van como valor literal dentro
-              de la hoja. Son los que hay que respetar para que una pantalla nueva no
-              desentone.
+              Cada una es un rol, no un color: «el fondo de la barra», «el borde de una tarjeta». Están declaradas dos veces —claro y oscuro— y las reglas usan la variable, así que el tema se cambia volcando ese bloque.
             </p>
           </div>
         </div>
 
         <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#b0aef0] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Línea del formulario</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Rodea todo grupo de campos, en cada pantalla.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--fondo)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Fondo de página</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Papel cálido; sin velos de color.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#e9edfa] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Campo de formulario</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Relleno en reposo; pasa a blanco al escribir.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--barra)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Barra superior</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Lavanda muy claro sobre el papel.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#dedcfa] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Título de página</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Morado claro de <code>.page-heading</code>.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--superficie)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Panel</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Paneles, tarjetas de lista y campos.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#e3e0fb] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Calendario</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Morado de todos los calendarios.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--superficie-suave)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Zona embebida</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Bloques dentro de un panel.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#e6e4fc] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Panel de canal</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Bloques de la pantalla de canales.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--linea-tarjeta)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Contorno de toda superficie.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#e8ecf6] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Gris de tarjeta</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Base del degradado de <code>.tarjeta-color</code>.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--linea-tarjeta-fuerte)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde al pasar</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Se oscurece con el ratón encima.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#e4e2fb] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Botón secundario</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Relleno de <code>.btn-secondary</code>.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--campo-borde)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde de campo</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Lo que define un campo blanco.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#dfe4f0] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde de tarjeta</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Contorno de las tarjetas de lista.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--cal-cabecera)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Cabecera de calendario</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Franja de días y barra de semana.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#c5c2ef] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde morado</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Contorno de títulos y calendarios.</small></figcaption></figure>
-
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#edf0f5] shadow-sm" data-muestra></div>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--cal-rejilla)]" data-muestra></div>
             <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Rejilla horaria</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Líneas de hora dentro del calendario.</small></figcaption></figure>
+            <small class="text-[11px] leading-snug text-muted-light">Líneas de hora del calendario.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#f8f9fe] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Tarjeta de lista</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Arriba de su degradado gris.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--boton-dos)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Botón secundario</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Blanco con borde propio.</small></figcaption></figure>
 
-          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[#ffffff] shadow-sm" data-muestra></div>
-            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Blanco</b><code class="text-[11px] text-muted" data-hex></code>
-            <small class="text-[11px] leading-snug text-muted-light">Paneles y campos con el foco puesto.</small></figcaption></figure>
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--chip-neutro)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Etiqueta neutra</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Estados sin color asignado.</small></figcaption></figure>
+
+          <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--realce)]" data-muestra></div>
+            <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Realce</b><code class="text-[11px] text-muted" data-hex></code>
+            <small class="text-[11px] leading-snug text-muted-light">Hover de enlaces y elementos suaves.</small></figcaption></figure>
         </div>
       </section>
 
@@ -215,22 +212,22 @@
         </div>
 
         <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 p-2">
-          <figure class="grid gap-2.5"><div class="h-20 rounded border border-[#ccd4e8] bg-white shadow-tarjeta" data-sombra></div>
+          <figure class="grid gap-2.5"><div class="h-20 rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] shadow-tarjeta" data-sombra></div>
             <figcaption><b class="font-display text-[13px]">shadow-tarjeta</b>
             <small class="block text-[11px] leading-snug text-muted">Todas las tarjetas: proyecto, tarea, lista y color.</small></figcaption></figure>
-          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-white shadow-sm" data-sombra></div>
+          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-sm" data-sombra></div>
             <figcaption><b class="font-display text-[13px]">shadow-sm</b>
             <small class="block text-[11px] leading-snug text-muted">Detalles pequeños; ya no la usan las tarjetas.</small></figcaption></figure>
-          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-white shadow" data-sombra></div>
+          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow" data-sombra></div>
             <figcaption><b class="font-display text-[13px]">shadow</b>
             <small class="block text-[11px] leading-snug text-muted">Tarjeta de lista con el ratón encima.</small></figcaption></figure>
-          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-white shadow-alta" data-sombra></div>
+          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-alta" data-sombra></div>
             <figcaption><b class="font-display text-[13px]">shadow-alta</b>
             <small class="block text-[11px] leading-snug text-muted">Tarjeta de color al levantarse.</small></figcaption></figure>
-          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-white shadow-barra" data-sombra></div>
+          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-barra" data-sombra></div>
             <figcaption><b class="font-display text-[13px]">shadow-barra</b>
             <small class="block text-[11px] leading-snug text-muted">Barra superior fija.</small></figcaption></figure>
-          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-white shadow-pop" data-sombra></div>
+          <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-pop" data-sombra></div>
             <figcaption><b class="font-display text-[13px]">shadow-pop</b>
             <small class="block text-[11px] leading-snug text-muted">Diálogos y ventanas emergentes.</small></figcaption></figure>
         </div>
@@ -262,12 +259,12 @@
             <p>Dos familias: una para titular y otra para leer.</p>
           </div></div>
           <div class="grid gap-4">
-            <div class="tarjeta-lista hover:translate-y-0">
+            <div class="tarjeta-lista">
               <p class="eyebrow">font-display · Plus Jakarta Sans</p>
               <p class="font-display text-2xl font-extrabold text-ink">Organiza tu semestre</p>
               <p class="mt-1 text-[12px] text-muted">Títulos, nombres de tarjeta y el logotipo.</p>
             </div>
-            <div class="tarjeta-lista hover:translate-y-0">
+            <div class="tarjeta-lista">
               <p class="eyebrow">font-sans · DM Sans</p>
               <p class="text-[15px] text-ink">Anota lo que anunciaron en clase; si tiene fecha, se convierte en recordatorio.</p>
               <p class="mt-1 text-[12px] text-muted">Todo el texto corrido de la interfaz.</p>
@@ -278,7 +275,7 @@
 
       <p class="mt-6 text-center text-[12px] text-muted-light">
         Los colores con nombre salen de <code>tailwind.config.js</code>;
-        los grises de superficie, de <code>src/main/frontend/tailwind.css</code>.
+        las superficies, de las variables de rol de <code>src/main/frontend/tailwind.css</code>.
       </p>
     </main>
 

@@ -20,20 +20,20 @@
       </section>
 
       <!-- Tareas libres: cada persona elige la suya -->
-      <section class="tarjeta-color tono-cian mb-5 hover:translate-y-0" aria-labelledby="available-title">
+      <section class="tarjeta-color tono-cian mb-5 " aria-labelledby="available-title">
         <div class="section-head flex-wrap">
           <div>
             <p class="eyebrow">Reparto del trabajo</p>
             <h2 id="available-title">Tareas disponibles</h2>
             <p>Sin responsable y con sus dependencias ya terminadas. Elige la que quieras hacer.</p>
           </div>
-          <span id="available-count" class="tag bg-primary-soft text-primary">0</span>
+          <span id="available-count" class="tag bg-primary-soft text-[var(--estado-primary)]">0</span>
         </div>
         <div id="available-list" class="grid gap-2.5 md:grid-cols-2" aria-live="polite"></div>
       </section>
 
       <!-- Diagrama -->
-      <section class="tarjeta-color tono-indigo hover:translate-y-0" aria-labelledby="diagram-title">
+      <section class="panel" aria-labelledby="diagram-title">
         <div class="section-head flex-wrap">
           <div>
             <p class="eyebrow">Mapa del proyecto</p>
@@ -41,7 +41,7 @@
             <p>Una tarea bloqueada muestra de qué depende.</p>
           </div>
         </div>
-        <div class="overflow-x-auto rounded-sm border border-[#cdd3e6] bg-white/70 p-4">
+        <div class="overflow-x-auto">
           <div id="diagram" class="flex min-w-max items-start gap-4"></div>
         </div>
       </section>
@@ -75,7 +75,7 @@
           <div id="dependency-list" class="mt-2 flex flex-wrap gap-1.5"></div>
         </div>
 
-        <p id="task-blocked" class="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] font-semibold text-[#8a5a12]" hidden></p>
+        <p id="task-blocked" class="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] font-semibold text-[var(--estado-warning)]" hidden></p>
         <p id="task-feedback" class="form-feedback" role="alert"></p>
         <div class="dialog-actions">
           <button id="release-task" class="btn btn-ghost" type="button">Liberar tarea</button>

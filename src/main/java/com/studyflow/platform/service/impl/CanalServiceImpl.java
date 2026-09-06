@@ -73,12 +73,31 @@ public class CanalServiceImpl implements CanalService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CanalDTO> listarDeProyecto(String codigoProyecto, Long usuarioId) {
         Proyecto proyecto = proyectoService.obtenerEntidadPorCodigo(codigoProyecto);
+        asegurarCanalGeneral(proyecto);
         return canalRepository.findByProyectoIdOrderByOrdenAscNombreAsc(proyecto.getId()).stream()
                 .map(canal -> mapper.aDTO(canal, usuarioId, false))
                 .toList();
+    }
+
+    /**
+     * Repone el canal #general si el proyecto no lo tiene.
+     *
+     * <p>Los proyectos creados antes de que ProyectoService abriera el canal se
+     * quedaron sin el, y sin esto seguirian sin poder usarlo. Es una reparacion
+     * silenciosa: si ya existe, no hace nada.</p>
+     */
+    private void asegurarCanalGeneral(Proyecto proyecto) {
+        if (canalRepository.existsByProyectoIdAndSlug(proyecto.getId(), Canal.NOMBRE_GENERAL)) {
+            return;
+        }
+        Canal general = new Canal(Canal.NOMBRE_GENERAL, TipoCanal.GENERAL, 0);
+        general.setSlug(Canal.NOMBRE_GENERAL);
+        general.setDescripcion("Coordinación general de " + proyecto.getNombre());
+        general.setCreador(proyecto.getPropietario());
+        proyecto.agregarCanal(general);
+        canalRepository.save(general);
     }
 
     @Override
@@ -103,6 +122,14 @@ public class CanalServiceImpl implements CanalService {
 
         if (canalRepository.existsByProyectoIdAndSlug(proyecto.getId(), slug)) {
             throw new IllegalArgumentException("Ya existe un canal #%s en este proyecto.".formatted(slug));
+        }
+
+        // El nombre esta reservado: si se dejara pasar, quedaria un segundo
+        // #general de tipo LIBRE que si se puede eliminar, y el proyecto
+        // acabaria con dos canales que se llaman igual.
+        if (Canal.NOMBRE_GENERAL.equals(slug)) {
+            throw new IllegalArgumentException(
+                    "El canal #general ya existe en el proyecto y lo crea el sistema.");
         }
 
         TipoCanal tipo = peticion.tipo() != null && !peticion.tipo().isBlank()

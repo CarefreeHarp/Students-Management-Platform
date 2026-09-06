@@ -41,7 +41,7 @@
   function pintarCanales() {
     $("#channel-list").innerHTML = estado.canales.map((canal) => `
       <button class="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-[13px] font-semibold transition-colors
-                     ${canal.id === estado.activo?.id ? "bg-primary-soft text-primary" : "text-muted hover:bg-primary-soft hover:text-primary"}"
+                     ${canal.id === estado.activo?.id ? "bg-primary-soft text-[var(--estado-primary)]" : "text-muted hover:bg-primary-soft hover:text-[var(--estado-primary)]"}"
               type="button" data-channel="${canal.id}">
         <span class="text-muted-light">#</span>
         <span class="min-w-0 flex-1 truncate">${esc(canal.slug)}</span>
@@ -58,7 +58,7 @@
   function burbujaReacciones(mensaje) {
     const existentes = mensaje.reacciones.map((reaccion) => `
       <button class="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11px] transition-colors
-                     ${reaccion.propia ? "border-primary bg-primary-soft text-primary" : "border-line bg-white text-muted hover:border-primary"}"
+                     ${reaccion.propia ? "border-primary bg-primary-soft text-[var(--estado-primary)]" : "border-line bg-[var(--superficie)] text-muted hover:border-primary"}"
               type="button" data-react="${mensaje.id}" data-emoji="${esc(reaccion.emoji)}"
               title="${esc(reaccion.personas.join(", "))}">
         <span>${esc(reaccion.emoji)}</span><span>${reaccion.total}</span>
@@ -66,7 +66,7 @@
 
     return `<div class="mt-1.5 flex flex-wrap items-center gap-1">
         ${existentes}
-        <button class="grid h-6 w-6 place-items-center rounded-full border border-line bg-white text-[11px] text-muted hover:border-primary hover:text-primary"
+        <button class="grid h-6 w-6 place-items-center rounded-full border border-line bg-[var(--superficie)] text-[11px] text-muted hover:border-primary hover:text-primary"
                 type="button" data-open-picker="${mensaje.id}" aria-label="Añadir reacción">
           <i class="bi bi-emoji-smile"></i>
         </button>
@@ -79,7 +79,7 @@
       ? `<a href="${archivo.url}" target="_blank" rel="noopener">
            <img src="${archivo.url}" alt="${esc(archivo.nombre)}" class="max-h-52 rounded-sm border border-line object-cover">
          </a>`
-      : `<a href="${archivo.url}" class="inline-flex items-center gap-2 rounded-sm border border-line bg-white px-2.5 py-1.5 text-xs hover:border-primary"
+      : `<a href="${archivo.url}" class="inline-flex items-center gap-2 rounded-sm border border-line bg-[var(--superficie)] px-2.5 py-1.5 text-xs hover:border-primary"
             target="_blank" rel="noopener">
            <i class="bi bi-file-earmark-arrow-down text-primary"></i>
            <span class="min-w-0 flex-1 truncate">${esc(archivo.nombre)}</span>
@@ -89,7 +89,7 @@
 
   function burbuja(mensaje) {
     if (mensaje.generadoPorIa) {
-      return `<div class="self-center w-full max-w-[85%] rounded-sm border border-primary/20 bg-primary-soft/60 p-3 text-xs text-[#4b4bb5]">
+      return `<div class="self-center w-full max-w-[85%] rounded-sm border border-primary/20 bg-primary-soft/60 p-3 text-xs text-[var(--estado-primary)]">
           <strong class="mb-1 block"><i class="bi bi-stars"></i> Asistente</strong>${esc(mensaje.contenido)}
         </div>`;
     }
@@ -98,7 +98,7 @@
         <span class="member-avatar ml-0 flex-none" style="--member-color:${esc(mensaje.autorColor)}"
               title="${esc(mensaje.autorNombre)}">${esc(mensaje.iniciales)}</span>
         <div class="min-w-0">
-          <div class="rounded-sm border border-line ${mensaje.propio ? "bg-primary-soft" : "bg-white"} px-3 py-2">
+          <div class="rounded-sm border border-line ${mensaje.propio ? "bg-primary-soft" : "bg-[var(--superficie)]"} px-3 py-2">
             <p class="mb-0.5 text-[11px] font-extrabold ${mensaje.propio ? "text-primary" : "text-muted"}">
               ${esc(mensaje.autorNombre)} · ${esc(mensaje.fechaEnvio)}
             </p>
@@ -185,7 +185,7 @@
     $("#documents").innerHTML = documentos.length
       ? documentos.map((documento) => `
           <a href="${documento.url}" target="_blank" rel="noopener"
-             class="flex items-center gap-2 rounded-sm border border-line bg-white p-2 text-xs hover:border-primary">
+             class="flex items-center gap-2 rounded-sm border border-line bg-[var(--superficie)] p-2 text-xs hover:border-primary">
             <i class="bi bi-file-earmark-text text-lg text-primary"></i>
             <span class="min-w-0 flex-1">
               <span class="block truncate font-bold">${esc(documento.nombre)}</span>

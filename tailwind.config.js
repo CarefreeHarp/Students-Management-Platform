@@ -45,29 +45,24 @@ module.exports = {
         sans: ['"DM Sans"', 'Arial', 'sans-serif'],
         display: ['"Plus Jakarta Sans"', '"DM Sans"', 'sans-serif']
       },
+      /* Radios contenidos: el rediseño usa esquinas suaves, no cápsulas. */
       borderRadius: {
-        sm: '12px',
-        DEFAULT: '18px',
-        lg: '24px'
+        sm: '10px',
+        DEFAULT: '12px',
+        lg: '16px'
       },
       /*
-       * Elevación por niveles en lugar de una sombra única y plana. Cada nivel
-       * combina un contacto corto (define el borde) con una sombra larga y muy
-       * suave (separa del fondo); apilarlas da profundidad sin ensuciar.
+       * El rediseño se apoya en bordes finos, no en relieve: las sombras bajan
+       * a un apoyo mínimo y solo los elementos flotantes (menús, diálogos)
+       * conservan una sombra de verdad.
        */
       boxShadow: {
-        sm: '0 1px 2px rgba(22, 32, 58, .05), 0 2px 6px rgba(22, 32, 58, .04)',
-        DEFAULT: '0 1px 2px rgba(22, 32, 58, .06), 0 8px 18px rgba(38, 47, 84, .08)',
-        /*
-         * Nivel propio de las tarjetas. Cuatro capas en vez de dos: el contacto
-         * dibuja el canto, las intermedias dan volumen y la última proyecta la
-         * tarjeta sobre la página. Con `sm` se confundían con el fondo, porque
-         * su base (#f1f3fb) queda a un paso del fondo del documento (#f4f6fc).
-         */
-        tarjeta: '0 1px 1px rgba(22, 32, 58, .07), 0 3px 6px rgba(38, 47, 84, .07), 0 10px 20px rgba(38, 47, 84, .10), 0 22px 40px rgba(38, 47, 84, .07)',
-        alta: '0 2px 4px rgba(22, 32, 58, .06), 0 18px 36px rgba(38, 47, 84, .14)',
-        barra: '0 1px 0 rgba(22, 32, 58, .04), 0 8px 24px rgba(38, 47, 84, .07)',
-        pop: '0 25px 65px rgba(16, 27, 60, .28)'
+        sm: '0 1px 2px rgba(32, 30, 44, .04)',
+        DEFAULT: '0 1px 2px rgba(32, 30, 44, .05), 0 2px 6px rgba(32, 30, 44, .04)',
+        tarjeta: '0 1px 2px rgba(32, 30, 44, .04)',
+        alta: '0 2px 6px rgba(32, 30, 44, .06), 0 8px 20px rgba(32, 30, 44, .07)',
+        barra: '0 1px 0 rgba(32, 30, 44, .04)',
+        pop: '0 16px 44px rgba(20, 18, 34, .18)'
       },
       keyframes: {
         'slide-in': { from: { transform: 'translateY(12px)', opacity: '0' } },

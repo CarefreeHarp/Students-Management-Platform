@@ -30,68 +30,64 @@
    * ══════════════════════════════════════════════════════════════════
    */
   :root {
-    --c-ink: 24 35 56;
-    --c-muted: 111 120 144;
-    --c-muted-light: 164 171 192;
-    --c-canvas: 245 247 252;
-    --c-line: 231 234 242;
-    --c-primary-soft: 238 238 255;
-    --c-success-soft: 233 248 241;
-    --c-warning-soft: 255 246 230;
-    --c-danger-soft: 255 240 241;
+    --c-ink: 26 26 32;
+    --c-muted: 106 106 122;
+    --c-muted-light: 150 150 166;
+    --c-canvas: 246 245 242;
+    --c-line: 230 229 233;
+    --c-primary-soft: 238 237 251;
+    --c-success-soft: 232 245 238;
+    --c-warning-soft: 253 243 227;
+    --c-danger-soft: 253 235 236;
 
-    --fondo: #f4f6fc;
-    --velo-uno: rgba(91, 92, 226, .13);
-    --velo-dos: rgba(25, 167, 189, .09);
+    /* Papel cálido y liso: el fondo ya no lleva velos de color. */
+    --fondo: #f6f5f2;
+    --velo-uno: transparent;
+    --velo-dos: transparent;
+
+    --barra: #f2f1fb;                 /* barra superior, lavanda muy claro */
+    --barra-borde: #e2e0ee;
 
     --superficie: #ffffff;            /* paneles y contenido */
-    --superficie-suave: #f6f8fd;      /* zonas embebidas dentro de un panel */
-    --tarjeta-gris: #eef1f9;          /* base de las tarjetas de color */
-    --lista-a: #f8f9fe;               /* degradado de las tarjetas de lista */
-    --lista-b: #f1f3fb;
+    --superficie-suave: #faf9f7;      /* zonas embebidas dentro de un panel */
 
-    --linea-tarjeta: #ccd4e8;
-    --linea-tarjeta-fuerte: #b6c0da;
+    --linea-tarjeta: #e6e5e9;
+    --linea-tarjeta-fuerte: #d3d2da;
 
-    --campo: #e9edfa;                 /* relleno de los campos en reposo */
-    --campo-borde: #c8cfe8;
+    --campo: #ffffff;                 /* campos blancos, definidos por su borde */
+    --campo-borde: #dedce4;
     --campo-foco: #ffffff;
-    --form-linea: #b0aef0;            /* la línea morada que rodea el formulario */
+    --form-linea: #e6e5e9;            /* el cuadro de formulario ya no lleva anillo */
 
-    --titulo-a: #dedcfa;              /* fondo morado claro de los títulos */
-    --titulo-b: #e8e7fc;
-    --titulo-c: #f1f0ff;
-    --titulo-borde: #c5c2ef;
+    --cal-cabecera: #f0eff9;          /* franja superior y fila de días */
+    --cal-cuerpo: #ffffff;
+    --cal-borde: #e4e3ea;
+    --cal-rejilla: #eceaf3;
 
-    --cal-a: #e3e0fb;                 /* calendarios */
-    --cal-b: #eeecfe;
-    --cal-c: #f6f5ff;
-    --cal-borde: #bdb8ee;
-    --cal-rejilla: #edf0f5;
-    --cal-celda: rgba(255, 255, 255, .85);
+    --boton-dos: #ffffff;             /* secundario: blanco con borde */
+    --boton-dos-borde: #dedce4;
+    --boton-dos-texto: #2c2c38;
 
-    --morado-a: #e6e4fc;              /* paneles de canal */
-    --morado-b: #f1f0fe;
-    --morado-c: #f7f6ff;
+    --chip-neutro: #f1f0ee;
+    --pista: #eceaf3;
+    --embebido: #faf9f7;
+    --linea-suave: #e6e5e9;
+    --cal-linea: #eceaf3;
+    --realce: #e8e7fa;
+    --cyan-suave: #e4f4f5;
 
-    --boton-dos: #e4e2fb;             /* botón secundario */
-    --boton-dos-borde: #b9b6ee;
-    --boton-dos-texto: #3f3fa8;
+    --social-google-fondo: #fdf2f0;   --social-google-borde: #f2d8d3;   --social-google-texto: #c0392b;
+    --social-github-fondo: #f4f4f5;   --social-github-borde: #dcdce0;   --social-github-texto: #24292f;
+    --social-facebook-fondo: #eff4fd; --social-facebook-borde: #cfdcf3; --social-facebook-texto: #1b4f9c;
 
-    --chip-neutro: #f0f2f7;           /* etiquetas y botones de icono neutros */
-    --pista: #edf0f6;                 /* canal de las barras de progreso */
-    --embebido: #fcfdff;              /* filas dentro de un panel */
-    --linea-suave: #e3e7f2;           /* gris con el que se mezclan los tonos */
-    --cal-linea: #dcd9f2;             /* separadores dentro del calendario */
-    --realce: #e2e2ff;                 /* hover de los elementos suaves */
-    --cyan-suave: #e4f6f9;
+    /* Texto de las etiquetas de estado. El color de marca no sirve aquí: sobre
+       su propio fondo suave da 1.75:1 en claro y 2.47:1 en oscuro. */
+    --estado-primary: #3b3ba8;
+    --estado-success: #1c6b4a;
+    --estado-warning: #8a5a12;
+    --estado-danger:  #a82b39;
 
-    --social-google-fondo: #fdf1ef;   --social-google-borde: #f0d2cd;   --social-google-texto: #c0392b;
-    --social-github-fondo: #eef0f4;   --social-github-borde: #d5d9e2;   --social-github-texto: #24292f;
-    --social-facebook-fondo: #eef3fd; --social-facebook-borde: #ccdaf3; --social-facebook-texto: #1b4f9c;
-
-    --mezcla-clara: #ffffff;          /* con qué se aclara un tono */
-    --sombra-color: 38 47 84;
+    --mezcla-clara: #ffffff;
   }
 
   /*
@@ -101,68 +97,61 @@
    * Lo que cambia es de qué lado del gris está cada cosa.
    */
   .dark {
-    --c-ink: 231 235 247;
-    --c-muted: 156 165 190;
-    --c-muted-light: 122 131 157;
-    --c-canvas: 17 20 34;
-    --c-line: 55 61 84;
-    --c-primary-soft: 48 46 96;
-    --c-success-soft: 24 58 45;
-    --c-warning-soft: 66 50 22;
-    --c-danger-soft: 70 32 40;
+    --c-ink: 233 232 238;
+    --c-muted: 158 157 172;
+    --c-muted-light: 124 123 138;
+    --c-canvas: 20 19 25;
+    --c-line: 54 52 64;
+    --c-primary-soft: 47 45 92;
+    --c-success-soft: 25 56 44;
+    --c-warning-soft: 63 48 22;
+    --c-danger-soft: 67 31 38;
 
-    --fondo: #0f1220;
-    --velo-uno: rgba(91, 92, 226, .22);
-    --velo-dos: rgba(25, 167, 189, .12);
+    --fondo: #141319;
+    --velo-uno: transparent;
+    --velo-dos: transparent;
 
-    --superficie: #191d31;
-    --superficie-suave: #212639;
-    --tarjeta-gris: #232840;          /* más claro que el fondo, igual que en claro va más oscuro */
-    --lista-a: #212639;
-    --lista-b: #1b2033;
+    --barra: #1d1b2b;
+    --barra-borde: #322f45;
 
-    --linea-tarjeta: #3a4162;
-    --linea-tarjeta-fuerte: #545c85;
+    --superficie: #1c1b23;
+    --superficie-suave: #232129;
 
-    --campo: #0e1120;                 /* el campo se hunde respecto a su cuadro */
-    --campo-borde: #454d73;
-    --campo-foco: #0a0d18;
-    --form-linea: #7c78e0;
+    --linea-tarjeta: #363442;
+    --linea-tarjeta-fuerte: #4c4a5c;
 
-    --titulo-a: #2e2a63;
-    --titulo-b: #262350;
-    --titulo-c: #1d1c3c;
-    --titulo-borde: #4b46a0;
+    --campo: #121118;
+    --campo-borde: #403e50;
+    --campo-foco: #0e0d13;
+    --form-linea: #363442;
 
-    --cal-a: #262254;
-    --cal-b: #201d45;
-    --cal-c: #1a1836;
-    --cal-borde: #443e8c;
-    --cal-rejilla: #333a5c;
-    --cal-celda: rgba(255, 255, 255, .05);
+    --cal-cabecera: #262338;
+    --cal-cuerpo: #1c1b23;
+    --cal-borde: #363442;
+    --cal-rejilla: #2c2a38;
 
-    --morado-a: #2a2557;
-    --morado-b: #232048;
-    --morado-c: #1d1b3b;
+    --boton-dos: #26242f;
+    --boton-dos-borde: #423f52;
+    --boton-dos-texto: #e2e0ea;
 
-    --boton-dos: #322f6e;
-    --boton-dos-borde: #56519f;
-    --boton-dos-texto: #cfcdf7;
-
-    --chip-neutro: #2a3048;
-    --pista: #2b3149;
-    --embebido: #1c2134;
-    --linea-suave: #39405e;
-    --cal-linea: #3a3570;
-    --realce: #3b3885;
-    --cyan-suave: #123c46;
+    --chip-neutro: #2a2833;
+    --pista: #2c2a38;
+    --embebido: #232129;
+    --linea-suave: #363442;
+    --cal-linea: #2c2a38;
+    --realce: #322f5e;
+    --cyan-suave: #123a40;
 
     --social-google-fondo: #3a201d;   --social-google-borde: #6b3a34;   --social-google-texto: #f0968b;
-    --social-github-fondo: #262b3d;   --social-github-borde: #454d66;   --social-github-texto: #d6dbe6;
+    --social-github-fondo: #26262d;   --social-github-borde: #454452;   --social-github-texto: #d6dbe6;
     --social-facebook-fondo: #172740; --social-facebook-borde: #2f4c74; --social-facebook-texto: #8ab4ea;
 
-    --mezcla-clara: #111427;          /* en oscuro, «aclarar» un tono es acercarlo al fondo */
-    --sombra-color: 0 0 0;
+    --estado-primary: #b3b2f8;
+    --estado-success: #6cd3a6;
+    --estado-warning: #f3bd63;
+    --estado-danger:  #f4949e;
+
+    --mezcla-clara: #1c1b23;
   }
 
   html {
@@ -222,64 +211,39 @@
      ══════════════════════════════════════════════════════════════════ */
 
   /*
-   * El degradado se apoya en un gris claro, no en blanco. Con blanco al final
-   * la tarjeta se confundía con el fondo de la página justo en la esquina donde
-   * el tono ya se ha desvanecido.
+   * Tarjeta destacada: un lavado muy suave de su tono y un filete del mismo
+   * color pegado al borde superior. Es la pieza que da color a las pantallas;
+   * todo lo demás es blanco sobre el papel del fondo.
    */
   .tarjeta-color {
-    @apply relative overflow-hidden rounded p-5 shadow-tarjeta transition-all duration-200
-           hover:-translate-y-1 hover:shadow-alta;
+    @apply relative overflow-hidden rounded-sm p-[18px] transition-colors duration-200;
     --tono: #5b5ce2;
-    /* Un punto entre el fondo (#f5f7fc) y el gris anterior (#e8ecf6): tiene que
-       verse más oscuro que la página, pero sin apagar la tarjeta. */
-    --gris-base: var(--tarjeta-gris);
-    border: 1px solid color-mix(in srgb, var(--tono) 28%, var(--linea-suave));
-    background: linear-gradient(158deg,
-      color-mix(in srgb, var(--tono) 16%, var(--gris-base)) 0%,
-      color-mix(in srgb, var(--tono) 8%, var(--gris-base)) 52%,
-      var(--gris-base) 100%);
+    border: 1px solid color-mix(in srgb, var(--tono) 22%, var(--linea-tarjeta));
+    background: color-mix(in srgb, var(--tono) 9%, var(--mezcla-clara));
   }
   /* Filete superior del mismo tono: marca la tarjeta sin saturarla. */
   .tarjeta-color::before {
-    @apply absolute inset-x-0 top-0 h-[4px] content-[''];
-    background: linear-gradient(90deg, var(--tono),
-      color-mix(in srgb, var(--tono) 45%, var(--mezcla-clara)));
+    @apply absolute inset-x-0 top-0 h-[3px] content-[''];
+    background: var(--tono);
   }
   .tarjeta-color:hover {
-    border-color: color-mix(in srgb, var(--tono) 48%, var(--linea-suave));
+    border-color: color-mix(in srgb, var(--tono) 38%, var(--linea-tarjeta));
   }
   .tarjeta-color h2, .tarjeta-color h3 {
     color: color-mix(in srgb, var(--tono) 62%, #16203a);
   }
 
   .tarjeta-lista {
-    @apply rounded-sm border border-[var(--linea-tarjeta)] p-3.5 shadow-tarjeta transition-all duration-200
-           hover:-translate-y-0.5 hover:border-[var(--linea-tarjeta-fuerte)] hover:shadow-alta;
-    background: linear-gradient(180deg, var(--lista-a) 0%, var(--lista-b) 100%);
+    @apply rounded-sm border border-[var(--linea-tarjeta)] bg-[var(--superficie)] p-3.5 transition-colors duration-200
+           hover:border-[var(--linea-tarjeta-fuerte)];
   }
-  .tarjeta-lista:hover { background: linear-gradient(180deg, var(--superficie) 0%, var(--superficie-suave) 100%); }
 
   /* Variante con filete lateral de color propio, pasado por --borde. */
   .tarjeta-borde-color {
     --borde: #5b5ce2;
-    border-left: 5px solid var(--borde);
-    border-color: color-mix(in srgb, var(--borde) 32%, var(--linea-suave));
-    border-left-color: var(--borde);
-  }
-  .tarjeta-borde-color:hover {
-    border-color: color-mix(in srgb, var(--borde) 55%, #c9d0e6);
-    border-left-color: var(--borde);
+    border-left: 3px solid var(--borde);
   }
 
-  /*
-   * Superficie morada. La usan las piezas de un canal (lista, conversación,
-   * archivos y resumen) para que todo lo del canal se lea como un bloque y no
-   * como paneles blancos sueltos sobre la página.
-   */
-  .panel-morado {
-    @apply rounded border-2 border-[var(--cal-borde)] p-[18px] shadow-alta max-[620px]:p-4;
-    background: linear-gradient(180deg, var(--morado-a) 0%, var(--morado-b) 60%, var(--morado-c) 100%);
-  }
 
   /* Los tonos van después de .tarjeta-color para poder sobrescribir su valor
      por omisión: con igual especificidad, manda la regla más tardía. */
@@ -303,35 +267,28 @@
 
   /* ---------- Navegación superior (renderizada por main.js) ---------- */
   /*
-   * Barra morada: es la única superficie de color pleno de la interfaz, así que
-   * todo lo que va dentro (marca, enlaces, perfil) se invierte a blanco. El
-   * degradado se detiene en #6f52dc porque más claro el blanco ya no llega al
-   * contraste mínimo de 4.5:1.
+   * Barra clara: lavanda muy tenue sobre el papel del fondo, con el contenido
+   * en tinta. Se distingue de la página por su color propio y una línea abajo,
+   * no por ser un bloque de color pleno.
    */
   .app-nav {
-    @apply sticky top-0 z-[100] flex min-h-[74px] items-center px-[4.5vw] text-white shadow-barra;
-    background: linear-gradient(100deg, #4342c4 0%, #5b5ce2 48%, #6f52dc 100%);
-    border-bottom: 1px solid rgba(52, 51, 148, .55);
-  }
-  /* Filete inferior más claro, para rematar la barra contra la página. */
-  .app-nav::after {
-    @apply pointer-events-none absolute inset-x-0 bottom-0 h-[3px] content-[''];
-    background: linear-gradient(90deg, #8b8cf0 0%, #a98cf5 55%, #c3a6f8 100%);
+    @apply sticky top-0 z-[100] flex min-h-[62px] items-center px-[4.5vw] text-ink;
+    background: var(--barra);
+    border-bottom: 1px solid var(--barra-borde);
   }
   .nav-inner {
     @apply mx-auto flex w-[min(1360px,100%)] items-center gap-5 max-[900px]:gap-3 max-[620px]:gap-2;
   }
   /* Separadores entre logo, navegación y perfil: tres zonas, no una fila. */
   .nav-separador {
-    @apply h-7 w-px flex-none bg-white/30 max-[620px]:hidden;
+    @apply h-7 w-px flex-none bg-[var(--barra-borde)] max-[620px]:hidden;
   }
   .brand {
-    @apply inline-flex flex-none items-center gap-2.5 font-display text-[18px] font-extrabold tracking-[-0.7px] text-white max-[620px]:text-base;
+    @apply inline-flex flex-none items-center gap-2.5 font-display text-[18px] font-extrabold tracking-[-0.7px] text-ink max-[620px]:text-base;
   }
-  /* Sobre la barra morada el cuadro se invierte: blanco con el rayo en morado. */
   .brand-mark {
-    @apply grid h-[34px] w-[34px] place-items-center rounded-[11px] bg-white text-lg text-primary max-[620px]:h-[31px] max-[620px]:w-[31px];
-    box-shadow: 0 6px 14px rgba(26, 25, 92, .28);
+    @apply grid h-[30px] w-[30px] place-items-center rounded-[9px] text-base text-white max-[620px]:h-[27px] max-[620px]:w-[27px];
+    background: linear-gradient(140deg, #7675ee, #4a4bcf);
   }
   .nav-links {
     @apply mr-auto flex items-center gap-2 max-[900px]:gap-1
@@ -344,20 +301,23 @@
    * activo se queda más grande: el tamaño refuerza dónde estás.
    */
   .nav-link {
-    @apply rounded-[10px] px-3 py-2 text-sm font-semibold text-white/90 transition-all duration-150
-           hover:scale-[1.07] hover:bg-white/20 hover:text-white
+    @apply relative rounded-md px-2.5 py-2 text-sm font-medium text-muted transition-colors duration-150
+           hover:bg-[var(--realce)] hover:text-ink
            max-[900px]:p-2 max-[620px]:p-2.5;
   }
-  /* El activo se invierte: blanco pleno con el texto en morado. */
+  /* El activo se señala con color y un subrayado pegado al borde de la barra. */
   .nav-link.active {
-    @apply scale-[1.1] bg-white font-bold text-primary shadow-sm hover:bg-white hover:text-primary-dark;
+    @apply font-semibold text-primary hover:bg-transparent hover:text-primary;
+  }
+  .nav-link.active::after {
+    @apply absolute inset-x-2.5 -bottom-[19px] h-[2px] rounded-full bg-primary content-[''] max-[620px]:hidden;
   }
   .nav-link span { @apply max-[900px]:hidden max-[620px]:inline; }
   .nav-actions { @apply flex items-center gap-2.5; }
   .profile-menu { @apply relative; }
   .profile-trigger {
-    @apply flex items-center gap-2 rounded-full border border-white/35 bg-white/15 p-1 pr-2.5 text-white
-           transition-all duration-150 hover:scale-105 hover:border-white/60 hover:bg-white/25;
+    @apply flex items-center gap-2 rounded-full border border-[var(--barra-borde)] bg-[var(--superficie)] p-[3px] pr-2.5 text-ink
+           transition-colors duration-150 hover:border-primary/45 hover:bg-primary-soft;
   }
   .profile-trigger > i { @apply max-[620px]:hidden; }
   .nav-avatar, .avatar {
@@ -372,31 +332,23 @@
   .profile-menu:hover .profile-dropdown,
   .profile-menu:focus-within .profile-dropdown { @apply visible translate-y-0 opacity-100; }
   .profile-dropdown a {
-    @apply block rounded-lg px-2.5 py-2 text-[13px] font-semibold text-muted hover:bg-primary-soft hover:text-primary;
+    @apply block rounded-lg px-2.5 py-2 text-[13px] font-semibold text-muted hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
-  /* Interruptor de tema: vive en la barra morada, así que va en blanco. */
+  /* Interruptor de tema: mismo acabado que el botón secundario. */
   .tema-boton {
-    @apply grid h-9 w-9 flex-none place-items-center rounded-full border border-white/35 bg-white/15 text-base text-white
-           transition-all duration-150 hover:scale-110 hover:border-white/60 hover:bg-white/25;
+    @apply grid h-9 w-9 flex-none place-items-center rounded-lg border border-[var(--boton-dos-borde)] bg-[var(--boton-dos)] text-base text-muted
+           transition-colors duration-150 hover:border-primary/45 hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
   /* Fuera de la barra morada (acceso, guía de estilo) el botón va sobre fondo
      claro, así que invierte sus colores. */
   .tema-boton--suelto {
-    @apply absolute right-5 top-5 z-[200] border-[var(--linea-tarjeta)] bg-[var(--superficie)] text-muted shadow-tarjeta
-           hover:border-primary hover:bg-primary-soft hover:text-primary;
+    @apply absolute right-5 top-5 z-[200] border-[var(--linea-tarjeta)] bg-[var(--superficie)] text-muted
+           hover:border-primary hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
   .page-heading .tema-boton--suelto { @apply static shadow-none; }
 
   .mobile-nav-toggle {
-    @apply hidden border-0 bg-transparent text-[22px] text-white max-[620px]:ml-auto max-[620px]:block;
-  }
-  /*
-   * En móvil los enlaces se despliegan en un panel blanco fuera de la barra, así
-   * que ahí el texto vuelve a ser oscuro: en blanco sobre blanco no se leería.
-   */
-  @media (max-width: 620px) {
-    .nav-link { @apply text-muted hover:bg-primary-soft hover:text-primary; }
-    .nav-link.active { @apply bg-primary text-white; }
+    @apply hidden border-0 bg-transparent text-[22px] text-ink max-[620px]:ml-auto max-[620px]:block;
   }
   .nav-actions .btn { @apply max-[620px]:hidden; }
 
@@ -407,20 +359,15 @@
            max-[620px]:w-[min(100%-24px,1360px)] max-[620px]:py-6;
   }
   /*
-   * El título de cada pantalla vive en su propia superficie, con un filete de
-   * acento a la izquierda. Antes era texto suelto sobre el fondo y no había
-   * nada que marcara dónde empieza la página.
+   * El título va directo sobre el papel del fondo: antesala en color, titular
+   * en tinta y entradilla apagada. Antes era una caja morada con filete, que
+   * competía con las tarjetas de la propia pantalla.
    */
   .page-heading {
-    @apply relative mb-7 flex items-end justify-between gap-4 overflow-hidden rounded
-           border border-[var(--titulo-borde)] py-5 pl-7 pr-6 shadow
-           max-[620px]:mb-5 max-[620px]:flex-col max-[620px]:items-start max-[620px]:py-4 max-[620px]:pl-5 max-[620px]:pr-4;
-    background: linear-gradient(112deg, var(--titulo-a) 0%, var(--titulo-b) 48%, var(--titulo-c) 100%);
+    @apply mb-6 flex items-end justify-between gap-4
+           max-[620px]:mb-5 max-[620px]:flex-col max-[620px]:items-start;
   }
-  .page-heading::before {
-    @apply absolute inset-y-0 left-0 w-[6px] content-[''];
-    background: linear-gradient(180deg, #4a4bcf, #8b6ff0);
-  }
+  .page-heading h1 { @apply mt-0.5; }
   .eyebrow, .section-kicker {
     @apply m-0 mb-[5px] inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.08em] text-primary;
   }
@@ -435,24 +382,20 @@
 
   /* ---------- Botones (vocabulario único para HTML y JS) ---------- */
   .btn {
-    @apply inline-flex min-h-[40px] items-center justify-center gap-2 rounded-[10px] border border-transparent bg-[var(--superficie)] px-3.5 py-2.5
-           text-[13px] font-bold text-ink transition-all duration-200 hover:-translate-y-px;
+    @apply inline-flex min-h-[38px] items-center justify-center gap-2 rounded-md border border-transparent bg-[var(--superficie)] px-3.5 py-2
+           text-[13px] font-semibold text-ink transition-colors duration-150;
   }
   .btn-primary {
     @apply bg-primary text-white hover:bg-primary-dark;
-    box-shadow: 0 7px 16px rgba(91, 92, 226, .2);
   }
-  /*
-   * Relleno morado claro con borde propio. En blanco sobre un fondo casi
-   * blanco no se veía, y un gris apenas lo mejoraba: hace falta color.
-   */
+  /* Secundario: blanco con borde, como en el rediseño. */
   .btn-secondary {
-    @apply border-[var(--boton-dos-borde)] bg-[var(--boton-dos)] font-bold text-[var(--boton-dos-texto)] shadow-sm
-           hover:border-[#9a97e6] hover:bg-[#d6d3f7] hover:text-[var(--boton-dos-texto)] hover:shadow;
+    @apply border-[var(--boton-dos-borde)] bg-[var(--boton-dos)] text-[var(--boton-dos-texto)]
+           hover:border-primary/45 hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
-  .btn-soft { @apply bg-primary-soft text-primary hover:bg-[var(--realce)]; }
-  .btn-ghost { @apply bg-transparent text-muted hover:bg-primary-soft hover:text-primary; }
-  .btn-danger { @apply bg-danger-soft text-danger; }
+  .btn-soft { @apply bg-primary-soft text-[var(--estado-primary)] hover:bg-[var(--realce)]; }
+  .btn-ghost { @apply bg-transparent text-muted hover:bg-primary-soft hover:text-[var(--estado-primary)]; }
+  .btn-danger { @apply bg-danger-soft text-[var(--estado-danger)]; }
   .btn-ai {
     @apply border-0 text-white;
     background: linear-gradient(135deg, #6d6cec, #22a7bc);
@@ -460,9 +403,9 @@
   }
   .btn-sm { @apply min-h-[34px] px-2.5 py-[7px] text-xs; }
   .btn-icon { @apply w-10 p-0; }
-  .btn:disabled { @apply cursor-not-allowed opacity-50 hover:translate-y-0; }
+  .btn:disabled { @apply cursor-not-allowed opacity-50; }
   .icon-button {
-    @apply grid h-[31px] w-[31px] flex-none place-items-center rounded-lg border-0 bg-[var(--chip-neutro)] text-muted transition-colors hover:bg-primary-soft hover:text-primary;
+    @apply grid h-[31px] w-[31px] flex-none place-items-center rounded-lg border-0 bg-[var(--chip-neutro)] text-muted transition-colors hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
   .text-action, .subtle-link, .focus-link {
     @apply inline-flex items-center gap-1.5 text-[13px] font-bold text-primary hover:text-primary-dark;
@@ -470,15 +413,13 @@
 
   /* ---------- Superficies ---------- */
   .card {
-    @apply rounded border border-[var(--linea-suave)] bg-[var(--superficie)] shadow-tarjeta transition-shadow duration-200;
+    @apply rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)];
   }
   .panel {
-    @apply rounded border border-[var(--linea-suave)] bg-[var(--superficie)] p-[22px] shadow-sm transition-shadow duration-200 max-[620px]:p-4;
+    @apply rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] p-[22px] max-[620px]:p-4;
   }
-  /* Un panel que agrupa contenido gana relieve al acercarse a él. */
-  .panel:hover, .card:hover { @apply shadow; }
   .step-number {
-    @apply grid h-8 w-8 flex-none place-items-center rounded-[10px] bg-primary-soft font-display text-[13px] font-extrabold text-primary;
+    @apply grid h-8 w-8 flex-none place-items-center rounded-[10px] bg-primary-soft font-display text-[13px] font-extrabold text-[var(--estado-primary)];
   }
   .panel-heading { @apply mb-4 flex items-center gap-3; }
   .panel-heading h2 { @apply text-base; }
@@ -493,7 +434,7 @@
    */
   .filter-button {
     @apply min-h-[34px] rounded-lg border-0 bg-transparent px-3.5 py-1.5 text-xs font-bold text-muted
-           transition-all duration-150 hover:bg-primary-soft hover:text-primary;
+           transition-all duration-150 hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
   .filter-button.is-active {
     @apply bg-primary text-white shadow-sm hover:bg-primary-dark hover:text-white;
@@ -508,10 +449,10 @@
   /* Cuatro estados actuales más los nombres antiguos, que siguen guardados
      en las pantallas que aún leen localStorage. */
   .status-sin-empezar, .status-pending, .task-status.is-pending { @apply bg-[var(--chip-neutro)] text-muted; }
-  .status-en-proceso, .status-progress, .status-in-progress, .task-status.is-progress { @apply bg-primary-soft text-primary; }
-  .status-en-revision { @apply bg-warning-soft text-warning; }
-  .status-terminada, .status-done, .status-completed, .task-status.is-completed { @apply bg-success-soft text-success; }
-  .status-late, .task-status.is-late { @apply bg-danger-soft text-danger; }
+  .status-en-proceso, .status-progress, .status-in-progress, .task-status.is-progress { @apply bg-primary-soft text-[var(--estado-primary)]; }
+  .status-en-revision { @apply bg-warning-soft text-[var(--estado-warning)]; }
+  .status-terminada, .status-done, .status-completed, .task-status.is-completed { @apply bg-success-soft text-[var(--estado-success)]; }
+  .status-late, .task-status.is-late { @apply bg-danger-soft text-[var(--estado-danger)]; }
 
   /* Marca de completado en los apuntes de la página de recordatorios. */
   .task-check.is-done { @apply border-success bg-success text-white; }
@@ -530,38 +471,32 @@
   /* ---------- Formularios ---------- */
   .form-grid { @apply grid grid-cols-2 gap-4 max-[620px]:grid-cols-1; }
   /*
-   * Tratamiento único de formulario, igual en TODAS las pantallas que piden
-   * datos: línea morada rodeando el grupo de campos, fondo blanco y sombra
-   * teñida. Lo comparten `.cuadro-formulario` (grupos sueltos) y `.form-panel`
-   * (los pasos numerados de «crear proyecto»), para que no haya dos estilos.
-   *
-   * Va después de `.panel` a propósito: `.form-panel` dejó de heredar de él y
-   * cualquier propiedad repetida tiene que resolverse a favor de esta regla.
+   * Los campos se agrupan en una superficie blanca con borde fino, igual que
+   * cualquier otro panel. El anillo morado de la versión anterior competía con
+   * el filete de las tarjetas y ensuciaba las pantallas con mucho formulario.
    */
   .cuadro-formulario, .form-panel {
-    @apply rounded bg-[var(--superficie)] p-5 max-[620px]:p-4;
-    border: 2px solid var(--form-linea);
-    box-shadow: 0 2px 5px rgba(22, 32, 58, .05), 0 14px 32px rgba(91, 92, 226, .15);
+    @apply rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] p-5 max-[620px]:p-4;
   }
   .form-panel { @apply p-[22px] max-[620px]:p-4; }
   .cuadro-formulario > .form-grid, .cuadro-formulario > .auth-form { @apply mt-0; }
   .form-grid-two { @apply grid grid-cols-2 gap-3.5 max-[620px]:grid-cols-1; }
   .form-group, .form-field, .edit-field { @apply grid gap-[7px]; }
   .form-group.full, .form-field--full, .field-span-2, .full-width { @apply col-span-full max-[620px]:col-auto; }
-  label { @apply text-xs font-extrabold text-ink/80; }
+  label { @apply text-xs font-semibold text-ink/85; }
   .field-help, .field-hint, small { @apply text-[11px] text-muted; }
 
   /*
-   * El campo se distingue del cuadro que lo contiene: relleno gris azulado en
-   * reposo y blanco al escribir. Sobre un panel blanco, un campo blanco solo se
-   * veía por su borde.
+   * Campo blanco definido por su borde, como en el rediseño; al enfocarlo el
+   * borde pasa al color de marca con un halo tenue.
    */
   .input, input:not([type='checkbox']):not([type='radio']):not([type='file']), select, textarea {
-    @apply w-full min-h-[44px] rounded-[10px] border border-[var(--campo-borde)] bg-[var(--campo)] px-3 py-2.5 text-sm text-ink outline-none transition-all
-           hover:border-[#b4bddc] hover:bg-[var(--realce)]
-           focus:border-[#7d7eea] focus:bg-[var(--campo-foco)] focus:shadow-[0_0_0_3px_rgba(91,92,226,.18)];
+    @apply w-full min-h-[42px] rounded-md border border-[var(--campo-borde)] bg-[var(--campo)] px-3 py-2.5 text-sm text-ink outline-none transition-all
+           placeholder:text-muted-light
+           hover:border-[var(--linea-tarjeta-fuerte)]
+           focus:border-primary focus:bg-[var(--campo-foco)] focus:shadow-[0_0_0_3px_rgba(91,92,226,.14)];
   }
-  textarea { @apply min-h-[105px] resize-y; }
+  textarea { @apply min-h-[100px] resize-y; }
 
   .input-wrap {
     @apply relative flex items-center;
@@ -589,7 +524,7 @@
   }
   .check-label input { @apply h-4 w-4 accent-[#5b5ce2]; }
   .form-feedback {
-    @apply hidden rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-danger;
+    @apply hidden rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-[var(--estado-danger)];
   }
   /* Campo señalado tras un error de validación, para no tener que buscarlo a ojo. */
   .campo-con-error {
@@ -597,7 +532,7 @@
   }
   .campo-con-error:focus { @apply border-danger shadow-[0_0_0_3px_rgba(231,100,114,.15)]; }
   .form-feedback.is-visible { @apply block; }
-  .form-feedback.is-success { @apply bg-success-soft text-success; }
+  .form-feedback.is-success { @apply bg-success-soft text-[var(--estado-success)]; }
   .form-actions, .dialog-actions {
     @apply flex flex-wrap items-center justify-end gap-2.5;
   }
@@ -616,7 +551,7 @@
   }
   .members-input-list, .tasks-input-list, .dialog-members-list, .subject-list { @apply grid gap-2.5; }
   .member-row-avatar {
-    @apply grid h-[31px] w-[31px] place-items-center rounded-full bg-primary-soft text-[11px] font-extrabold text-primary;
+    @apply grid h-[31px] w-[31px] place-items-center rounded-full bg-primary-soft text-[11px] font-extrabold text-[var(--estado-primary)];
   }
 
   /* ---------- Avatares de equipo ---------- */
@@ -633,37 +568,21 @@
     grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
   }
   /*
-   * La tarjeta toma el color del proyecto: franja superior, un lavado muy suave
-   * del mismo tono en el fondo y un halo de ese color al elevarse. Así cada
-   * proyecto se reconoce por su color en todas las pantallas.
-   */
-  /*
-   * Base gris para despegarse del fondo, con el color del proyecto en la franja
-   * superior y un rastro en la esquina: identifica sin teñir la tarjeta entera.
+   * La tarjeta toma el color del proyecto: lavado suave de fondo y filete
+   * superior, igual que cualquier otra tarjeta destacada.
    */
   .project-card, .profile-project-card {
-    @apply relative block overflow-hidden rounded border border-[var(--linea-tarjeta)] p-5 shadow-tarjeta transition-all duration-200
-           hover:-translate-y-1 hover:shadow-alta;
+    @apply relative block overflow-hidden rounded-sm p-[18px] transition-colors duration-200;
     --color-tarjeta: var(--card-color, var(--project-color, #5b5ce2));
-    background:
-      linear-gradient(158deg, color-mix(in srgb, var(--color-tarjeta) 11%, var(--lista-a)) 0%,
-                              var(--lista-a) 46%,
-                              var(--lista-b) 100%);
-  }
-  .project-card:hover, .profile-project-card:hover {
-    background:
-      linear-gradient(158deg, color-mix(in srgb, var(--color-tarjeta) 13%, var(--mezcla-clara)) 0%,
-                              var(--superficie) 50%,
-                              var(--lista-a) 100%);
+    border: 1px solid color-mix(in srgb, var(--color-tarjeta) 22%, var(--linea-tarjeta));
+    background: color-mix(in srgb, var(--color-tarjeta) 9%, var(--mezcla-clara));
   }
   .project-card::before, .profile-project-card::before {
-    @apply absolute inset-x-0 top-0 h-[5px] content-[''];
-    background: linear-gradient(90deg,
-      var(--color-tarjeta),
-      color-mix(in srgb, var(--color-tarjeta) 55%, var(--mezcla-clara)));
+    @apply absolute inset-x-0 top-0 h-[3px] content-[''];
+    background: var(--color-tarjeta);
   }
   .project-card:hover, .profile-project-card:hover {
-    border-color: color-mix(in srgb, var(--color-tarjeta) 35%, var(--linea-suave));
+    border-color: color-mix(in srgb, var(--color-tarjeta) 40%, var(--linea-tarjeta));
   }
   .project-card-topline, .project-card-top { @apply mb-3 flex items-center gap-2; }
   .project-card-topline i, .project-card-menu { @apply ml-auto text-muted; }
@@ -696,20 +615,19 @@
   }
   .empty-projects h3, .empty-state h3 { @apply mb-2 text-ink; }
   .empty-icon {
-    @apply mx-auto mb-3 grid h-12 w-12 place-items-center rounded-[14px] bg-primary-soft text-[22px] text-primary;
+    @apply mx-auto mb-3 grid h-12 w-12 place-items-center rounded-[14px] bg-primary-soft text-[22px] text-[var(--estado-primary)];
   }
 
   /* ---------- Tarjetas de tarea (proyecto.html) ---------- */
   /* El borde izquierdo lleva el color de quien la hace: identifica de un vistazo. */
   .task-card {
-    @apply relative grid gap-2.5 overflow-hidden rounded border border-[var(--linea-tarjeta)] p-4 pl-[18px]
-           shadow-tarjeta transition-all duration-200 hover:-translate-y-1 hover:border-[var(--linea-tarjeta-fuerte)] hover:shadow-alta;
-    background: linear-gradient(180deg, var(--lista-a) 0%, var(--lista-b) 100%);
+    @apply relative grid gap-2.5 rounded-sm border border-[var(--linea-tarjeta)] bg-[var(--superficie)] p-4 pl-[15px]
+           transition-colors duration-200 hover:border-[var(--linea-tarjeta-fuerte)];
   }
-  .task-card:hover { background: linear-gradient(180deg, var(--superficie) 0%, var(--superficie-suave) 100%); }
+  /* Canto izquierdo con el color de quien la tiene asignada. */
   .task-card::before {
-    @apply absolute inset-y-0 left-0 w-[4px] content-[''];
-    background: var(--assignee-color, #c9cfe0);
+    @apply absolute inset-y-0 left-0 w-[3px] content-[''];
+    background: var(--assignee-color, var(--task-color, #5b5ce2));
   }
   .task-card.is-completed { @apply bg-[var(--superficie-suave)]; }
   .task-card.is-completed .task-title { @apply text-muted line-through; }
@@ -731,7 +649,7 @@
     background: var(--assignee-color, #5b5ce2);
   }
   .file-control {
-    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-[var(--chip-neutro)] px-2 py-1.5 text-[11px] font-bold text-muted hover:bg-primary-soft hover:text-primary;
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-[var(--chip-neutro)] px-2 py-1.5 text-[11px] font-bold text-muted hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
   .file-control input { @apply hidden; }
   .task-filter-wrap select { @apply min-h-[38px] w-auto text-[13px]; }
@@ -742,26 +660,26 @@
    * central de varias pantallas y en blanco se fundían con la página.
    */
   .calendar-shell {
-    @apply overflow-hidden rounded border-2 border-[var(--cal-borde)] shadow-alta;
-    background: linear-gradient(180deg, var(--cal-a) 0%, var(--cal-b) 55%, var(--cal-c) 100%);
+    @apply overflow-hidden rounded border border-[var(--cal-borde)];
+    background: var(--cal-cuerpo);
   }
   .calendar-toolbar {
-    @apply flex items-center justify-between gap-3 border-b border-[#c9c4ef] px-[18px] py-4;
-    background: linear-gradient(180deg, rgba(206, 201, 248, .85), rgba(233, 230, 253, 0));
+    @apply flex items-center justify-between gap-3 border-b border-[var(--cal-borde)] px-4 py-3 text-[13px] font-semibold;
+    background: var(--cal-cabecera);
   }
   .calendar-toolbar h2 { @apply text-base; }
   .calendar-actions { @apply flex gap-1.5; }
   .calendar-button {
-    @apply grid h-[30px] w-[30px] place-items-center rounded-lg border border-line bg-[var(--superficie)] text-muted hover:bg-primary-soft hover:text-primary;
+    @apply grid h-[30px] w-[30px] place-items-center rounded-lg border border-line bg-[var(--superficie)] text-muted hover:bg-primary-soft hover:text-[var(--estado-primary)];
   }
   .week-calendar, .detail-calendar-wrap, .schedule-calendar-wrap { @apply overflow-x-auto; }
   .schedule-calendar-wrap {
-    @apply rounded border-2 border-[var(--cal-borde)] shadow-alta;
-    background: linear-gradient(180deg, var(--cal-a) 0%, var(--cal-b) 55%, var(--cal-c) 100%);
+    @apply overflow-hidden rounded border border-[var(--cal-borde)];
+    background: var(--cal-cuerpo);
   }
   .detail-calendar-wrap {
-    @apply rounded border-2 border-[var(--cal-borde)] shadow-alta;
-    background: linear-gradient(180deg, var(--cal-a) 0%, var(--cal-b) 55%, var(--cal-c) 100%);
+    @apply overflow-hidden rounded border border-[var(--cal-borde)];
+    background: var(--cal-cuerpo);
   }
   .calendar-grid {
     @apply grid min-w-[720px];
@@ -772,7 +690,8 @@
     grid-template-columns: 105px repeat(7, minmax(88px, 1fr));
   }
   .calendar-corner, .calendar-day-head {
-    @apply min-h-[53px] border-b border-[var(--cal-linea)] p-2.5;
+    @apply min-h-[48px] border-b border-[var(--cal-borde)] p-2.5;
+    background: var(--cal-cabecera);
   }
   .calendar-day-head {
     @apply border-l border-line text-center text-[11px] font-bold uppercase text-muted;
@@ -792,10 +711,10 @@
   .calendar-cell.is-due-date { @apply bg-[#fffaf5]; }
   .calendar-cell.is-today { @apply bg-primary-soft/40; }
   .calendar-event, .calendar-task {
-    @apply relative z-[2] block min-h-[34px] rounded-md border border-l-[4px] border-current px-1.5 py-1
-           text-[10px] font-extrabold leading-tight shadow-sm transition-transform;
+    @apply relative z-[2] block min-h-[32px] rounded-md border-l-[3px] border-current px-1.5 py-1
+           text-[10px] font-semibold leading-tight transition-transform;
     color: var(--event-color, var(--task-color, #5b5ce2));
-    background: color-mix(in srgb, currentColor 26%, var(--mezcla-clara));
+    background: color-mix(in srgb, currentColor 13%, var(--mezcla-clara));
   }
   /* El recorte va solo en el evento, que sí trunca su texto. En la tarea
      recortaba la ventana flotante y por eso no se veía al pasar el ratón. */
@@ -836,26 +755,25 @@
     @apply grid grid-cols-7 gap-[3px] text-center;
   }
   .planning-calendar {
-    @apply rounded-sm border-2 border-[var(--cal-borde)] p-2.5 shadow-alta;
-    background: linear-gradient(180deg, var(--cal-a) 0%, var(--morado-b) 100%);
+    @apply rounded-sm border border-[var(--cal-borde)] p-2.5;
+    background: var(--cal-cuerpo);
   }
   .mini-calendar-weekdays { @apply mb-1 text-[10px] font-extrabold uppercase text-muted-light; }
-  /* Blanco sobre el morado del calendario: cada día se lee como una casilla. */
   .calendar-day {
-    @apply grid aspect-square place-items-center rounded-lg border border-[var(--cal-linea)] bg-[var(--cal-celda)] text-[11px] font-semibold text-muted;
+    @apply grid aspect-square place-items-center rounded-md border border-transparent bg-[var(--superficie-suave)] text-[11px] font-semibold text-muted;
   }
   .calendar-day.is-empty { @apply bg-transparent; }
   .calendar-day.is-today { @apply border-primary text-primary; }
-  .calendar-day.is-filled { @apply bg-primary-soft font-extrabold text-primary; }
-  .calendar-day.is-due { @apply bg-warning-soft text-warning; }
+  .calendar-day.is-filled { @apply bg-primary-soft font-extrabold text-[var(--estado-primary)]; }
+  .calendar-day.is-due { @apply bg-warning-soft text-[var(--estado-warning)]; }
   .calendar-task-marker { @apply mt-0.5 h-1 w-1 rounded-full bg-current; }
   .preview-legend { @apply mt-3 flex flex-wrap gap-3 text-[11px] text-muted; }
   .preview-legend span { @apply inline-flex items-center gap-1.5; }
   .preview-legend i { @apply h-2 w-2 rounded-full bg-primary; }
   .preview-legend span:last-child i { @apply bg-warning; }
-  .task-counter { @apply rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-extrabold text-primary; }
+  .task-counter { @apply rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-extrabold text-[var(--estado-primary)]; }
   .ai-hint {
-    @apply mt-4 flex gap-2.5 rounded-sm bg-primary-soft/70 p-3 text-xs text-[#4b4bb5];
+    @apply mt-4 flex gap-2.5 rounded-sm bg-primary-soft/70 p-3 text-xs text-[var(--estado-primary)];
   }
 
   /* ---------- Calendario de horarios (crear-horario) ---------- */
@@ -890,13 +808,9 @@
   .schedule-calendar__empty {
     @apply col-span-full grid place-items-center p-6 text-[13px] text-muted;
   }
-  /*
-   * Sobre el calendario morado, una mezcla al 14 % con blanco se perdía. Cada
-   * materia lleva ahora su color con más cuerpo, borde completo y sombra.
-   */
   .schedule-event {
-    @apply absolute inset-x-1 overflow-hidden rounded-lg border border-l-[4px] border-current px-2 py-1.5 text-[11px] font-bold leading-tight shadow-sm;
-    background: color-mix(in srgb, currentColor 26%, var(--mezcla-clara));
+    @apply absolute inset-x-1 overflow-hidden rounded-md border-l-[3px] border-current px-2 py-1.5 text-[11px] font-semibold leading-tight;
+    background: color-mix(in srgb, currentColor 13%, var(--mezcla-clara));
   }
   .schedule-event__name { @apply block overflow-hidden text-ellipsis whitespace-nowrap; }
   .schedule-event__time { @apply block text-[10px] font-semibold text-muted; }
@@ -915,19 +829,17 @@
   .subject-item__content { @apply min-w-0 text-ink; }
   .subject-item__name { @apply overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-bold text-ink; }
   .subject-item__meta { @apply mt-0.5 flex gap-2 text-[11px] text-muted-light; }
-  .subject-remove { @apply grid h-[30px] w-[30px] place-items-center rounded-lg border-0 bg-transparent text-muted hover:bg-danger-soft hover:text-danger; }
+  .subject-remove { @apply grid h-[30px] w-[30px] place-items-center rounded-lg border-0 bg-transparent text-muted hover:bg-danger-soft hover:text-[var(--estado-danger)]; }
 
   .schedule-options { @apply grid gap-3.5; grid-template-columns: repeat(auto-fill, minmax(275px, 1fr)); }
   .schedule-option {
-    @apply relative grid cursor-pointer gap-2.5 rounded border border-[var(--linea-suave)] p-4 text-left shadow-sm
-           transition-all duration-200 hover:-translate-y-1 hover:border-[#c9d0e6] hover:shadow-alta;
-    background: linear-gradient(180deg, var(--lista-a) 0%, var(--lista-b) 100%);
+    @apply relative grid cursor-pointer gap-2.5 rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] p-4 text-left
+           transition-colors duration-200 hover:border-primary/45;
   }
-  .schedule-option:hover { background: linear-gradient(180deg, var(--superficie) 0%, var(--superficie-suave) 100%); }
   .schedule-option.is-selected { @apply border-primary ring-2 ring-primary/20; }
   .schedule-option__top { @apply flex items-center justify-between gap-2; }
   .schedule-option__name { @apply font-display text-[15px] font-bold; }
-  .schedule-option__type { @apply rounded-full bg-primary-soft px-2 py-1 text-[10px] font-extrabold uppercase text-primary; }
+  .schedule-option__type { @apply rounded-full bg-primary-soft px-2 py-1 text-[10px] font-extrabold uppercase text-[var(--estado-primary)]; }
   .schedule-option__score { @apply font-display text-lg font-extrabold text-primary; }
   .schedule-option__description { @apply text-xs text-muted; }
   .schedule-option__metrics { @apply flex flex-wrap gap-3 text-[11px] font-semibold text-muted; }
@@ -940,32 +852,22 @@
    * un tablero. El color entra por --color-fase desde el JavaScript.
    */
   /*
-   * La columna entera se tiñe de su etapa, no solo la cabecera. En blanco sobre
-   * el fondo blanco del diagrama las cinco fases se confundían entre sí.
+   * Cada columna lleva un lavado suave de su etapa y su cabecera algo más
+   * saturada, para que las fases se distingan entre sí de un vistazo.
    */
   .fase-columna {
-    @apply relative grid gap-2.5 overflow-hidden rounded-sm p-2.5 pt-3 shadow-tarjeta;
+    @apply grid gap-2.5 rounded-sm p-2.5;
     --color-fase: #5b5ce2;
-    border: 1px solid color-mix(in srgb, var(--color-fase) 38%, var(--linea-suave));
-    background: linear-gradient(180deg,
-      color-mix(in srgb, var(--color-fase) 17%, var(--mezcla-clara)) 0%,
-      color-mix(in srgb, var(--color-fase) 8%, var(--mezcla-clara)) 45%,
-      color-mix(in srgb, var(--color-fase) 4%, var(--mezcla-clara)) 100%);
-  }
-  /* Filete superior, igual que en las tarjetas de color del resto de la app. */
-  .fase-columna::before {
-    @apply absolute inset-x-0 top-0 h-[4px] content-[''];
-    background: linear-gradient(90deg, var(--color-fase),
-      color-mix(in srgb, var(--color-fase) 45%, var(--mezcla-clara)));
+    border: 1px solid color-mix(in srgb, var(--color-fase) 24%, var(--linea-tarjeta));
+    background: color-mix(in srgb, var(--color-fase) 7%, var(--mezcla-clara));
   }
   .fase-cabecera {
-    @apply flex items-center gap-2 rounded-lg px-2 py-1.5;
-    background: color-mix(in srgb, var(--color-fase) 26%, var(--mezcla-clara));
-    border: 1px solid color-mix(in srgb, var(--color-fase) 42%, var(--mezcla-clara));
+    @apply flex items-center gap-2 rounded-md px-2 py-1.5;
+    background: color-mix(in srgb, var(--color-fase) 15%, var(--mezcla-clara));
   }
   .fase-cabecera h3 { color: color-mix(in srgb, var(--color-fase) 72%, #16203a); }
   .fase-numero {
-    @apply grid h-6 w-6 flex-none place-items-center rounded-full text-[11px] font-extrabold text-white;
+    @apply grid h-[22px] w-[22px] flex-none place-items-center rounded-md text-[11px] font-extrabold text-white;
     background: var(--color-fase);
   }
   .fase-total {
@@ -983,29 +885,23 @@
   .fase-flecha { @apply mt-8 flex-none text-xl text-muted-light; }
 
   /*
-   * Tarea dentro del diagrama. Lleva el color de su responsable en el canto y
-   * un lavado del mismo tono, para que sobre la columna teñida siga siendo una
-   * pieza propia y se sepa de quién es sin leer el nombre.
+   * Tarea del diagrama: blanca sobre la columna teñida, con el color de su
+   * responsable en el canto izquierdo.
    */
   .tarea-nodo {
-    @apply relative grid w-[220px] gap-1.5 overflow-hidden rounded-sm p-2.5 pl-3.5 text-left
-           shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-alta;
+    @apply relative grid w-[220px] gap-1.5 rounded-md border border-[var(--linea-tarjeta)] bg-[var(--superficie)]
+           p-2.5 pl-3 text-left transition-colors duration-200 hover:border-[var(--linea-tarjeta-fuerte)];
     --color-tarea: #5b5ce2;
-    border: 1px solid color-mix(in srgb, var(--color-tarea) 34%, var(--linea-suave));
-    border-left: 5px solid var(--color-tarea);
-    background: linear-gradient(160deg,
-      color-mix(in srgb, var(--color-tarea) 11%, var(--mezcla-clara)) 0%, #ffffff 72%);
+    border-left: 3px solid var(--color-tarea);
   }
   /* Una tarea bloqueada se raya en diagonal: se distingue sin leer el candado. */
   .tarea-nodo.esta-bloqueada {
-    border-style: dashed;
-    border-left-style: solid;
     background-image: repeating-linear-gradient(135deg,
-      rgba(120, 129, 150, .09) 0 6px, transparent 6px 13px);
+      rgba(120, 120, 138, .07) 0 6px, transparent 6px 13px);
   }
 
   .schedule-icon-badge {
-    @apply grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-primary;
+    @apply grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-[var(--estado-primary)];
   }
 
   /* ---------- Toasts y modales ---------- */
@@ -1021,9 +917,8 @@
   .modal-backdrop {
     @apply fixed inset-0 z-[1000] grid place-items-center bg-[#1a223c]/40 p-5;
   }
-  /* El diálogo también pide datos: lleva la misma línea morada del formulario. */
   .modal, .dialog-form {
-    @apply max-h-[calc(100vh-40px)] w-[min(550px,100%)] overflow-auto rounded border-2 border-[var(--form-linea)] bg-[var(--superficie)] shadow-pop;
+    @apply max-h-[calc(100vh-40px)] w-[min(550px,100%)] overflow-auto rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] shadow-pop;
   }
   .modal-header, .dialog-header {
     @apply flex items-center justify-between gap-3 px-[22px] pb-3.5 pt-5;
@@ -1069,12 +964,10 @@
   .auth-brand { @apply inline-flex items-center gap-2.5 font-display text-lg font-extrabold; }
   .auth-panel {
     @apply grid place-items-center p-8 max-[620px]:p-4;
-    background:
-      radial-gradient(700px 320px at 50% -140px, var(--velo-uno), transparent 70%),
-      var(--fondo);
+    background: var(--fondo);
   }
   .auth-card {
-    @apply grid w-[min(430px,100%)] gap-5 rounded-lg border border-[var(--linea-suave)] bg-[var(--superficie)] p-7 shadow-alta
+    @apply grid w-[min(430px,100%)] gap-5 rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] p-7
            max-[620px]:p-5;
   }
   .register-card { @apply w-[min(560px,100%)]; }
@@ -1085,19 +978,23 @@
   .two-columns { @apply grid grid-cols-2 gap-3.5 max-[620px]:grid-cols-1; }
   .auth-divider { @apply relative text-center text-xs font-semibold text-muted before:absolute before:left-0 before:top-1/2 before:h-px before:w-[calc(50%-70px)] before:bg-line before:content-[''] after:absolute after:right-0 after:top-1/2 after:h-px after:w-[calc(50%-70px)] after:bg-line after:content-['']; }
   .social-actions { @apply grid grid-cols-3 gap-2.5 max-[420px]:grid-cols-1; }
-  /* Cada proveedor con su color: en blanco los tres eran indistinguibles. */
+  /* Cada proveedor con su fondo y su borde; el color de marca va en el icono. */
   .social-button {
-    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] border text-[13px] font-bold
-           shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow;
+    @apply inline-flex min-h-[42px] items-center justify-center gap-2 rounded-md border text-[13px] font-semibold text-ink
+           transition-colors duration-150;
+    border-color: var(--marca-borde);
+    background: var(--marca-fondo);
   }
+  .social-button i { color: var(--marca); }
+  .social-button:hover { border-color: var(--marca); }
   .social-button[data-provider="Google"] {
-    @apply border-[#f0d2cd] bg-[#fdf1ef] text-[#c0392b] hover:bg-[#fbe6e2];
+    --marca: var(--social-google-texto);   --marca-fondo: var(--social-google-fondo);   --marca-borde: var(--social-google-borde);
   }
   .social-button[data-provider="GitHub"] {
-    @apply border-[#d5d9e2] bg-[#eef0f4] text-[#24292f] hover:bg-[#e3e6ec];
+    --marca: var(--social-github-texto);   --marca-fondo: var(--social-github-fondo);   --marca-borde: var(--social-github-borde);
   }
   .social-button[data-provider="Facebook"] {
-    @apply border-[#ccdaf3] bg-[#eef3fd] text-[#1b4f9c] hover:bg-[#e0eafb];
+    --marca: var(--social-facebook-texto); --marca-fondo: var(--social-facebook-fondo); --marca-borde: var(--social-facebook-borde);
   }
   .auth-switch { @apply text-center text-[13px] text-muted; }
   .auth-switch a { @apply font-bold text-primary; }
@@ -1118,7 +1015,7 @@
 
   /* ---------- Perfil ---------- */
   .profile-cover {
-    @apply relative h-[150px] overflow-hidden rounded-t;
+    @apply relative h-[92px] overflow-hidden rounded-t;
     background: linear-gradient(120deg, #5b5ce2, #19a7bd);
   }
   .cover-orb { @apply absolute rounded-full bg-white/15; }
@@ -1150,7 +1047,7 @@
   .profile-stat strong, .summary-card strong { @apply block font-display text-2xl; }
   .profile-stat span:last-child, .summary-card span:last-child { @apply text-xs text-muted; }
   .stat-icon, .summary-icon, .overview-icon, .empty-icon, .complete-icon, .focus-icon, .edit-header-icon {
-    @apply grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-primary;
+    @apply grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-[var(--estado-primary)];
   }
   /* Dentro de una tarjeta con tono, el icono lo hereda. */
   .tarjeta-color .stat-icon, .tarjeta-color .summary-icon,
@@ -1159,7 +1056,7 @@
     color: color-mix(in srgb, var(--tono) 78%, #16203a);
   }
   .stat-icon.cyan, .summary-card--blue .summary-icon { @apply bg-[var(--cyan-suave)] text-cyan; }
-  .stat-icon.orange, .summary-card--orange .summary-icon { @apply bg-warning-soft text-warning; }
+  .stat-icon.orange, .summary-card--orange .summary-icon { @apply bg-warning-soft text-[var(--estado-warning)]; }
   .profile-details { @apply m-0 grid gap-3.5 p-0; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .profile-details dt { @apply inline-flex items-center gap-1.5 text-xs font-extrabold text-muted; }
   .profile-details dd { @apply m-0 mt-1 text-sm; }
@@ -1167,7 +1064,7 @@
     @apply grid content-start gap-2 rounded border border-primary/20 bg-primary-soft/60 p-5;
   }
   .upload-button {
-    @apply inline-flex cursor-pointer items-center gap-2 rounded-[10px] bg-primary-soft px-3.5 py-2.5 text-[13px] font-bold text-primary hover:bg-[var(--realce)];
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-[10px] bg-primary-soft px-3.5 py-2.5 text-[13px] font-bold text-[var(--estado-primary)] hover:bg-[var(--realce)];
   }
   #avatar-file { @apply hidden; }
 

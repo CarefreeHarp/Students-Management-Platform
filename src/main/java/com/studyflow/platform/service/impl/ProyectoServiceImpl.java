@@ -6,12 +6,14 @@ import com.studyflow.platform.model.dto.PeticionIntegrante;
 import com.studyflow.platform.model.dto.PeticionProyecto;
 import com.studyflow.platform.model.dto.PeticionTarea;
 import com.studyflow.platform.model.dto.ProyectoDTO;
+import com.studyflow.platform.model.entity.Canal;
 import com.studyflow.platform.model.entity.Etapa;
 import com.studyflow.platform.model.entity.Integrante;
 import com.studyflow.platform.model.entity.Proyecto;
 import com.studyflow.platform.model.entity.Tarea;
 import com.studyflow.platform.model.enums.EstadoTarea;
 import com.studyflow.platform.model.enums.RolIntegrante;
+import com.studyflow.platform.model.enums.TipoCanal;
 import com.studyflow.platform.repository.ProyectoRepository;
 import com.studyflow.platform.service.ProyectoService;
 import com.studyflow.platform.service.UsuarioService;
@@ -104,7 +106,25 @@ public class ProyectoServiceImpl implements ProyectoService {
             }
         }
 
+        crearCanalGeneral(proyecto);
+
         return proyectoMapper.aDTO(proyectoRepository.save(proyecto));
+    }
+
+    /**
+     * Abre el canal #general del proyecto.
+     *
+     * <p>Todo proyecto nace con el, igual que los de ejemplo: es el sitio por
+     * defecto para hablar antes de que existan canales por tarea. Se crea aqui
+     * y no en CanalService porque el canal forma parte del proyecto recien
+     * creado, no de una peticion posterior del usuario.</p>
+     */
+    private void crearCanalGeneral(Proyecto proyecto) {
+        Canal general = new Canal(Canal.NOMBRE_GENERAL, TipoCanal.GENERAL, 0);
+        general.setSlug(Canal.NOMBRE_GENERAL);
+        general.setDescripcion("Coordinación general de " + proyecto.getNombre());
+        general.setCreador(proyecto.getPropietario());
+        proyecto.agregarCanal(general);
     }
 
     @Override

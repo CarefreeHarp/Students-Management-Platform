@@ -11,10 +11,10 @@
   const proyecto = document.body.dataset.projectId;
 
   const COLOR_ESTADO = {
-    "sin-empezar": "bg-[#f0f2f7] text-[#788196]",
-    "en-proceso": "bg-primary-soft text-primary",
-    "en-revision": "bg-warning-soft text-[#8a5a12]",
-    "terminada": "bg-success-soft text-success"
+    "sin-empezar": "bg-[var(--chip-neutro)] text-muted",
+    "en-proceso": "bg-primary-soft text-[var(--estado-primary)]",
+    "en-revision": "bg-warning-soft text-[var(--estado-warning)]",
+    "terminada": "bg-success-soft text-[var(--estado-success)]"
   };
 
   /* Un color por etapa, en el orden en que avanzan las fases del proyecto. */
@@ -187,7 +187,7 @@
       .filter(Boolean);
     $("#dependency-list").innerHTML = dependencias.length
       ? dependencias.map((dependencia) => `
-          <span class="tag bg-[#f4f5fa] text-[#5c6883]">
+          <span class="tag bg-[var(--chip-neutro)] text-muted">
             ${esc(dependencia.titulo)}
             <button type="button" data-remove-dep="${dependencia.id}" aria-label="Quitar dependencia"><i class="bi bi-x"></i></button>
           </span>`).join("")

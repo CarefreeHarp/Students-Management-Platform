@@ -20,14 +20,14 @@
       <div class="grid items-start gap-4 lg:grid-cols-[220px_minmax(0,1fr)_300px]">
 
         <!-- Barra lateral de canales -->
-        <aside class="panel-morado p-2.5" aria-label="Lista de canales">
+        <aside class="panel p-2.5" aria-label="Lista de canales">
           <p class="px-2 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-muted">Canales</p>
           <nav id="channel-list" class="grid gap-0.5"></nav>
         </aside>
 
         <!-- Conversación -->
-        <section class="panel-morado flex flex-col overflow-hidden p-0" aria-labelledby="channel-title">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#c9c4ef] px-4 py-3">
+        <section class="panel flex flex-col overflow-hidden p-0" aria-labelledby="channel-title">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
             <div>
               <h2 id="channel-title" class="font-display text-base">#general</h2>
               <p id="channel-description" class="text-xs text-muted"></p>
@@ -40,8 +40,8 @@
 
           <div id="messages" class="flex max-h-[58vh] min-h-[320px] flex-col gap-3.5 overflow-y-auto p-4" aria-live="polite"></div>
 
-          <form id="message-form" class="grid gap-2 border-t border-[#c9c4ef] p-3.5" novalidate>
-            <div id="pending-file" class="hidden items-center gap-2 rounded-sm bg-primary-soft px-2.5 py-1.5 text-xs text-primary"></div>
+          <form id="message-form" class="grid gap-2 border-t border-line p-3.5" novalidate>
+            <div id="pending-file" class="hidden items-center gap-2 rounded-sm bg-primary-soft px-2.5 py-1.5 text-xs text-[var(--estado-primary)]"></div>
             <div class="flex items-end gap-2">
               <label class="file-control" title="Adjuntar archivo">
                 <input id="file-input" type="file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip">
@@ -57,7 +57,7 @@
 
         <!-- Archivos y resumen -->
         <aside class="grid content-start gap-4">
-          <section class="panel-morado" aria-labelledby="gallery-title">
+          <section class="panel" aria-labelledby="gallery-title">
             <div class="section-head">
               <h2 id="gallery-title" class="text-base">Imágenes</h2>
               <span id="image-count" class="text-[11px] text-muted">0</span>
@@ -65,7 +65,7 @@
             <div id="gallery" class="grid grid-cols-3 gap-1.5"></div>
           </section>
 
-          <section class="panel-morado" aria-labelledby="docs-title">
+          <section class="panel" aria-labelledby="docs-title">
             <div class="section-head">
               <h2 id="docs-title" class="text-base">Documentos</h2>
               <span id="doc-count" class="text-[11px] text-muted">0</span>
@@ -73,10 +73,10 @@
             <div id="documents" class="grid gap-2"></div>
           </section>
 
-          <section class="panel-morado" aria-labelledby="summary-title">
+          <section class="panel" aria-labelledby="summary-title">
             <div class="section-head">
               <h2 id="summary-title" class="text-base">Resumen</h2>
-              <span id="summary-model" class="tag bg-primary-soft text-primary">simulado</span>
+              <span id="summary-model" class="tag bg-primary-soft text-[var(--estado-primary)]">simulado</span>
             </div>
             <div id="summary-body"></div>
           </section>
@@ -85,7 +85,7 @@
     </main>
 
     <!-- Selector de emoji para reaccionar -->
-    <div id="emoji-picker" class="fixed z-[600] hidden gap-1 rounded-sm border border-line bg-white p-1.5 shadow" role="menu"></div>
+    <div id="emoji-picker" class="fixed z-[600] hidden gap-1 rounded-sm border border-line bg-[var(--superficie)] p-1.5 shadow" role="menu"></div>
 
     <dialog id="channel-dialog" class="app-dialog">
       <form id="channel-form" method="dialog" class="dialog-form" novalidate>

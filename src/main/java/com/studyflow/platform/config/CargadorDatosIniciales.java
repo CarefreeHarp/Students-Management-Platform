@@ -123,14 +123,8 @@ public class CargadorDatosIniciales {
                                     "Sara Gómez", "Investigación", LocalDate.of(2026, 8, 20), "14:00", "pending"))
             ), valentina.getId());
 
-            // Cada proyecto arranca con su canal #general.
-            proyectoRepository.findAll().forEach(proyecto -> {
-                Canal general = new Canal("general", TipoCanal.GENERAL, 0);
-                general.setDescripcion("Coordinación general de " + proyecto.getNombre());
-                general.setCreador(valentina);
-                proyecto.agregarCanal(general);
-                canalRepository.save(general);
-            });
+            // El canal #general ya lo abre ProyectoService al crear cada proyecto:
+            // duplicarlo aquí rompía el arranque por la clave única (proyecto, slug).
 
             // El proyecto de ejemplo tiene además un canal por tarea y una
             // conversación con material suficiente para el generador de resúmenes.

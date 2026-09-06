@@ -1,16 +1,302 @@
 # StudyFlow · Students Management Platform
 
-Sistema de organización académica para estudiantes: horarios de clase, proyectos en equipo con
-canales por tema, reparto de tareas por dependencias, registro de entregables, recordatorios
-por WhatsApp y asistencia con IA.
+El semestre de un estudiante, en una sola vista: horario de clases, tareas de todos los proyectos
+y entregas en el mismo calendario, y cada trabajo en grupo con su espacio propio —conversación por
+tema, reparto de tareas por dependencias y registro de entregables—.
 
 Aplicación **Spring Boot 3.3 + Thymeleaf + Tailwind CSS + MySQL 8**, organizada en capas **IMVC**.
 
+**Índice** · [Qué es](#1-qué-es-studyflow) · [Flujo de pantallas](#2-flujo-de-pantallas) ·
+[Las pantallas](#3-las-pantallas-una-a-una) · [Funcionalidades](#4-funcionalidades) ·
+[Arquitectura](#5-arquitectura-por-capas-imvc) · [Puesta en marcha](#6-puesta-en-marcha)
+
 ---
 
-## 1. Funcionalidades
+## 1. Qué es StudyFlow
 
-### 1.1 Acceso y perfil
+### El problema
+
+Un estudiante universitario no lleva un solo calendario: lleva el horario de clases,
+las entregas de cada materia, dos o tres trabajos en grupo con su propio reparto de
+tareas, un chat distinto por equipo, y los enlaces de Drive o Canva donde vive cada
+documento. Nada de eso se habla entre sí. Lo que se anuncia en clase se apunta en el
+móvil, la coordinación del grupo se pierde en un chat sin estructura, y el estado real
+de un trabajo solo lo sabe quien lo está haciendo.
+
+El resultado conocido: se llega a la semana de entregas sin una vista de qué falta, y
+el trabajo en grupo se reparte tarde y mal.
+
+### La propuesta
+
+**Un solo sitio donde el semestre se ve entero**: las clases, las tareas de todos los
+proyectos y las entregas en un mismo calendario, y cada trabajo en grupo con su
+espacio propio —conversación por tema, reparto de tareas por dependencias y registro
+de entregables—.
+
+### Para quién
+
+Estudiantes universitarios que cursan varias materias a la vez **y** trabajan en
+equipo. El caso de uso central no es la tarea individual, que ya cubre cualquier lista
+de pendientes, sino **el trabajo en grupo con fechas**.
+
+### Qué lo diferencia
+
+| | Herramienta habitual | StudyFlow |
+|---|---|---|
+| Coordinación del equipo | Un chat plano por grupo | Canales por tema dentro del proyecto |
+| Reparto de tareas | «¿Quién hace qué?» por mensaje | Cada quien **toma** la tarea que quiere, y solo si está desbloqueada |
+| Orden del trabajo | Implícito, en la cabeza de alguien | Explícito: dependencias entre tareas y diagrama de fases |
+| Dónde está cada archivo | Enlaces perdidos en el chat | Registro de entregables con estado y responsable |
+| Avisos | Recordatorio genérico del móvil | WhatsApp, con antelación distinta por tipo de vencimiento |
+| Lo anunciado en clase | Una nota suelta | Apunte que se convierte en recordatorio |
+
+La idea que sostiene el producto: **una tarea está disponible cuando no tiene
+responsable y todas sus dependencias están terminadas.** De ahí sale el reparto por
+libre elección, que es lo que evita la reunión de asignación.
+
+### En una frase
+
+> StudyFlow reúne el horario, las entregas y los trabajos en grupo de un estudiante en
+> una sola vista, y convierte el reparto de tareas de un equipo en algo que se ve y se
+> elige, en lugar de negociarse por chat.
+
+### Estado del proyecto
+
+Prototipo funcional con **136 clases Java, 15 pantallas, 70 endpoints REST, 22 tablas
+y 38 pruebas automáticas**. Los dos servicios externos (WhatsApp de Meta y OpenAI)
+están escritos e integrados, pero **corren en simulación**: la lógica se ejecuta
+entera y el envío se escribe en el log. El apartado 4.10 detalla qué no está hecho.
+
+---
+
+## 2. Flujo de pantallas
+
+### El recorrido
+
+```
+                        ┌─────────────┐
+                        │   /login    │  entrar con el nombre (un campo)
+                        │  /registro  │  o crear cuenta (tres datos)
+                        └──────┬──────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │         /           │   PANEL · el centro de todo
+                    │  calendario general │   clases + tareas + entregas
+                    └──┬───┬───┬───┬──────┘
+          ┌────────────┘   │   │   └────────────┐
+          │                │   │                │
+   ┌──────▼──────┐  ┌──────▼───▼─────┐  ┌───────▼────────┐
+   │  /horarios  │  │   /proyectos   │  │ /recordatorios │
+   │  materias   │  │  mis trabajos  │  │ avisos + apuntes│
+   └─────────────┘  └────────┬───────┘  └────────────────┘
+                             │
+                   ┌─────────▼──────────┐
+                   │ /proyectos/{codigo}│  ESPACIO DE TRABAJO
+                   │ calendario + tareas│
+                   └──┬───────┬───────┬─┘
+                      │       │       │
+        ┌─────────────▼─┐ ┌───▼────┐ ┌▼──────────────┐
+        │   /canales    │ │ /fases │ │ /entregables  │
+        │ conversación  │ │reparto │ │ documentos    │
+        └───────────────┘ └────────┘ └───────────────┘
+
+   Transversales, desde la barra superior:
+   /perfil → /perfil/editar        /chats (canales de todos los proyectos)
+   /paleta (guía de estilo, sin sesión)
+```
+
+### Las tres reglas de navegación
+
+1. **Todo empieza en el panel.** Al entrar se cae siempre en `/`, que es la vista
+   general del semestre. La barra superior lleva a las cuatro zonas: Inicio,
+   Proyectos, Horarios, Canales y Recordatorios.
+2. **Un proyecto es un espacio con tres pestañas.** Desde el espacio de trabajo se
+   entra a sus canales, a su diagrama de fases y a sus entregables. Las tres tienen
+   un enlace de vuelta al proyecto.
+3. **Sin sesión no se ve nada.** Cualquier ruta sin sesión redirige a `/login`. La
+   única excepción es `/paleta`, la guía de estilo, que no muestra datos de nadie.
+
+### Recorrido recomendado para una demostración
+
+| # | Pantalla | Qué enseñar |
+|---|---|---|
+| 1 | `/login` | Entrar con **un solo campo**, o el botón de datos de ejemplo |
+| 2 | `/` | El calendario con las tareas de los tres proyectos, cada uno con su color |
+| 3 | `/horarios` | Añadir una materia y verla aparecer en la semana |
+| 4 | `/proyectos` → `/proyectos/cognitiva` | Abrir un trabajo en grupo |
+| 5 | `/proyectos/cognitiva/fases` | **El momento fuerte**: tomar una tarea disponible y ver que otra sigue bloqueada |
+| 6 | `/proyectos/cognitiva/canales` | Escribir en `#general`, reaccionar con un emoji, pedir el resumen |
+| 7 | `/proyectos/cognitiva/entregables` | Registrar un enlace de Canva y ver que se reconoce el tipo |
+| 8 | `/recordatorios` | Apuntar algo «anunciado en clase» y ver que entra en la cola de avisos |
+| 9 | Barra superior | El interruptor de modo oscuro |
+
+Los datos de ejemplo ya traen tres proyectos, cuatro materias, una conversación con
+mensajes y dependencias entre tareas, así que **la demostración no necesita
+preparación**: basta con el botón «Explorar con datos de ejemplo» del acceso.
+
+---
+
+## 3. Las pantallas, una a una
+
+### 3.1 Acceso · `/login`
+
+Dos mitades: a la izquierda un panel con degradado de marca y tres ventajas del
+producto; a la derecha el formulario.
+
+- **Entrada de un solo campo**: el nombre basta. El correo es opcional y solo sirve
+  para recuperar la cuenta después.
+- Botón **«Explorar con datos de ejemplo»**, que entra con el usuario de demostración
+  y sus tres proyectos ya cargados.
+- Google, GitHub y Facebook aparecen, pero **avisan de que no están conectados** en
+  lugar de fingir una entrada.
+- Plegado abajo, el acceso con correo y contraseña para quien ya la tiene.
+
+### 3.2 Registro · `/registro`
+
+«Tres datos y listo»: nombre, correo y contraseña. Universidad, programa, semestre y
+edad quedan plegados como opcionales, para que el formulario no ahuyente. Se pueden
+completar después desde el perfil.
+
+### 3.3 Panel · `/`
+
+La pantalla que más se usa. Saluda por el nombre y resume la semana en una frase
+(«Siete tareas por avanzar esta semana. La más cercana vence el jueves»).
+
+- **Tres tarjetas de resumen**: avance del semestre, próxima entrega y avisos
+  programados.
+- **Calendario semanal** con las tareas de *todos* los proyectos, cada uno con su
+  color, y navegación entre semanas. Al pasar el ratón sobre una tarea sale una
+  ventana con su detalle; al pulsarla se abre su proyecto.
+- **«Próximamente»**: las siguientes entregas en una lista.
+- **«Tus proyectos»**: avance de cada uno en porcentaje.
+- **«¿Terminaste algo?»**: marcar una tarea como terminada sin salir del panel, lo
+  que además deja registro en la bitácora del proyecto.
+
+### 3.4 Mis proyectos · `/proyectos`
+
+Cuadrícula de tarjetas, una por trabajo, con su color, la fecha de entrega, los
+integrantes y el porcentaje de avance. Buscador por texto y filtros por estado.
+Botón para crear uno nuevo.
+
+### 3.5 Crear proyecto · `/proyectos/nuevo`
+
+Formulario en tres pasos numerados, con vista previa a la derecha.
+
+1. **Información**: nombre, contexto, fecha de entrega y etapa inicial.
+2. **Integrantes**: se añaden en filas, cada uno con su color.
+3. **Primeras tareas**: nombre, responsable y fecha.
+
+- **Calendario de vista previa** que se va llenando según se añaden tareas.
+- **«Organizar con IA»**: se indica un número de tareas (1–20) y se reparten con
+  plazos calculados y responsables rotados entre el equipo.
+- Al crearlo, el proyecto **nace con su canal `#general`**.
+
+### 3.6 Espacio de trabajo · `/proyectos/{codigo}`
+
+El interior de un proyecto. Arriba, tres botones que llevan a canales, fases y
+entregables.
+
+- **Calendario del proyecto** con sus tareas, coloreadas por responsable.
+- **Tablero de tareas** con estado, responsable, etapa y fecha; se filtran por estado.
+- **Equipo**: los integrantes y sus colores, modificables.
+- Alta de tareas con responsable, fecha, etapa y archivo adjunto.
+
+### 3.7 Canales · `/proyectos/{codigo}/canales`
+
+La conversación del equipo, dividida por temas al estilo de un servidor de mensajería.
+
+- **Barra lateral** con los canales y su número de mensajes. `#general` viene con el
+  proyecto y **no se puede eliminar**; el resto se crean libres o atados a una tarea.
+- **Mensajes** con el color y las iniciales de cada integrante.
+- **Reacciones con emoji**: ocho disponibles; volver a pulsar retira la reacción y se
+  ve quién reaccionó.
+- **Adjuntos hasta 10 MB**: las imágenes se muestran en línea y el resto se descarga.
+- Columna derecha con **galería de imágenes**, **lista de documentos** y **resumen de
+  la conversación** (marcado como simulado mientras la IA no esté conectada).
+
+### 3.8 Fases y dependencias · `/proyectos/{codigo}/fases`
+
+La pantalla más distintiva del producto.
+
+- **«Tareas disponibles»**: las que no tienen responsable y tienen todas sus
+  dependencias terminadas. Cada persona **toma** la que quiere con un botón, y al
+  hacerlo la tarea pasa a «En proceso» automáticamente.
+- **Diagrama por etapas** en columnas con flechas entre fases, cada etapa con su
+  color. Una tarea bloqueada muestra un candado, se raya en diagonal e indica **de
+  qué depende**.
+- Quien toma una tarea sin ser del equipo **se une al proyecto**.
+- El sistema **rechaza cualquier dependencia que cerraría un ciclo**.
+
+### 3.9 Documentos y entregables · `/proyectos/{codigo}/entregables`
+
+El índice de dónde vive cada parte del trabajo —distinto de los archivos subidos a un
+canal—.
+
+- Se pega un enlace (Google Docs, Word, Canva, GitHub, YouTube…) y **el tipo se
+  deduce solo**.
+- Cada documento lleva estado (**Borrador · En revisión · Final**), responsable y,
+  opcionalmente, la tarea de la que sale.
+- Tres tarjetas de resumen arriba con el recuento por estado.
+
+### 3.10 Horarios · `/horarios`
+
+Planificador de la semana de clases.
+
+- **Alta de materias** con día, hora de inicio y fin, profesor y créditos.
+- **Calendario semanal** con cada materia en un color, y aviso si dos se solapan.
+- **«Generar horarios con IA»**: propone alternativas seleccionando subconjuntos de
+  las materias registradas —sin inventarse horas que no existen— para comparar y
+  elegir.
+
+### 3.11 Recordatorios · `/recordatorios`
+
+Los avisos por WhatsApp y lo que se anuncia en clase.
+
+- **Configuración**: número de WhatsApp y **antelación distinta por tipo** —tareas,
+  entregas de proyecto y pendientes de clase—, más una franja de «no molestar» que
+  aplaza los avisos nocturnos.
+- **«Lo importante de hoy»**: se apunta lo anunciado en clase y, si tiene fecha, se
+  convierte en recordatorio.
+- **Agenda** de avisos programados con su estado (Programado · Enviado · Fallido ·
+  Cancelado) y un botón de mensaje de prueba.
+- Un aviso ámbar explica que está en **modo simulación** mientras no haya credenciales
+  de Meta.
+
+### 3.12 Canales de todos los proyectos · `/chats`
+
+Vista transversal: todos los canales agrupados por proyecto, para entrar directo a
+cualquier conversación sin pasar por el proyecto.
+
+### 3.13 Mi perfil · `/perfil`
+
+Portada con degradado, foto, nombre y datos académicos. Tres cifras (proyectos
+activos, tareas completadas, racha de días), la tarjeta «Sobre mí» con los datos del
+estudiante, el «Enfoque de la semana» y los proyectos en los que participa.
+
+### 3.14 Editar perfil · `/perfil/editar`
+
+Foto, datos personales y datos académicos, en dos grupos de campos.
+
+> **Aviso para la demostración:** los cambios del perfil **se guardan solo en el
+> navegador**, no en la base de datos. El endpoint existe pero la pantalla todavía no
+> lo llama (ver 4.10).
+
+### 3.15 Guía de estilo · `/paleta`
+
+Pantalla de apoyo al desarrollo: colores, sombras, radios y tipografías. Los valores
+no están escritos en la página, se leen de la hoja de estilos ya compilada, así que no
+puede quedar desfasada. No requiere sesión.
+
+### Modo claro y oscuro
+
+Todas las pantallas tienen las dos versiones, con el interruptor en la barra superior.
+Sin elegir nada se sigue la preferencia del sistema.
+
+---
+
+## 4. Funcionalidades
+
+### 4.1 Acceso y perfil
 
 | Funcionalidad | Estado |
 |---|---|
@@ -26,7 +312,7 @@ El camino principal de entrada es de **un solo campo**. Si el correo se omite, s
 interno (`nombre@studyflow.local`) para no pedir más datos; si se indica y ya existe, se reutiliza
 la cuenta en lugar de duplicarla.
 
-### 1.2 Proyectos y tareas
+### 4.2 Proyectos y tareas
 
 | Funcionalidad | Estado |
 |---|---|
@@ -38,7 +324,7 @@ la cuenta en lugar de duplicarla.
 | Bitácora de avance al marcar una tarea terminada | Completo |
 | Organización por etapas | Completo |
 
-### 1.3 Canales del proyecto
+### 4.3 Canales del proyecto
 
 | Funcionalidad | Estado |
 |---|---|
@@ -57,7 +343,7 @@ la cuenta en lugar de duplicarla.
 Los archivos se guardan en disco (carpeta configurable) y en la base queda solo la ficha. Las
 imágenes se muestran en línea y el resto se descarga.
 
-### 1.4 Diagrama de fases y reparto del trabajo
+### 4.4 Diagrama de fases y reparto del trabajo
 
 | Funcionalidad | Estado |
 |---|---|
@@ -77,7 +363,7 @@ antes del cambio.
 Una tarea está **disponible** cuando no tiene responsable **y** todas sus dependencias están
 terminadas.
 
-### 1.5 Documentos y entregables
+### 4.5 Documentos y entregables
 
 | Funcionalidad | Estado |
 |---|---|
@@ -89,7 +375,7 @@ terminadas.
 
 Es el índice de dónde vive cada parte del trabajo, distinto de los archivos subidos a un canal.
 
-### 1.6 Horarios de clase
+### 4.6 Horarios de clase
 
 | Funcionalidad | Estado |
 |---|---|
@@ -99,7 +385,7 @@ Es el índice de dónde vive cada parte del trabajo, distinto de los archivos su
 | Comparación y selección de alternativas | Completo |
 | Detección de choques de horas | Completo |
 
-### 1.7 Recordatorios por WhatsApp
+### 4.7 Recordatorios por WhatsApp
 
 | Funcionalidad | Estado |
 |---|---|
@@ -114,7 +400,7 @@ Es el índice de dónde vive cada parte del trabajo, distinto de los archivos su
 Sin credenciales de Meta la pasarela funciona en **modo simulación**: toda la lógica se ejecuta
 igual y el mensaje se escribe en el log en lugar de enviarse.
 
-### 1.8 Organizador de proyectos con IA
+### 4.8 Organizador de proyectos con IA
 
 | Funcionalidad | Estado |
 |---|---|
@@ -124,13 +410,13 @@ igual y el mensaje se escribe en el log en lugar de enviarse.
 | Reorganización de un proyecto conservando lo completado | Completo (vía API) |
 | Redacción de la explicación con ChatGPT | **Preparado, sin conectar** |
 
-### 1.9 Panel principal
+### 4.9 Panel principal
 
 Calendario general con las tareas de todos los proyectos (un color por proyecto), ventana flotante
 al pasar el ratón, clic para ir al proyecto, formulario para marcar tarea terminada y resumen de
 ritmo y próximas entregas.
 
-### 1.10 Qué **no** está implementado
+### 4.10 Qué **no** está implementado
 
 - **No hay autenticación real.** La sesión identifica a la persona pero no la verifica: no se usa
   Spring Security y la contraseña se guarda codificada en Base64 como marcador provisional.
@@ -139,12 +425,16 @@ ritmo y próximas entregas.
   pero nunca se ha ejecutado contra el servicio real.
 - **El envío por WhatsApp no se ha probado contra Meta**, por no disponer de credenciales.
 - **Los mensajes no llegan solos**: no hay WebSocket, hay que recargar para ver lo nuevo.
-- **Tres pantallas siguen leyendo `localStorage`**: panel, listado de proyectos y horarios. Las
-  demás (canales, fases, entregables, recordatorios, acceso) ya usan la API REST.
+- **El perfil no se guarda en la base de datos.** La pantalla lee y escribe en el navegador; el
+  endpoint `PUT /api/usuarios/{id}` existe pero ninguna pantalla lo llama, así que los cambios se
+  pierden al cerrar sesión.
+- **Los horarios viven solo en el navegador**: las materias se guardan en `localStorage` y no
+  llegan a la base. El resto de pantallas —panel, proyectos, canales, fases, entregables,
+  recordatorios y acceso— ya usan la API REST.
 
 ---
 
-## 2. Arquitectura por capas (IMVC)
+## 5. Arquitectura por capas (IMVC)
 
 | Capa | Ubicación | Responsabilidad |
 |------|-----------|-----------------|
@@ -156,7 +446,7 @@ ritmo y próximas entregas.
 Capas de apoyo: `service/` (+`impl/`), `repository/`, `mapper/`, `config/`, `exception/`, `util/`.
 
 ```
-src/main/java/com/studyflow/platform/        · 134 archivos
+src/main/java/com/studyflow/platform/        · 136 archivos
 ├── StudyFlowApplication.java
 ├── config/        ConfiguracionWeb · CargadorDatosIniciales
 │                  PropiedadesWhatsApp · PropiedadesIa
@@ -199,14 +489,14 @@ servicios ni controladores:
 
 ---
 
-## 3. Puesta en marcha
+## 6. Puesta en marcha
 
 ### Requisitos
 - JDK 17+
-- MySQL 8 — opcional, ver el atajo del apartado 3.1
+- MySQL 8 — opcional, ver el atajo del apartado 6.1
 - Node 18+ — solo si vas a recompilar los estilos
 
-### 3.1 Atajo: arrancar sin instalar MySQL
+### 6.1 Atajo: arrancar sin instalar MySQL
 
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
@@ -215,7 +505,7 @@ servicios ni controladores:
 Base H2 en memoria, sin instalar nada. Abre <http://localhost:6767>. Los datos de ejemplo se
 crean en cada arranque y se pierden al parar.
 
-### 3.2 Instalar MySQL (Ubuntu / Debian)
+### 6.2 Instalar MySQL (Ubuntu / Debian)
 
 ```bash
 sudo apt update
@@ -226,7 +516,7 @@ systemctl status mysql          # debe decir "active (running)"
 > `mysql_secure_installation` es opcional y **no afecta a este proyecto**: la aplicación se conecta
 > como `studyflow`, no como `root`.
 
-### 3.3 Crear la base de datos — paso manual, una sola vez
+### 6.3 Crear la base de datos — paso manual, una sola vez
 
 **Este paso no es automático.** La aplicación se conecta *a* la base `studyflow` con el usuario
 `studyflow`: ambos deben existir antes de que arranque, porque no puede crear la base a la que
@@ -256,7 +546,7 @@ clase). No hay riesgo de duplicados si ejecutas los dos.
 | Tablas | Hibernate, con `ddl-auto=update` |
 | Datos de demostración | `CargadorDatosIniciales`, si la base está vacía |
 
-### 3.4 Arrancar
+### 6.4 Arrancar
 
 ```bash
 ./mvnw spring-boot:run
@@ -264,7 +554,7 @@ clase). No hay riesgo de duplicados si ejecutas los dos.
 
 La aplicación queda en <http://localhost:6767>.
 
-### 3.5 Detener la ejecución
+### 6.5 Detener la ejecución
 
 - **Lanzada desde una terminal:** `Ctrl+C`.
 - **Lanzada en segundo plano** (`&` o `nohup`), `Ctrl+C` no sirve:
@@ -276,7 +566,7 @@ pkill -f "com.studyflow.platform.StudyFlowApplication"
 `spring-boot:run` arranca **dos** procesos (Maven y la JVM). El `pkill` de arriba apunta a la JVM,
 que es la que ocupa el puerto. Para ver quién lo tiene: `ss -ltnp | grep 6767`.
 
-### 3.6 Configuración
+### 6.6 Configuración
 
 Todo en `src/main/resources/application.properties`:
 
@@ -320,14 +610,14 @@ studyflow.ia.modelo=gpt-4o-mini
 `ClienteIaOpenAi` sustituye automáticamente a `ClienteIaSimulado`. Ese cliente **no se ha probado
 contra el servicio real**: al conectarlo conviene verificar el modelo y la forma de la respuesta.
 
-### 3.7 Empaquetar
+### 6.7 Empaquetar
 
 ```bash
 ./mvnw clean package
 java -jar target/students-management-platform.jar
 ```
 
-### 3.8 Estilos (Tailwind)
+### 6.8 Estilos (Tailwind)
 
 ```bash
 npm install
@@ -367,7 +657,7 @@ sitio donde se ven todos juntos y con su función explicada.
 
 ---
 
-## 4. Rutas
+## 7. Rutas
 
 ### Navegación
 
@@ -446,7 +736,7 @@ sitio donde se ven todos juntos y con su función explicada.
 
 ---
 
-## 5. Base de datos
+## 8. Base de datos
 
 22 tablas en MySQL 8:
 
@@ -468,7 +758,7 @@ una tarea no puede depender de sí misma, un emoji por persona y mensaje).
 
 ---
 
-## 6. Pruebas
+## 9. Pruebas
 
 ```bash
 ./mvnw test
@@ -481,7 +771,7 @@ estados, tipos de entregable deducidos del enlace y acceso rápido.
 
 ---
 
-## 7. Problemas frecuentes
+## 10. Problemas frecuentes
 
 **El navegador dice «no se puede acceder a este sitio».**
 La aplicación no está arrancada o murió al arrancar. Si ves `Communications link failure` o
@@ -490,7 +780,7 @@ La aplicación no está arrancada o murió al arrancar. Si ves `Communications l
 sí abre, el problema está en MySQL y no en la aplicación.
 
 **`Port 6767 was already in use`.**
-Quedó una ejecución viva. `ss -ltnp | grep 6767` y el `pkill` del apartado 3.5.
+Quedó una ejecución viva. `ss -ltnp | grep 6767` y el `pkill` del apartado 6.5.
 
 **`Unknown database 'studyflow'` o `Access denied`.**
 Falta el paso 3.3. Comprobar: `sudo mysql -e "SHOW DATABASES;" | grep studyflow`.

@@ -65,7 +65,7 @@
             </div>
 
             <!-- crear-horario.js alterna el atributo hidden, por eso no usa .form-feedback -->
-            <p id="subject-form-error" class="field-span-2 rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-danger" role="alert" hidden></p>
+            <p id="subject-form-error" class="field-span-2 rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-[var(--estado-danger)]" role="alert" hidden></p>
             <button class="btn btn-primary field-span-2" type="submit">
               <i class="bi bi-plus-lg"></i> Añadir materia
             </button>
@@ -115,7 +115,7 @@
             <h2 id="ai-results-title">Compara tus alternativas</h2>
             <p id="ai-results-summary">Selecciona una propuesta para verla en el calendario principal.</p>
           </div>
-          <span class="tag bg-primary-soft text-primary"><i class="bi bi-lightning-charge-fill"></i> Simulación inteligente</span>
+          <span class="tag bg-primary-soft text-[var(--estado-primary)]"><i class="bi bi-lightning-charge-fill"></i> Simulación inteligente</span>
         </div>
         <div id="schedule-options" class="schedule-options" role="list" aria-live="polite"></div>
       </section>

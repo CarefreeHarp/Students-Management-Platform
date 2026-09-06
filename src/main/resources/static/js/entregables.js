@@ -10,9 +10,9 @@
   const proyecto = document.body.dataset.projectId;
 
   const COLOR_ESTADO = {
-    BORRADOR: "bg-[#f0f2f7] text-[#788196]",
-    EN_REVISION: "bg-warning-soft text-[#8a5a12]",
-    FINAL: "bg-success-soft text-success"
+    BORRADOR: "bg-[var(--chip-neutro)] text-muted",
+    EN_REVISION: "bg-warning-soft text-[var(--estado-warning)]",
+    FINAL: "bg-success-soft text-[var(--estado-success)]"
   };
 
   const $ = (selector) => document.querySelector(selector);
@@ -50,7 +50,7 @@
     const color = entregable.colorResponsable || "#5b5ce2";
     return `
       <article class="tarjeta-lista tarjeta-borde-color flex items-start gap-3" style="--borde:${esc(color)}">
-        <span class="grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-primary">
+        <span class="grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-[var(--estado-primary)]">
           <i class="bi ${esc(entregable.icono)}"></i>
         </span>
         <div class="min-w-0 flex-1">
@@ -59,7 +59,7 @@
               ${esc(entregable.nombre)} <i class="bi bi-box-arrow-up-right text-xs"></i>
             </a>
             <span class="tag ${COLOR_ESTADO[entregable.estado] || ""}">${esc(entregable.estadoEtiqueta)}</span>
-            <span class="tag bg-[#f4f5fa] text-[#5c6883]">${esc(entregable.tipoEtiqueta)}</span>
+            <span class="tag bg-[var(--chip-neutro)] text-muted">${esc(entregable.tipoEtiqueta)}</span>
           </div>
           ${entregable.descripcion ? `<p class="mt-1 text-[13px] text-muted">${esc(entregable.descripcion)}</p>` : ""}
           <p class="mt-1.5 truncate text-[11px] text-muted-light">${esc(entregable.url)}</p>

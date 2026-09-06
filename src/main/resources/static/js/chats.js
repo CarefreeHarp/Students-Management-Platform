@@ -18,7 +18,7 @@
 
   function tarjetaProyecto(proyecto, canales) {
     const lista = canales.map((canal) => `
-      <a class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] font-semibold text-muted transition-colors hover:bg-primary-soft hover:text-primary"
+      <a class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] font-semibold text-muted transition-colors hover:bg-primary-soft hover:text-[var(--estado-primary)]"
          href="/proyectos/${esc(proyecto.codigo)}/canales?canal=${esc(canal.slug)}">
         <span class="text-muted-light">#</span>
         <span class="min-w-0 flex-1 truncate">${esc(canal.slug)}</span>

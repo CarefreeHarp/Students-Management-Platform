@@ -46,6 +46,9 @@ class FuncionalidadesNuevasTests {
     @Autowired
     private SesionService sesionService;
 
+    @Autowired
+    private ProyectoService proyectoService;
+
     /**
      * Sin sesión no hay identidad: la aplicación ya no actúa en nombre del
      * usuario sembrado. Cada prueba entra con la cuenta de ejemplo.
@@ -372,5 +375,43 @@ class FuncionalidadesNuevasTests {
         var primera = sesionService.accesoRapido("Diego Salas", "diego@u.edu");
         var segunda = sesionService.accesoRapido("Diego S.", "diego@u.edu");
         assertThat(segunda.getId()).isEqualTo(primera.getId());
+    }
+
+    // ------------------------------------------------------------ canal general
+
+    /**
+     * Un proyecto nuevo tiene que nacer con su #general, y ese canal no debe
+     * poder borrarse. Antes solo lo tenían los proyectos de ejemplo, porque el
+     * canal lo creaba el sembrador de datos y no el servicio.
+     */
+    @Test
+    void todoProyectoNuevoNaceConSuCanalGeneralYNoSePuedeBorrar() {
+        Long usuario = usuarioId();
+        var proyecto = proyectoService.crear(new PeticionProyecto(
+                "Proyecto de prueba", "Comprobación del canal general",
+                LocalDate.now().plusDays(30), "Planeación", null, List.of(), List.of()), usuario);
+
+        var canales = canalService.listarDeProyecto(proyecto.codigo(), usuario);
+
+        assertThat(canales).hasSize(1);
+        assertThat(canales.get(0).slug()).isEqualTo("general");
+        assertThat(canales.get(0).borrable()).isFalse();
+
+        assertThatThrownBy(() -> canalService.eliminar(canales.get(0).id()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("no se puede eliminar");
+    }
+
+    /** El nombre está reservado: a mano no se puede abrir un segundo #general. */
+    @Test
+    void noSePuedeCrearOtroCanalLlamadoGeneral() {
+        Long usuario = usuarioId();
+        var proyecto = proyectoService.crear(new PeticionProyecto(
+                "Proyecto con canal repetido", "Comprobación",
+                LocalDate.now().plusDays(30), "Planeación", null, List.of(), List.of()), usuario);
+
+        assertThatThrownBy(() -> canalService.crear(proyecto.codigo(), usuario,
+                new PeticionCanal("General", "Intento de duplicado", null, null)))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
