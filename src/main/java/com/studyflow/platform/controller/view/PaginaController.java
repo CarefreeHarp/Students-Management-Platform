@@ -31,6 +31,11 @@ public class PaginaController {
     }
 
     @GetMapping("/")
+    public String landing() {
+        return "landing";
+    }
+
+    @GetMapping("/panel")
     public String panel() {
         return conSesion("index");
     }

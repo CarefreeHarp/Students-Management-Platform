@@ -80,7 +80,7 @@ class StudyFlowApplicationTests {
     @Test
     void sinSesionLasPaginasLlevanAlAcceso() throws Exception {
         // Antes cargaban y sus llamadas a la API actuaban como el usuario sembrado.
-        for (String ruta : new String[]{"/", "/proyectos", "/horarios", "/recordatorios",
+        for (String ruta : new String[]{"/panel", "/proyectos", "/horarios", "/recordatorios",
                                         "/proyectos/cognitiva", "/proyectos/cognitiva/fases"}) {
             mockMvc.perform(get(ruta))
                     .andExpect(status().is3xxRedirection())
@@ -96,24 +96,18 @@ class StudyFlowApplicationTests {
     }
 
     @Test
-    void laRaizLlevaAlAccesoMientrasNoHaySesion() throws Exception {
-        // Entrar por la raíz sin haber accedido debe ofrecer la pantalla de acceso,
-        // no el panel con los datos de otra persona.
+    void laLandingEsPublicaConYSinSesion() throws Exception {
         mockMvc.perform(get("/"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(status().isOk())
+                .andExpect(view().name("landing"));
+        mockMvc.perform(get("/").session(sesionDeNavegador()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("landing"));
     }
 
     @Test
-    void laRaizMuestraElPanelConSesionIniciada() throws Exception {
-        MockHttpSession sesion = new MockHttpSession();
-        mockMvc.perform(post("/api/sesion/entrar")
-                        .session(sesion)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nombre\":\"Prueba Acceso\"}"))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get("/").session(sesion))
+    void elPanelMuestraElInicioConSesionIniciada() throws Exception {
+        mockMvc.perform(get("/panel").session(sesionDeNavegador()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"));
     }

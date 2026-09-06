@@ -81,7 +81,7 @@
       }
 
       feedback("Cuenta creada. Entrando…", "success");
-      window.setTimeout(() => window.location.assign("/"), 400);
+      window.setTimeout(() => window.location.assign("/panel"), 400);
     } catch (error) {
       feedback(error.message, "error");
     }

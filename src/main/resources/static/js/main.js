@@ -227,11 +227,11 @@
     holder.className = 'app-nav';
     holder.innerHTML = `
       <div class="nav-inner">
-        <a class="brand" href="/" aria-label="StudyFlow, ir al inicio"><span class="brand-mark"><i class="bi bi-lightning-charge-fill"></i></span>StudyFlow</a>
+        <a class="brand" href="/panel" aria-label="StudyFlow, ir al inicio"><span class="brand-mark"><i class="bi bi-lightning-charge-fill"></i></span>StudyFlow</a>
         <button class="mobile-nav-toggle" type="button" aria-label="Abrir navegación" aria-expanded="false"><i class="bi bi-list"></i></button>
         <span class="nav-separador" aria-hidden="true"></span>
         <nav class="nav-links" aria-label="Navegación principal">
-          <a class="nav-link ${active('dashboard')}" href="/"><i class="bi bi-grid-1x2"></i> <span>Inicio</span></a>
+          <a class="nav-link ${active('dashboard')}" href="/panel"><i class="bi bi-grid-1x2"></i> <span>Inicio</span></a>
           <a class="nav-link ${active('projects') || active('project') ? 'active' : ''}" href="/proyectos"><i class="bi bi-kanban"></i> <span>Proyectos</span></a>
           <a class="nav-link ${active('schedule')}" href="/horarios"><i class="bi bi-calendar3"></i> <span>Horarios</span></a>
           <a class="nav-link ${active('chats') || active('canales') ? 'active' : ''}" href="/chats"><i class="bi bi-chat-dots"></i> <span>Canales</span></a>

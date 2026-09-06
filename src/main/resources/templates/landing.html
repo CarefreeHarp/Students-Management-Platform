@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyFlow · Tu vida universitaria, en un mismo lugar</title>
+  <meta name="description" content="Organiza tu horario, coordina tus proyectos y ten presentes tus pendientes. StudyFlow: sencillo, rápido y presente en las aplicaciones que ya usas.">
+  <meta name="theme-color" content="#1c2538">
+  <link rel="icon" href="/assets/img/studyflow-isotipo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/landing.css" th:href="@{/css/landing.css}">
+  <script src="/js/landing.js" th:src="@{/js/landing.js}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <div class="scene" aria-hidden="true"><div class="scene-glow"></div><canvas id="flow-universe"></canvas><div class="scene-vignette"></div></div>
+  <header class="landing-nav">
+    <a class="wordmark" href="/" aria-label="StudyFlow, inicio"><img src="/assets/img/studyflow-isotipo.png" width="34" height="34" alt=""><span>Study<span class="brand-accent">Flow</span></span></a>
+    <nav aria-label="Navegación principal"><a href="#tu-semana">Así funciona</a><a href="#por-que">Por qué StudyFlow</a></nav>
+    <a class="nav-enter" href="/panel">Entrar <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="contenido">
+    <section class="hero chapter" data-scene="0" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tiny-star" aria-hidden="true">✦</span> Para estudiantes universitarios</p>
+        <h1 id="hero-title">Tu vida universitaria.<br><span>En un mismo lugar.</span></h1>
+        <p class="hero-slogan">Sencillo, rápido y presente en las aplicaciones que ya usas.</p>
+        <p class="hero-description">Dale espacio a lo que quieres aprender.<br>Tu horario, tus proyectos y tus pendientes encuentran su lugar en StudyFlow.</p>
+        <div class="hero-actions"><a class="button button-primary" href="/registro">Empieza a organizarte <span aria-hidden="true">↗</span></a><a class="button button-text" href="#tu-semana">Descubre cómo <span aria-hidden="true">↓</span></a></div>
+      </div>
+      <div class="hero-orbit" aria-hidden="true">
+        <div class="orbit-label label-top"><span class="status-dot"></span> Todo empieza a conectar</div>
+        <div class="floating-note note-one"><span class="note-icon">▦</span><div>Tu próxima clase<small>Cálculo · 10:00 a. m.</small></div></div>
+        <div class="floating-note note-two"><span class="note-icon cyan">✓</span><div>Un pendiente menos<small>Entrega lista para revisión</small></div></div>
+        <div class="orbit-label label-bottom">TU SEMANA, EN TU ÓRBITA</div>
+      </div>
+      <div class="hero-bottom"><span>Menos pendientes en tu cabeza. Más espacio para ti.</span><a href="#tu-semana" aria-label="Bajar a las funcionalidades">Explora a tu ritmo <span aria-hidden="true">↓</span></a></div>
+    </section>
+
+    <section class="feature chapter" data-scene="1" id="tu-semana" aria-labelledby="week-title">
+      <div class="feature-copy"><p class="eyebrow"><span class="section-number">01 /</span> Tu organización personal</p><h2 id="week-title">Hazle espacio<br>a tu <em>semana.</em></h2><p>Clases, actividades y fechas de entrega. Encuentra lo que viene en una sola vista y decide por dónde empezar.</p><ul class="feature-list"><li>Construye tu horario y compara opciones.</li><li>Reúne tus tareas y fechas importantes.</li><li>Guarda lo que necesitas recordar después de clase.</li></ul><a class="text-link" href="/horarios">Organiza tu horario <span aria-hidden="true">↗</span></a></div>
+      <div class="product-visual calendar-visual" data-depth="1">
+        <div class="window-bar"><span class="window-dots">● ● ●</span><span>Tu espacio · StudyFlow</span><span>✦</span></div>
+        <div class="preview-body"><div class="preview-heading"><div><span class="mini-label">CADA COSA A SU TIEMPO</span><h3>Tu semana, más clara.</h3></div><span class="soft-tag">Esta semana</span></div>
+          <div class="week-grid">
+            <div class="week-day"><div class="day">LUN<span>07</span></div><div class="class-block purple">Cálculo<small>08:00 – 10:00</small></div></div>
+            <div class="week-day"><div class="day selected">MAR<span>08</span></div><div class="class-block cyan">Diseño<small>09:00 – 11:00</small></div><div class="class-block peach">Proyecto<small>14:00 – 16:00</small></div></div>
+            <div class="week-day"><div class="day">MIÉ<span>09</span></div><div class="class-block purple">Cálculo<small>08:00 – 10:00</small></div></div>
+            <div class="week-day"><div class="day">JUE<span>10</span></div><div class="class-block cyan">Diseño<small>09:00 – 11:00</small></div><div class="class-block violet">Física<small>14:00 – 16:00</small></div></div>
+            <div class="week-day"><div class="day">VIE<span>11</span></div><div class="class-block blank"></div><div class="class-block peach">Proyecto<small>14:00 – 16:00</small></div></div>
+          </div>
+          <div class="preview-task"><span class="task-check">✓</span><span>Preparar la entrega de Diseño</span><span class="soft-tag">Hoy</span></div>
+        </div><span class="visual-caption">Una vista de ejemplo de lo que puedes organizar.</span>
+      </div>
+    </section>
+
+    <section class="feature chapter" data-scene="2" id="tus-proyectos" aria-labelledby="project-title">
+      <div class="feature-copy"><p class="eyebrow"><span class="section-number">02 /</span> Tu trabajo en equipo</p><h2 id="project-title">Ten claro tu paso.<br>Y el <em>siguiente.</em></h2><p>Descubre qué te toca, para cuándo y cómo se conecta con el trabajo de tu equipo. Avanza con el contexto a la mano.</p><ul class="feature-list"><li>Responsables, fases y dependencias visibles.</li><li>Conversaciones y archivos dentro de cada proyecto.</li><li>Entregables, versiones y progreso en un mismo espacio.</li></ul><a class="text-link" href="/proyectos">Dale forma a tu proyecto <span aria-hidden="true">↗</span></a></div>
+      <div class="product-visual project-visual" data-depth="2"><div class="window-bar"><span class="window-dots">● ● ●</span><span>Proyecto de Diseño</span><span>↗</span></div><div class="preview-body"><div class="preview-heading"><div><span class="mini-label">DEL PRIMER PASO A LA ENTREGA</span><h3>Cada avance cuenta.</h3></div><div class="avatars"><span>V</span><span>D</span><span>Tú</span></div></div><div class="phase-flow"><div class="phase-card done"><span class="phase-status">✓ Terminada</span><strong>Investigar</strong><small>El punto de partida</small></div><span class="phase-arrow">→</span><div class="phase-card current"><span class="phase-status">◉ En proceso</span><strong>Prototipar</strong><small>Tu siguiente paso</small></div><span class="phase-arrow">→</span><div class="phase-card"><span class="phase-status">○ Por empezar</span><strong>Validar</strong><small>Todo está conectado</small></div></div><div class="project-message"><span class="note-icon">✦</span><div><strong>Ponte al día con IA</strong><p>Consulta un resumen de los acuerdos y las decisiones del canal.</p></div></div><div class="progress-line"><span>Avance del proyecto</span><strong>60 %</strong></div><div class="progress-track"><span></span></div></div><span class="visual-caption">Ejemplo ilustrativo de un proyecto y sus fases.</span></div>
+    </section>
+
+    <section class="feature chapter" data-scene="3" id="tus-recordatorios" aria-labelledby="reminder-title"><div class="feature-copy"><p class="eyebrow"><span class="section-number">03 /</span> Presente en tu día</p><h2 id="reminder-title">Que no dependa<br>de tu <em>memoria.</em></h2><p>Configura cuándo quieres recordar una clase o una entrega. Y conserva ese pendiente que apareció justo al terminar la clase.</p><ul class="feature-list"><li>Recordatorios con la anticipación que elijas.</li><li>Apuntes de clase conectados con tus pendientes.</li><li>Integración configurable con WhatsApp.</li></ul><a class="text-link" href="/recordatorios">Prepara tus recordatorios <span aria-hidden="true">↗</span></a></div>
+      <div class="reminder-visual" data-depth="3"><div class="notification-card"><div class="notification-header"><img src="/assets/img/studyflow-isotipo.png" width="30" height="30" alt=""><strong>StudyFlow</strong><span>Tu recordatorio</span></div><h3>Tu entrega se acerca ✦</h3><p>Revisar el prototipo de Diseño.<br>Un pequeño paso hoy, más tranquilidad mañana.</p><div class="notification-footer"><span class="status-dot"></span> A tu ritmo. Con tiempo.</div></div><div class="reminder-note"><span>✎</span><div><strong>Antes de que se te olvide</strong><p>Guarda una idea, una tarea o un apunte después de clase.</p></div></div><p class="integration-note">Vista ilustrativa. Los envíos por WhatsApp requieren activar la integración.</p></div>
+    </section>
+
+    <section class="why-section" id="por-que" aria-labelledby="why-title"><p class="eyebrow">Tres piezas. Una sola app.</p><h2 id="why-title">Menos saltos entre herramientas.<br><em>Más claridad para ti.</em></h2><p class="section-intro">Tu vida académica tiene muchas partes. Organizarlas puede ser sencillo.</p><div class="benefit-grid"><article><span class="benefit-icon">▦</span><h3>Más que una agenda</h3><p>Relaciona tu horario con tus tareas y tus proyectos. Ve tu vida académica completa.</p></article><article><span class="benefit-icon">↗</span><h3>Más contexto que un chat</h3><p>Encuentra una conversación junto a su tarea, sus archivos y su fecha de entrega.</p></article><article><span class="benefit-icon">✦</span><h3>Un inicio más sencillo</h3><p>Apóyate en la IA para dar forma a un proyecto o resumir los acuerdos de un canal.</p></article></div></section>
+
+    <section class="faq-section" aria-labelledby="faq-title"><div><p class="eyebrow">Sin darle tantas vueltas</p><h2 id="faq-title">Antes de<br><em>empezar.</em></h2></div><div class="faq-list"><details><summary>¿StudyFlow es para mí?<span aria-hidden="true">+</span></summary><p>Si eres estudiante universitario y quieres organizar tus clases, tus pendientes y tus trabajos grupales desde un mismo lugar, StudyFlow está pensado para ti.</p></details><details><summary>¿Puedo usarlo para organizarme por mi cuenta?<span aria-hidden="true">+</span></summary><p>Sí. Puedes empezar por tu horario y tus recordatorios. Cuando tengas un trabajo grupal, crea un proyecto y organiza sus tareas, fases y entregables.</p></details><details><summary>¿Cómo funcionan WhatsApp y la IA?<span aria-hidden="true">+</span></summary><p>StudyFlow incluye la integración para enviar recordatorios por WhatsApp y usar IA al organizar proyectos o resumir canales. Su uso real requiere que las integraciones estén activadas. En la configuración de demostración se utilizan respuestas simuladas y no se envían mensajes reales.</p></details><details><summary>¿Cómo puedo conocer la aplicación?<span aria-hidden="true">+</span></summary><p>Entra a la pantalla de acceso y elige explorar el ejemplo. También puedes crear tu cuenta para empezar a organizar tu propio espacio.</p><a class="text-link" href="/login">Ir al acceso <span aria-hidden="true">↗</span></a></details></div></section>
+
+    <section class="closing chapter" data-scene="4" aria-labelledby="closing-title"><img src="/assets/img/studyflow-isotipo.png" alt="" width="64" height="64"><p class="eyebrow">Para estudiantes universitarios</p><h2 id="closing-title">Tu próximo paso,<br><em>un poco más claro.</em></h2><p>Sencillo, rápido y presente en las aplicaciones que ya usas.</p><a class="button button-primary" href="/registro">Encuentra tu flow <span aria-hidden="true">↗</span></a><a class="closing-login" href="/panel">Ya tengo mi espacio →</a></section>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="StudyFlow, inicio"><img src="/assets/img/studyflow-isotipo.png" width="46" height="46" alt=""><span>Study<span class="brand-accent">Flow</span></span></a>
+        <p>Tu vida académica tiene su espacio.<br>Hazlo tuyo.</p>
+        <div class="social-links" aria-label="Redes sociales">
+          <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube, página principal (abre en otra pestaña)"><i class="bi bi-youtube" aria-hidden="true"></i><span>YouTube</span><span aria-hidden="true">↗</span></a>
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram, página principal (abre en otra pestaña)"><i class="bi bi-instagram" aria-hidden="true"></i><span>Instagram</span><span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <nav class="footer-column" aria-label="Explorar StudyFlow">
+        <h3>Encuentra tu flow</h3>
+        <a href="#tu-semana">Tu organización</a>
+        <a href="#tus-proyectos">Tus proyectos</a>
+        <a href="#tus-recordatorios">Tus recordatorios</a>
+        <a href="#por-que">Por qué StudyFlow</a>
+      </nav>
+      <nav class="footer-column" aria-label="Tu espacio en StudyFlow">
+        <h3>Tu próximo paso</h3>
+        <a href="/registro">Crea tu cuenta ↗</a>
+        <a href="/panel">Entra a tu espacio ↗</a>
+        <p>Para estudiantes<br>universitarios.</p>
+      </nav>
+    </div>
+    <div class="footer-bottom"><span>© StudyFlow · Una sola app para tu vida académica.</span><a href="#contenido">Volver arriba <span aria-hidden="true">↑</span></a></div>
+  </footer>
+  <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pausar animación"><span aria-hidden="true">Ⅱ</span><span class="motion-label">Pausar movimiento</span></button>
+</body>
+</html>

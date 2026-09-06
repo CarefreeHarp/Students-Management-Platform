@@ -51,7 +51,7 @@
         });
       }
       feedback(`¡Hola, ${usuario.nombre}! Entrando…`, "success");
-      window.setTimeout(() => window.location.assign("/"), 350);
+      window.setTimeout(() => window.location.assign("/panel"), 350);
     } catch (error) {
       feedback(error.message, "error");
     }
@@ -70,7 +70,7 @@
         return;
       }
       feedback("Sesión iniciada.", "success");
-      window.setTimeout(() => window.location.assign("/"), 350);
+      window.setTimeout(() => window.location.assign("/panel"), 350);
     } catch (error) {
       feedback(error.message, "error");
     }
@@ -81,7 +81,7 @@
     try {
       const usuario = await pedir("/api/sesion/demostracion", {});
       feedback(`Entrando como ${usuario.nombreCompleto}…`, "success");
-      window.setTimeout(() => window.location.assign("/"), 350);
+      window.setTimeout(() => window.location.assign("/panel"), 350);
     } catch (error) {
       feedback(error.message, "error");
     }
