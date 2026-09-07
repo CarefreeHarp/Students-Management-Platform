@@ -49,6 +49,16 @@ if [ -z "$MAVEN_SKIP_RC" ]; then
 
 fi
 
+# Railway/Railpack can expose an invalid JAVA_HOME value. Fall back to the JDK on PATH.
+if [ -n "$JAVA_HOME" ] && [ ! -x "$JAVA_HOME/bin/java" ]; then
+  if [ -x "$JAVA_HOME/java" ]; then
+    JAVA_HOME="$(dirname "$JAVA_HOME")"
+  else
+    unset JAVA_HOME
+  fi
+  export JAVA_HOME
+fi
+
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
 darwin=false
