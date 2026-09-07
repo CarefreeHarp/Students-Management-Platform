@@ -33,6 +33,9 @@
 #   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 # ----------------------------------------------------------------------------
 
+# Railway provides the JDK; ignore host-level Maven rc overrides.
+MAVEN_SKIP_RC=true
+
 if [ -z "$MAVEN_SKIP_RC" ]; then
 
   if [ -f /usr/local/etc/mavenrc ]; then
