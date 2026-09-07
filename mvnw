@@ -52,7 +52,7 @@ if [ -z "$MAVEN_SKIP_RC" ]; then
 
 fi
 
-# Railway/Railpack can expose invalid Java paths. Fall back to the JDK on PATH.
+# Railway/Railpack can expose invalid Java paths. Resolve the JDK installed by mise.
 if [ -n "$JAVACMD" ] && [ ! -x "$JAVACMD" ]; then
   unset JAVACMD
 fi
@@ -63,6 +63,13 @@ if [ -n "$JAVA_HOME" ] && [ ! -x "$JAVA_HOME/bin/java" ]; then
     unset JAVA_HOME
   fi
   export JAVA_HOME
+fi
+if [ -z "$JAVA_HOME" ] && command -v mise >/dev/null 2>&1; then
+  miseJava="$(mise which java 2>/dev/null)"
+  if [ -x "$miseJava" ]; then
+    JAVA_HOME="$(dirname "$(dirname "$miseJava")")"
+    export JAVA_HOME
+  fi
 fi
 
 # OS specific support.  $var _must_ be set to either true or false.
