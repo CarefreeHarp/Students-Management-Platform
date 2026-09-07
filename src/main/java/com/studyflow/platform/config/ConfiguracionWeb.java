@@ -5,7 +5,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/** Ajustes de la capa Interfaz: recursos estaticos y CORS de la API. */
+/** Ajustes de la capa Interfaz: recursos estáticos y CORS de la API. */
 @Configuration
 public class ConfiguracionWeb implements WebMvcConfigurer {
 
@@ -18,9 +18,11 @@ public class ConfiguracionWeb implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Permite consumir la API desde un cliente separado durante el desarrollo.
+        // Desarrollo local y dominio público de Railway.
         registry.addMapping("/api/**")
-                .allowedOriginPatterns("http://localhost:*")
+                .allowedOriginPatterns(
+                        "http://localhost:*",
+                        "https://students-management-platform-production.up.railway.app")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE");
     }
 }
