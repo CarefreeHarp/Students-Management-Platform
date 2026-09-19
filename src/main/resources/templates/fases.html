@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/layout :: head('Fases del proyecto', 'Diagrama de fases, dependencias entre tareas y reparto del trabajo.')}"></head>
+  <head th:replace="~{fragments/layout :: head('Fases y tareas del proyecto', 'Diagrama de fases y tareas, dependencias y reparto del trabajo.')}"></head>
   <body data-page="fases" th:attr="data-project-id=${projectId}">
     <a class="skip-link" href="#contenido">Ir al contenido</a>
     <header th:replace="~{fragments/layout :: nav}"></header>
@@ -11,21 +11,35 @@
       <section class="page-heading" aria-labelledby="fases-title">
         <div>
           <p class="eyebrow" id="project-label">Planificación</p>
-          <h1 id="fases-title">Diagrama de fases</h1>
+          <h1 id="fases-title">Diagrama de fases y tareas</h1>
           <p class="mt-2 max-w-[62ch] text-muted">
-            Cada columna es una etapa. Las flechas indican qué tarea depende de cuál.
+            Sigue las ramas de arriba hacia abajo: cada conexión es una dependencia real.
           </p>
         </div>
         <a class="btn btn-secondary" id="link-deliverables" href="#"><i class="bi bi-folder2-open"></i> Entregables</a>
       </section>
 
-      <!-- Tareas libres: cada persona elige la suya -->
-      <section class="tarjeta-color tono-cian mb-5 " aria-labelledby="available-title">
+      <section class="panel reparto-panel" aria-labelledby="reparto-title">
+        <div class="reparto-summary">
+          <div><h2 id="reparto-title">Reparto del trabajo</h2><p id="reparto-description">Cargando configuración…</p></div>
+          <button id="configure-reparto" class="btn btn-secondary btn-sm" type="button" aria-expanded="false" aria-controls="reparto-settings"><i class="bi bi-sliders"></i> Configurar</button>
+        </div>
+        <form id="reparto-settings" hidden>
+          <fieldset class="reparto-options">
+            <legend class="sr-only">Cómo se reparten las tareas</legend>
+            <label class="reparto-option"><input type="radio" name="modoReparto" value="asignado"><span><strong>Tareas asignadas</strong><small>Elige quién se encarga de cada tarea.</small></span></label>
+            <label class="reparto-option"><input type="radio" name="modoReparto" value="libre"><span><strong>Elección libre</strong><small>Cualquiera del equipo puede tomar una tarea disponible.</small></span></label>
+          </fieldset>
+          <div class="reparto-actions"><p>El cambio conserva los responsables actuales.</p><button class="btn btn-primary btn-sm" type="submit">Guardar modo</button></div>
+          <p id="reparto-feedback" class="form-feedback" role="status"></p>
+        </form>
+      </section>
+
+      <section id="available-section" class="panel available-section" aria-labelledby="available-title" hidden>
         <div class="section-head flex-wrap">
           <div>
-            <p class="eyebrow">Reparto del trabajo</p>
             <h2 id="available-title">Tareas disponibles</h2>
-            <p>Sin responsable y con sus dependencias ya terminadas. Elige la que quieras hacer.</p>
+            <p>Sin responsable y sin bloqueos. Elige por dónde empezar.</p>
           </div>
           <span id="available-count" class="tag bg-primary-soft text-[var(--estado-primary)]">0</span>
         </div>
@@ -33,55 +47,80 @@
       </section>
 
       <!-- Diagrama -->
-      <section class="panel" aria-labelledby="diagram-title">
+      <section class="panel branch-panel" aria-labelledby="diagram-title">
         <div class="section-head flex-wrap">
           <div>
-            <p class="eyebrow">Mapa del proyecto</p>
-            <h2 id="diagram-title">Fases y dependencias</h2>
-            <p>Una tarea bloqueada muestra de qué depende.</p>
+            <h2 id="diagram-title">Diagrama de fases y tareas</h2>
+            <p>Pasa el cursor para ver el detalle; abre una tarea para editar sus conexiones.</p>
           </div>
+          <button id="configure-phases" class="btn btn-secondary btn-sm" type="button" hidden><i class="bi bi-kanban"></i> Gestionar fases</button>
         </div>
-        <div class="overflow-x-auto">
-          <div id="diagram" class="flex min-w-max items-start gap-4"></div>
+        <div id="phase-legend" class="branch-legend" aria-label="Etapas del proyecto"></div>
+        <div class="branch-diagram-region" role="region" aria-label="Ramas y dependencias del proyecto; ordenadas de arriba hacia abajo">
+          <div id="diagram" class="branch-diagram"></div>
         </div>
       </section>
     </main>
 
     <!-- Panel de una tarea -->
     <dialog id="task-dialog" class="app-dialog">
-      <div class="dialog-form">
+      <form id="task-form" class="dialog-form" novalidate>
         <div class="dialog-header">
-          <div><p class="eyebrow" id="task-stage">Etapa</p><h2 id="task-title">Tarea</h2></div>
+          <div><p class="eyebrow" id="task-dialog-kicker">Editar tarea</p><h2 id="task-dialog-title">Tarea</h2></div>
           <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
         </div>
-        <p id="task-description" class="text-[13px] text-muted"></p>
-
-        <div class="form-field">
-          <label for="task-state">Estado</label>
-          <select id="task-state">
-            <option value="sin-empezar">Sin empezar</option>
-            <option value="en-proceso">En proceso</option>
-            <option value="en-revision">En revisión</option>
-            <option value="terminada">Terminada</option>
-          </select>
+        <input id="editing-task-id" type="hidden">
+        <label class="form-field">Nombre de la tarea<input id="task-title-input" required maxlength="100"></label>
+        <label class="form-field">Descripción<textarea id="task-description-input" rows="3" maxlength="400"></textarea></label>
+        <div class="form-grid-two">
+          <label class="form-field">Responsable asignado<select id="task-assignee-input"></select></label>
+          <label class="form-field">Fase<select id="task-stage-input"></select></label>
         </div>
-
-        <div class="form-field">
-          <label for="task-dependency">Depende de</label>
-          <div class="flex gap-2">
-            <select id="task-dependency" class="flex-1"></select>
-            <button id="add-dependency" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus"></i></button>
-          </div>
-          <div id="dependency-list" class="mt-2 flex flex-wrap gap-1.5"></div>
+        <div class="form-grid-two">
+          <label class="form-field">Fecha límite<input id="task-date-input" type="date"></label>
+          <label class="form-field">Estado<select id="task-state-input"><option value="sin-empezar">Sin empezar</option><option value="en-proceso">En proceso</option><option value="en-revision">En revisión</option><option value="terminada">Terminada</option></select></label>
         </div>
-
+        <section id="task-result-section" class="task-result-form" hidden aria-labelledby="task-result-title">
+          <div><p class="eyebrow">Resultado requerido</p><h3 id="task-result-title">¿Qué entregaste?</h3><p>Antes de terminar la tarea, registra un comentario, un archivo o ambos.</p></div>
+          <label class="form-field">Resultado o comentario<textarea id="task-result-input" rows="3" maxlength="2000" placeholder="Explica qué se completó o comparte las conclusiones."></textarea></label>
+          <label class="form-field">Archivo de resultado<input id="task-result-file" type="file"><span class="field-hint">Opcional si ya escribiste un resultado. Máximo 10 MB.</span></label>
+          <a id="task-result-file-link" class="text-link" hidden download><i class="bi bi-paperclip" aria-hidden="true"></i> <span></span></a>
+        </section>
+        <div class="form-field">
+          <label for="task-dependency">Esta tarea depende de</label>
+          <select id="task-dependency"></select>
+          <p class="mt-1 text-[11px] text-muted">Al elegir una tarea se añadirá la conexión al diagrama.</p>
+          <div class="mt-3"><p class="text-[11px] font-semibold text-muted">Tareas de las que depende</p><div id="dependency-list" class="mt-2 flex flex-wrap gap-1.5"></div></div>
+        </div>
         <p id="task-blocked" class="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] font-semibold text-[var(--estado-warning)]" hidden></p>
         <p id="task-feedback" class="form-feedback" role="alert"></p>
         <div class="dialog-actions">
-          <button id="release-task" class="btn btn-ghost" type="button">Liberar tarea</button>
-          <button id="claim-task" class="btn btn-primary" type="button"><i class="bi bi-hand-index"></i> Tomar esta tarea</button>
+          <div class="flex flex-wrap gap-2"><button id="release-task" class="btn btn-ghost" type="button">Liberar tarea</button><button id="claim-task" class="btn btn-secondary" type="button"><i class="bi bi-hand-index"></i> Tomar esta tarea</button></div>
+          <div class="flex gap-2"><button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button><button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar cambios</button></div>
         </div>
-      </div>
+      </form>
+    </dialog>
+
+    <!-- Editor persistente de fases: las tareas conservan su fase al renombrarla. -->
+    <dialog id="phase-dialog" class="app-dialog">
+      <form id="phase-form" class="dialog-form" novalidate>
+        <div class="dialog-header">
+          <div><p class="eyebrow">Estructura del proyecto</p><h2>Gestionar fases</h2></div>
+          <button class="icon-button" type="button" data-close-phase-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <p class="text-[13px] text-muted">Crea, renombra y ordena las fases. Para eliminar una fase con tareas, primero muévelas desde cada tarea.</p>
+        <div id="phase-editor-list" class="grid gap-2" aria-live="polite"></div>
+        <button id="add-phase" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus-lg"></i> Añadir fase</button>
+        <label class="form-field">Fase predeterminada para tareas nuevas
+          <select id="default-phase"></select>
+          <span class="field-hint">Puedes cambiar la fase de cada tarea después.</span>
+        </label>
+        <p id="phase-feedback" class="form-feedback" role="alert"></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-phase-dialog>Cancelar</button>
+          <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar fases</button>
+        </div>
+      </form>
     </dialog>
 
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>

@@ -5,25 +5,20 @@
   const PROJECTS_KEY = "studyflow_projects";
   const COLOR_PALETTE = ["#6757dd", "#21b7bd", "#ee985b", "#d26795", "#4f9ee9"];
   const DEFAULT_USER = {
-    id: "demo-user",
-    firstName: "Valentina",
-    lastName: "Gómez",
-    name: "Valentina Gómez",
-    email: "valentina.gomez@universidad.edu",
-    university: "Universidad Central",
-    career: "Ingeniería de Sistemas",
-    semester: "6",
-    age: "20",
-    description: "Construyendo soluciones que hacen la vida universitaria más simple.",
+    id: "",
+    firstName: "Estudiante",
+    lastName: "",
+    name: "Estudiante",
+    email: "",
+    university: "",
+    career: "",
+    semester: "",
+    age: "",
+    description: "",
     avatar: "",
-    provider: "Correo electrónico",
-    joinedAt: "2026-08-01T12:00:00.000Z"
+    provider: "",
+    joinedAt: ""
   };
-  const DEMO_PROJECTS = [
-    { id: "campus-verde", name: "Campus Verde", dueDate: "2026-08-22", members: ["VG", "JM", "LC", "AM"], progress: 72, color: "#6757dd" },
-    { id: "rediseño-app", name: "Rediseño de la app de biblioteca", dueDate: "2026-08-28", members: ["VG", "SR", "MP"], progress: 45, color: "#21b7bd" },
-    { id: "investigacion-ux", name: "Investigación UX", dueDate: "2026-09-04", members: ["VG", "AN"], progress: 28, color: "#ee985b" }
-  ];
 
   function safeParse(value) {
     try {
@@ -120,6 +115,7 @@
   }
 
   function formatJoined(value) {
+    if (!value) return "Sin fecha registrada";
     const date = new Date(value || DEFAULT_USER.joinedAt);
     if (Number.isNaN(date.getTime())) return "Este semestre";
     const result = new Intl.DateTimeFormat("es-CO", { month: "long", year: "numeric" }).format(date);
@@ -127,10 +123,10 @@
   }
 
   function normaliseProject(project, index) {
-    const rawProgress = Number(project.progress ?? project.avance ?? project.porcentajeAvance ?? 0);
+    const rawProgress = Number(project.progress ?? project.progreso ?? project.avance ?? project.porcentajeAvance ?? 0);
     const members = project.members || project.integrantes || project.participants || [];
     return {
-      id: project.id || project.slug || `proyecto-${index + 1}`,
+      id: project.codigo || project.id || project.slug || `proyecto-${index + 1}`,
       name: project.name || project.nombre || "Proyecto sin nombre",
       dueDate: project.dueDate || project.fechaEntrega || project.deliveryDate || "",
       members: Array.isArray(members) ? members : String(members).split(",").map((member) => member.trim()).filter(Boolean),
@@ -153,7 +149,7 @@
     const storedProjects = storageCandidates
       .map((key) => safeParse(safeGet(key)))
       .find((projects) => Array.isArray(projects));
-    const source = Array.isArray(externalProjects) ? externalProjects : (storedProjects || DEMO_PROJECTS);
+    const source = Array.isArray(externalProjects) ? externalProjects : (storedProjects || []);
     return source.map(normaliseProject);
   }
 
@@ -351,7 +347,7 @@
       const message = "Cambios guardados. Tu perfil ya está actualizado.";
       setEditFeedback(message, "success");
       notify(message, "success");
-      window.setTimeout(() => window.location.assign("/perfil"), 450);
+      window.setTimeout(() => window.App.navigate("/perfil"), 450);
     });
   }
 

@@ -4,6 +4,29 @@
  */
 (() => {
   'use strict';
+  const menuButton = document.querySelector('.landing-menu-toggle');
+  const menuLinks = document.querySelector('#landing-links');
+  const narrowNavigation = matchMedia('(max-width: 900px)');
+  function closeMenu() {
+    menuButton?.setAttribute('aria-expanded', 'false');
+    menuButton?.setAttribute('aria-label', 'Abrir menú de navegación');
+    menuLinks?.classList.remove('is-open');
+  }
+  menuButton?.addEventListener('click', () => {
+    const open = menuButton.getAttribute('aria-expanded') !== 'true';
+    menuButton.setAttribute('aria-expanded', String(open));
+    menuButton.setAttribute('aria-label', open ? 'Cerrar menú de navegación' : 'Abrir menú de navegación');
+    menuLinks?.classList.toggle('is-open', open);
+  });
+  menuLinks?.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
+  document.addEventListener('click', event => { if (!event.target.closest('.landing-nav')) closeMenu(); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') {
+      closeMenu();
+      menuButton.focus();
+    }
+  });
+  narrowNavigation.addEventListener('change', closeMenu);
   const canvas = document.querySelector('#flow-universe');
   const toggle = document.querySelector('.motion-toggle');
   if (!canvas || !toggle) return;
@@ -112,10 +135,13 @@
     const heroX = stacked ? width * .5 : width * .76;
     const heroY = stacked ? orbitCenter - scroll : height * .51;
     const unit = stacked ? Math.min(width * .31, 200) : Math.min(height * .32, width * .2);
-    const closingY = clamp(closingTop - scroll + closingHeight * .46, height * .32, height * .72);
-    const closingUnit = mobile ? width * .18 : Math.min(height * .27, width * .15);
-    const closingLeft = mobile ? .12 : .19;
-    const closingRight = mobile ? .88 : .81;
+    // Keep both silhouettes attached to the closing section. Clamping their
+    // centre to the viewport left them stranded behind the opaque footer.
+    // On small screens use the open space above the copy; on desktop flank it.
+    const closingY = closingTop - scroll + (stacked ? 76 : closingHeight * .44);
+    const closingUnit = stacked ? Math.min(width * .085, 52) : Math.min(height * .20, width * .10, 150);
+    const closingLeft = stacked ? .22 : .13;
+    const closingRight = stacked ? .78 : .87;
     const overHero = scatter < .85 && Math.abs(mouseX - heroX) < unit * .65 && Math.abs(mouseY - heroY) < unit * 1.1;
     const overClosing = reunion > .6 && [closingLeft, closingRight].some(x => Math.abs(mouseX - width * x) < closingUnit * .7 && Math.abs(mouseY - closingY) < closingUnit * 1.1);
     const overBolt = pointerPresent && !paused && (overHero || overClosing);
@@ -127,7 +153,8 @@
     const angleZ = .10 + Math.sin(clock * .12) * .025;
     const density = mobile ? 2 : 1;
     const fieldWeight = scatter * (1 - reunion);
-    const opacity = mix(mix(1, mobile ? .40 : .62, scatter), mobile ? .55 : .9, reunion);
+    const closingVisibility = 1 - ease((scroll - closingTop - closingHeight * .68) / (closingHeight * .25));
+    const opacity = mix(mix(1, mobile ? .40 : .62, scatter), (mobile ? .65 : .9) * closingVisibility, reunion);
 
     ctx.clearRect(0, 0, width, height);
     for (const star of stars) {

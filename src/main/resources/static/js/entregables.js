@@ -25,7 +25,7 @@
     });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      window.location.assign("/login");
+      app.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) {
@@ -49,7 +49,7 @@
 
     const color = entregable.colorResponsable || "#5b5ce2";
     return `
-      <article class="tarjeta-lista tarjeta-borde-color flex items-start gap-3" style="--borde:${esc(color)}">
+      <article class="deliverable-card tarjeta-lista tarjeta-borde-color flex items-start gap-3" style="--borde:${esc(color)}">
         <span class="grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-[var(--estado-primary)]">
           <i class="bi ${esc(entregable.icono)}"></i>
         </span>
@@ -69,7 +69,7 @@
             <span><i class="bi bi-calendar3"></i> ${esc(entregable.fechaRegistro)}</span>
           </div>
         </div>
-        <div class="flex flex-none gap-1">
+        <div class="deliverable-actions flex flex-none gap-1">
           <select class="min-h-0 w-auto px-1.5 py-1 text-[11px]" data-state="${entregable.id}" aria-label="Cambiar estado">
             <option value="BORRADOR" ${entregable.estado === "BORRADOR" ? "selected" : ""}>Borrador</option>
             <option value="EN_REVISION" ${entregable.estado === "EN_REVISION" ? "selected" : ""}>En revisión</option>
@@ -124,9 +124,8 @@
     $("#deliverable-url").value = entregable ? entregable.url : "";
     $("#deliverable-name").value = entregable ? entregable.nombre : "";
     $("#deliverable-description").value = entregable ? entregable.descripcion || "" : "";
-    $("#deliverable-type").value = entregable ? entregable.tipo : "";
+    $("#deliverable-type").value = entregable ? entregable.tipo : "DOCUMENTO";
     $("#deliverable-state").value = entregable ? entregable.estado : "BORRADOR";
-    $("#deliverable-owner").value = entregable && entregable.responsable ? entregable.responsable : "";
     $("#deliverable-feedback").classList.remove("is-visible");
     $("#deliverable-dialog").showModal();
   }
@@ -139,9 +138,8 @@
       nombre: $("#deliverable-name").value.trim(),
       descripcion: $("#deliverable-description").value.trim(),
       url: $("#deliverable-url").value.trim(),
-      tipo: $("#deliverable-type").value || null,
-      estado: $("#deliverable-state").value,
-      responsable: $("#deliverable-owner").value || null
+      tipo: $("#deliverable-type").value,
+      estado: $("#deliverable-state").value
     };
 
     if (!cuerpo.nombre || !cuerpo.url) {
@@ -173,9 +171,6 @@
 
     const detalle = await pedir(`/api/proyectos/${proyecto}`);
     $("#project-label").textContent = detalle.nombre;
-    $("#deliverable-owner").innerHTML = '<option value="">Sin asignar</option>'
-      + detalle.integrantes.map((integrante) =>
-          `<option value="${esc(integrante.nombre)}">${esc(integrante.nombre)}</option>`).join("");
 
     const dialogo = $("#deliverable-dialog");
     $("#new-deliverable").addEventListener("click", () => abrirFormulario(null));

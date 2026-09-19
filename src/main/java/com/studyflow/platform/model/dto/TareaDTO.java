@@ -15,6 +15,10 @@ public record TareaDTO(
         String horaLimite,
         String estado,
         String estadoEtiqueta,
-        boolean generadaPorIa
+        boolean generadaPorIa,
+        boolean tieneResultado,
+        String resultadoTexto,
+        String archivoResultadoNombre,
+        String archivoResultadoUrl
 ) {
 }

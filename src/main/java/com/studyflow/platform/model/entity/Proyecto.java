@@ -1,5 +1,6 @@
 package com.studyflow.platform.model.entity;
 
+import com.studyflow.platform.model.enums.ModoReparto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -47,6 +48,15 @@ public class Proyecto {
 
     @Column(name = "etapa_actual", length = 60)
     private String etapaActual = "Planeación";
+
+    /** Existing projects retain explicit assignment when the column is introduced. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "modo_reparto", nullable = false, columnDefinition = "varchar(16) default 'ASIGNADO'")
+    private ModoReparto modoReparto = ModoReparto.ASIGNADO;
+
+    public ModoReparto getModoReparto() {
+        return modoReparto != null ? modoReparto : ModoReparto.ASIGNADO;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "propietario_id", nullable = false)

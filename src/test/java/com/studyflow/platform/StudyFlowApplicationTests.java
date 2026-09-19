@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /** Comprobaciones basicas de arranque, navegacion y datos iniciales. */
-@SpringBootTest
+@SpringBootTest(properties = "studyflow.demo.enabled=true")
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
 class StudyFlowApplicationTests {
@@ -165,5 +165,33 @@ class StudyFlowApplicationTests {
         MockHttpSession sesion = sesionDeNavegador();
         mockMvc.perform(get("/api/proyectos").session(sesion)).andExpect(status().isOk());
         mockMvc.perform(get("/api/usuarios/actual").session(sesion)).andExpect(status().isOk());
+    }
+
+    @Test
+    void crearProyectoDevuelveLosErroresDeCamposObligatoriosDesdeElBackend() throws Exception {
+        mockMvc.perform(post("/api/proyectos")
+                        .session(sesionDeNavegador())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errores.nombre").value("es obligatorio"))
+                .andExpect(jsonPath("$.errores.descripcion").value("es obligatoria"))
+                .andExpect(jsonPath("$.errores.fechaEntrega").value("es obligatoria"));
+    }
+
+    @Test
+    void crearProyectoRechazaUnaEntregaQueNoSeaPosteriorAHoy() throws Exception {
+        String cuerpo = """
+                {"nombre":"Proyecto inválido","descripcion":"Validar la fecha de entrega",%n
+                "fechaEntrega":"%s","etapaInicial":"Planeación","modoReparto":"asignado"}
+                """.formatted(java.time.LocalDate.now());
+
+        mockMvc.perform(post("/api/proyectos")
+                        .session(sesionDeNavegador())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errores.fechaEntrega")
+                        .value("La fecha de entrega debe ser posterior a la fecha actual."));
     }
 }

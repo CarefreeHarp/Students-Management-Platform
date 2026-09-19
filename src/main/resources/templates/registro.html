@@ -5,7 +5,7 @@
     <main class="auth-layout">
       <section class="auth-showcase" aria-labelledby="register-showcase-title">
         <a class="auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow">
-          <span class="brand-mark" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></span>
+          <img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="48" height="48" alt="">
           <span>StudyFlow</span>
         </a>
 
@@ -26,7 +26,7 @@
       <section class="auth-panel" aria-labelledby="register-title">
         <div class="auth-card">
           <a class="mobile-brand auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow">
-            <span class="brand-mark" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></span>
+            <img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="48" height="48" alt="">
             <span>StudyFlow</span>
           </a>
 
@@ -39,7 +39,7 @@
           <form id="register-form" class="cuadro-formulario auth-form" novalidate>
             <div class="form-field">
               <label for="register-name">Nombre y apellido</label>
-              <span class="input-wrap"><i class="bi bi-person" aria-hidden="true"></i><input id="register-name" name="nombre" type="text" autocomplete="name" placeholder="Valentina Rojas" required autofocus></span>
+              <span class="input-wrap"><i class="bi bi-person" aria-hidden="true"></i><input id="register-name" name="nombre" type="text" autocomplete="name" placeholder="Tu nombre completo" required autofocus></span>
             </div>
 
             <div class="form-field">
@@ -83,7 +83,7 @@
             <button class="btn btn-primary w-full" type="submit">Crear mi cuenta <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
           </form>
 
-          <p class="auth-switch">¿Solo quieres probar? <a th:href="@{/login}" href="/login">Entra con tu nombre</a></p>
+          <p class="auth-switch">¿Ya tienes una cuenta? <a th:href="@{/login(acceso='cuenta')}" href="/login?acceso=cuenta">Ingresa a tu espacio</a></p>
         </div>
       </section>
     </main>

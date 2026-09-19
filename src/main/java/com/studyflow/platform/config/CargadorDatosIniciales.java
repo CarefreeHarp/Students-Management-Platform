@@ -26,6 +26,7 @@ import com.studyflow.platform.repository.UniversidadRepository;
 import com.studyflow.platform.repository.UsuarioRepository;
 import com.studyflow.platform.service.ProyectoService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -41,6 +42,7 @@ import java.util.List;
  * la aplicacion se vea igual con o sin backend conectado.
  */
 @Configuration
+@ConditionalOnProperty(name = "studyflow.demo.enabled", havingValue = "true")
 public class CargadorDatosIniciales {
 
     @Bean
@@ -73,54 +75,58 @@ public class CargadorDatosIniciales {
             valentina.setDescripcion("Diseño soluciones que hacen más fácil aprender, colaborar y crear.");
             usuarioRepository.save(valentina);
 
+            // These seed records must remain valid regardless of when the app
+            // starts.  The project service correctly rejects past deadlines,
+            // so relative dates keep the sample workspace usable over time.
+            LocalDate hoy = LocalDate.now();
             proyectoService.crear(new PeticionProyecto(
                     "Cognitiva",
                     "Aplicación para visualizar hábitos de estudio y bienestar universitario.",
-                    LocalDate.of(2026, 8, 21),
+                    hoy.plusDays(32),
                     "Desarrollo",
                     "#5b5ce2",
                     List.of(new PeticionIntegrante("Mateo Díaz", "mateo@universidad.edu.co", "#e2779b"),
                             new PeticionIntegrante("Sara Gómez", "sara@universidad.edu.co", "#2ca89b")),
                     List.of(
                             new PeticionTarea("Diseñar flujo de onboarding", "Definir las pantallas y mensajes de bienvenida.",
-                                    "Valentina Rojas", "Diseño", LocalDate.of(2026, 8, 13), "09:00", "in-progress"),
+                                    "Valentina Rojas", "Diseño", hoy.plusDays(8), "09:00", "in-progress"),
                             new PeticionTarea("Entrevistas a estudiantes", "Sintetizar hallazgos de las entrevistas realizadas.",
-                                    "Mateo Díaz", "Investigación", LocalDate.of(2026, 8, 14), "11:00", "pending"),
+                                    "Mateo Díaz", "Investigación", hoy.plusDays(11), "11:00", "pending"),
                             new PeticionTarea("Prototipo de analítica", "Crear primera versión del tablero de hábitos.",
-                                    "Sara Gómez", "Desarrollo", LocalDate.of(2026, 8, 15), "14:00", "pending"),
+                                    "Sara Gómez", "Desarrollo", hoy.plusDays(15), "14:00", "pending"),
                             new PeticionTarea("Presentación de avance", "Preparar demo y narrativa para la revisión.",
-                                    "Valentina Rojas", "Entrega", LocalDate.of(2026, 8, 19), "10:00", "completed"))
+                                    "Valentina Rojas", "Entrega", hoy.plusDays(23), "10:00", "completed"))
             ), valentina.getId());
 
             proyectoService.crear(new PeticionProyecto(
                     "Redes inteligentes",
                     "Propuesta de optimización para una red de sensores del campus.",
-                    LocalDate.of(2026, 8, 28),
+                    hoy.plusDays(42),
                     "Investigación",
                     "#19a7bd",
                     List.of(new PeticionIntegrante("Daniela Ruiz", "daniela@universidad.edu.co", "#f0a33f")),
                     List.of(
                             new PeticionTarea("Mapa de actores", "Identificar usuarios, áreas y responsables involucrados.",
-                                    "Daniela Ruiz", "Investigación", LocalDate.of(2026, 8, 13), "13:00", "in-progress"),
+                                    "Daniela Ruiz", "Investigación", hoy.plusDays(8), "13:00", "in-progress"),
                             new PeticionTarea("Modelo de datos", "Definir entidades y métricas del sistema de sensores.",
-                                    "Valentina Rojas", "Planeación", LocalDate.of(2026, 8, 16), "08:00", "pending"),
+                                    "Valentina Rojas", "Planeación", hoy.plusDays(12), "08:00", "pending"),
                             new PeticionTarea("Revisar bibliografía", "Organizar fuentes y referencias principales.",
-                                    "Valentina Rojas", "Investigación", LocalDate.of(2026, 8, 18), "15:00", "completed"))
+                                    "Valentina Rojas", "Investigación", hoy.plusDays(17), "15:00", "completed"))
             ), valentina.getId());
 
             proyectoService.crear(new PeticionProyecto(
                     "Laboratorio UX",
                     "Rediseño colaborativo de la experiencia de préstamo de equipos.",
-                    LocalDate.of(2026, 9, 4),
+                    hoy.plusDays(52),
                     "Planeación",
                     "#d7639d",
                     List.of(new PeticionIntegrante("Nicolás Vega", "nicolas@universidad.edu.co", "#7c76d9"),
                             new PeticionIntegrante("Sara Gómez", "sara@universidad.edu.co", "#2ca89b")),
                     List.of(
                             new PeticionTarea("Auditoría de interfaz", "Registrar hallazgos de accesibilidad y experiencia.",
-                                    "Nicolás Vega", "Diseño", LocalDate.of(2026, 8, 17), "10:00", "pending"),
+                                    "Nicolás Vega", "Diseño", hoy.plusDays(12), "10:00", "pending"),
                             new PeticionTarea("Organizar pruebas de uso", "Convocar estudiantes y preparar guion de pruebas.",
-                                    "Sara Gómez", "Investigación", LocalDate.of(2026, 8, 20), "14:00", "pending"))
+                                    "Sara Gómez", "Investigación", hoy.plusDays(16), "14:00", "pending"))
             ), valentina.getId());
 
             // El canal #general ya lo abre ProyectoService al crear cada proyecto:

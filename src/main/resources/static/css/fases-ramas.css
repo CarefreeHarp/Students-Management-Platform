@@ -1,0 +1,103 @@
+/* A vertical, phase-aware dependency tree. The task detail is intentionally
+   reserved for hover/focus so the tree itself remains easy to scan. */
+.reparto-panel, .available-section { margin-bottom: 20px; }
+.reparto-summary, .reparto-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.reparto-summary p, .reparto-actions p, .reparto-create-hint { color: rgb(var(--c-muted)); font-size: 14px; line-height: 1.6; margin-top: 6px; }
+.reparto-summary h2 { font-size: 20px; }
+.reparto-options { border: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; min-width: 0; margin: 18px 0 12px; }
+.reparto-options legend { font-size: 13px; font-weight: 600; padding-bottom: 12px; }
+.reparto-option { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--linea-tarjeta); border-radius: 12px; padding: 14px; cursor: pointer; min-width: 0; transition: border-color .2s, background .2s; }
+.reparto-option:has(input:checked) { border-color: var(--estado-primary); background: rgb(var(--c-primary-soft) / .45); }
+.reparto-create .reparto-option { border-color: color-mix(in srgb, var(--linea-tarjeta) 72%, rgb(var(--c-muted))); background: rgb(var(--c-muted) / .055); }
+.reparto-create .reparto-option:has(input:checked) { border-color: var(--estado-primary); background: rgb(var(--c-primary-soft) / .45); }
+.reparto-option input[type="radio"] { width: 17px; min-width: 17px; height: 17px; padding: 0; margin-top: 2px; accent-color: var(--estado-primary); }
+.reparto-option strong { display: block; font-size: 13px; }
+.reparto-option small { display: block; font-size: 12px; line-height: 1.6; color: rgb(var(--c-muted)); margin-top: 4px; }
+.reparto-actions { align-items: flex-start; }
+.reparto-create-hint { margin-bottom: 18px; }
+.task-input-row .task-assignee:disabled { opacity: .65; }
+.task-result-form { display: grid; gap: 12px; padding: 14px; border: 1px solid color-mix(in srgb, var(--estado-primary) 36%, var(--linea-tarjeta)); border-radius: 12px; background: rgb(var(--c-primary-soft) / .28); }
+.task-result-form h3 { margin-top: 3px; font-size: 16px; }
+.task-result-form > div > p:last-child { margin-top: 5px; color: rgb(var(--c-muted)); font-size: 13px; line-height: 1.5; }
+.task-result-form .field-hint { display: block; margin-top: 5px; color: rgb(var(--c-muted)); font-size: 11px; }
+.task-result-form .text-link { width: fit-content; color: var(--estado-primary); font-size: 13px; font-weight: 700; }
+
+.branch-panel { min-width: 0; overflow: visible; }
+.branch-panel .section-head h2 { font-size: 22px; }
+.branch-panel .section-head p { font-size: 15px; line-height: 1.55; }
+.branch-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--linea-tarjeta); }
+.branch-legend span { display: inline-flex; gap: 7px; align-items: center; font-size: 13px; color: rgb(var(--c-muted)); }
+.branch-legend i { width: 8px; height: 8px; background: var(--branch-color); border-radius: 50%; flex-shrink: 0; }
+.branch-legend small { font-size: 11px; opacity: .75; }
+.branch-diagram-region { width: 100%; min-width: 0; overflow-x: clip; }
+.branch-diagram { position: relative; min-width: 0; padding: 4px 0 28px; isolation: isolate; }
+.branch-svg { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.branch-edge { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: .9; filter: drop-shadow(0 1px 2px color-mix(in srgb, currentColor 22%, transparent)); transition: opacity .2s, stroke-width .2s; }
+/* A broad transparent path makes each thin dependency easy to inspect. */
+.branch-edge-hit { fill: none; stroke-width: 18; pointer-events: stroke; }
+.branch-diagram.has-focus .branch-edge { opacity: .18; }
+.branch-diagram.has-focus .branch-edge.is-related { opacity: 1; stroke-width: 3.1; }
+.branch-tree { position: relative; display: grid; gap: 20px; min-width: 0; padding: 2px 48px 30px; }
+/* Layer 1: only the phase decoration lives behind the relationship SVG. */
+.branch-phase-group { position: relative; min-width: 0; padding: 10px 12px 18px; overflow: visible; }
+.branch-phase-group::before { position: absolute; z-index: 1; inset: 0; content: ""; border-top: 2px solid color-mix(in srgb, var(--branch-color) 74%, var(--linea-tarjeta)); border-bottom: 1px solid color-mix(in srgb, var(--branch-color) 26%, transparent); border-radius: 14px; background-color: color-mix(in srgb, var(--branch-color) 8%, var(--superficie)); pointer-events: none; }
+.branch-phase-group.is-empty { opacity: .72; padding-bottom: 10px; }
+.branch-phase-divider { position: relative; z-index: 3; display: flex; align-items: center; flex-wrap: wrap; gap: 7px 11px; min-width: 0; margin: 0 0 16px; color: var(--branch-color); }
+.branch-phase-number { display: inline-grid; min-width: 60px; min-height: 25px; place-items: center; padding: 3px 8px; border-radius: 7px; background: color-mix(in srgb, var(--branch-color) 19%, transparent); font-size: 11px; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; }
+.branch-phase-divider strong { font-size: 18px; line-height: 1.25; letter-spacing: -.015em; overflow-wrap: anywhere; }
+.branch-phase-divider small { color: rgb(var(--c-muted)); font-size: 12px; }
+.branch-phase-levels { display: grid; gap: 16px; min-width: 0; }
+.branch-level { position: relative; display: grid; grid-template-columns: repeat(var(--branch-columns), minmax(0, 1fr)); align-items: start; gap: clamp(14px, 4vw, 64px); min-width: 0; min-height: 84px; }
+.branch-row { position: relative; z-index: 3; display: grid; grid-column: var(--branch-column); place-items: start center; min-width: 0; }
+.branch-task { position: relative; display: grid; width: min(100%, 226px); min-height: 70px; place-items: center; gap: 5px; padding: 11px 13px; border: 2px solid color-mix(in srgb, var(--branch-color) 75%, var(--linea-tarjeta)); border-radius: 13px; background: var(--superficie); box-shadow: 0 5px 14px rgb(9 7 25 / .13); color: rgb(var(--c-texto)); cursor: pointer; font: inherit; text-align: center; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease; }
+.branch-node-status { width: 11px; height: 11px; border: 3px solid var(--superficie); border-radius: 50%; background: var(--branch-color); box-shadow: 0 0 0 2px var(--branch-color); }
+.branch-task[data-state="terminada"] .branch-node-status { background: var(--estado-success); box-shadow: 0 0 0 2px var(--estado-success); }
+.branch-task[data-state="en-revision"] .branch-node-status { background: var(--estado-warning); box-shadow: 0 0 0 2px var(--estado-warning); }
+.branch-node-name { font-size: 14px; font-weight: 780; line-height: 1.2; overflow-wrap: anywhere; }
+.branch-task:hover, .branch-task:focus-visible { z-index: 7; border-color: var(--branch-color); box-shadow: 0 8px 25px color-mix(in srgb, var(--branch-color) 31%, transparent); transform: scale(1.035); outline: none; }
+.branch-task:focus-visible { outline: 3px solid color-mix(in srgb, var(--branch-color) 54%, transparent); outline-offset: 3px; }
+.branch-diagram.has-focus .branch-task { opacity: .28; }
+.branch-diagram.has-focus .branch-task.is-related { opacity: 1; }
+.branch-row.is-focused, .branch-row:has(.branch-task:hover), .branch-row:has(.branch-task:focus-visible) { z-index: 4; }
+/* Layer 4: the open detail is above every relationship and task. */
+.branch-node-detail { position: absolute; z-index: 5; top: calc(100% + 12px); left: 50%; display: grid; width: min(270px, calc(100vw - 42px)); gap: 7px; padding: 13px 14px; transform: translateX(-50%) translateY(-4px); border: 1px solid color-mix(in srgb, var(--branch-color) 50%, var(--linea-tarjeta)); border-radius: 12px; background-color: var(--superficie); box-shadow: 0 14px 34px rgb(8 6 24 / .3), 0 0 0 1px var(--superficie); color: rgb(var(--c-texto)); font-size: 12px; line-height: 1.4; opacity: 0; pointer-events: none; text-align: left; transition: opacity .16s ease, transform .16s ease; visibility: hidden; }
+.branch-node-detail > strong { color: var(--branch-color); font-size: 14px; line-height: 1.25; }
+.branch-node-detail-phase { color: var(--branch-color); font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.branch-node-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.branch-node-detail-grid span { display: grid; gap: 1px; min-width: 0; color: rgb(var(--c-muted)); overflow-wrap: anywhere; }
+.branch-node-detail-grid b { color: rgb(var(--c-texto)); font-size: 10px; letter-spacing: .035em; text-transform: uppercase; }
+.branch-node-detail-blocked { color: var(--estado-warning); font-weight: 700; overflow-wrap: anywhere; }
+.branch-node-detail-action { padding-top: 7px; border-top: 1px solid var(--linea-tarjeta); color: rgb(var(--c-muted)); font-size: 11px; font-weight: 650; }
+.branch-task:hover .branch-node-detail, .branch-task:focus-visible .branch-node-detail { opacity: 1; transform: translateX(-50%) translateY(0); visibility: visible; }
+.branch-level .branch-row:first-child .branch-node-detail { left: 0; transform: translateY(-4px); }
+.branch-level .branch-row:first-child .branch-task:hover .branch-node-detail, .branch-level .branch-row:first-child .branch-task:focus-visible .branch-node-detail { transform: translateY(0); }
+.branch-level .branch-row:last-child .branch-node-detail { right: 0; left: auto; transform: translateY(-4px); }
+.branch-level .branch-row:last-child .branch-task:hover .branch-node-detail, .branch-level .branch-row:last-child .branch-task:focus-visible .branch-node-detail { transform: translateY(0); }
+.branch-empty { border: 1px dashed var(--linea-tarjeta); border-radius: 12px; padding: 28px 16px; color: rgb(var(--c-muted)); font-size: 14px; text-align: center; }
+.branch-cycle-warning { position: relative; z-index: 4; margin-bottom: 16px; color: var(--estado-warning); font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 600px) {
+  .reparto-options { grid-template-columns: minmax(0, 1fr); }
+  .reparto-summary, .reparto-actions { align-items: stretch; flex-direction: column; gap: 10px; }
+  .reparto-summary > .btn { align-self: flex-start; }
+  .branch-panel .section-head h2 { font-size: 20px; }
+  .branch-panel .section-head p { font-size: 14px; }
+  .branch-legend { gap: 8px 12px; margin-bottom: 18px; }
+  .branch-tree { gap: 15px; padding: 2px 10px 22px; }
+  .branch-phase-group { padding: 9px 7px 16px; border-radius: 11px; }
+  .branch-phase-divider { gap: 5px 8px; margin-bottom: 13px; }
+  .branch-phase-number { min-width: 48px; min-height: 22px; padding: 3px 6px; font-size: 9px; }
+  .branch-phase-divider strong { font-size: 15px; }
+  .branch-phase-divider small { font-size: 11px; }
+  .branch-phase-levels { gap: 13px; }
+  .branch-level { gap: 8px; min-height: 70px; }
+  .branch-task { min-height: 62px; padding: 8px 5px; border-radius: 10px; }
+  .branch-node-status { width: 9px; height: 9px; border-width: 2px; }
+  .branch-node-name { font-size: 12px; line-height: 1.16; }
+  .branch-node-detail { width: min(248px, calc(100vw - 34px)); padding: 11px 12px; font-size: 11px; }
+  .branch-node-detail > strong { font-size: 13px; }
+  .branch-node-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .branch-edge, .branch-task, .branch-node-detail, .reparto-option { transition: none; }
+}

@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /** Recordatorios por WhatsApp, organizador de proyectos y chats grupales. */
-@SpringBootTest
+@SpringBootTest(properties = "studyflow.demo.enabled=true")
 @ActiveProfiles("dev")
 class FuncionalidadesNuevasTests {
 
@@ -49,6 +49,9 @@ class FuncionalidadesNuevasTests {
     @Autowired
     private ProyectoService proyectoService;
 
+    @Autowired
+    private TareaService tareaService;
+
     /**
      * Sin sesión no hay identidad: la aplicación ya no actúa en nombre del
      * usuario sembrado. Cada prueba entra con la cuenta de ejemplo.
@@ -56,6 +59,7 @@ class FuncionalidadesNuevasTests {
     @BeforeEach
     void entrarComoEjemplo() {
         sesionService.entrarComoDemostracion();
+        proyectoService.actualizarReparto("cognitiva", "libre", usuarioId());
     }
 
     private Long usuarioId() {
@@ -160,6 +164,8 @@ class FuncionalidadesNuevasTests {
         ResumenChatDTO resumen = canalService.resumir(canal.id());
         assertThat(resumen.mensajesResumidos()).isEqualTo(2);
         assertThat(resumen.contenido()).isNotBlank();
+        assertThat(resumen.modelo()).isEqualTo("Local");
+        assertThat(resumen.contenido()).contains("revisaron 2 mensajes");
         // Los puntos clave recogen el acuerdo y la pregunta abierta.
         assertThat(resumen.puntosClave()).hasSize(2);
     }
@@ -189,31 +195,31 @@ class FuncionalidadesNuevasTests {
     // ------------------------------------------------------------ reacciones
 
     @Test
-    void reaccionarDosVecesConElMismoEmojiRetiraLaReaccion() {
+    void reaccionarDosVecesConLaMismaOpcionRetiraLaReaccion() {
         Long usuario = usuarioId();
         CanalDTO canal = canalService.crear("cognitiva", usuario,
                 new PeticionCanal("reacciones", null, null, null));
         MensajeChatDTO mensaje = canalService.publicar(canal.id(), usuario,
                 new PeticionMensajeChat("Mensaje para reaccionar", null));
 
-        MensajeChatDTO conReaccion = canalService.alternarReaccion(mensaje.id(), usuario, "👍");
+        MensajeChatDTO conReaccion = canalService.alternarReaccion(mensaje.id(), usuario, "acuerdo");
         assertThat(conReaccion.reacciones()).hasSize(1);
         assertThat(conReaccion.reacciones().get(0).total()).isEqualTo(1);
         assertThat(conReaccion.reacciones().get(0).propia()).isTrue();
 
-        MensajeChatDTO sinReaccion = canalService.alternarReaccion(mensaje.id(), usuario, "👍");
+        MensajeChatDTO sinReaccion = canalService.alternarReaccion(mensaje.id(), usuario, "acuerdo");
         assertThat(sinReaccion.reacciones()).isEmpty();
     }
 
     @Test
-    void noSeAdmiteUnEmojiFueraDeLaLista() {
+    void noSeAdmiteUnaReaccionFueraDeLaLista() {
         Long usuario = usuarioId();
         CanalDTO canal = canalService.crear("cognitiva", usuario,
                 new PeticionCanal("emojis", null, null, null));
         MensajeChatDTO mensaje = canalService.publicar(canal.id(), usuario,
                 new PeticionMensajeChat("Hola", null));
 
-        assertThatThrownBy(() -> canalService.alternarReaccion(mensaje.id(), usuario, "💀"))
+        assertThatThrownBy(() -> canalService.alternarReaccion(mensaje.id(), usuario, "no-admitida"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -298,18 +304,17 @@ class FuncionalidadesNuevasTests {
     }
 
     @Test
-    void alguienDeFueraDelEquipoPuedeTomarUnaTareaYSeUneAlProyecto() {
-        // Un usuario nuevo, que no figura entre los integrantes del proyecto.
-        var recienLlegado = sesionService.accesoRapido("Ana Nueva", "ana.nueva@u.edu");
-
+    void alguienDeFueraDelEquipoNoPuedeTomarUnaTareaNiUnirseSinInvitacion() {
         TareaFaseDTO libre = tareasDe("cognitiva").stream()
                 .filter(tarea -> tarea.bloqueantes().isEmpty())
                 .findFirst()
                 .orElseThrow();
         faseService.liberar(libre.id());
+        var recienLlegado = sesionService.accesoRapido("Ana Nueva", "ana.nueva@u.edu");
 
-        TareaFaseDTO tomada = faseService.reclamar(libre.id(), recienLlegado.getId());
-        assertThat(tomada.responsable()).isEqualTo("Ana Nueva");
+        assertThatThrownBy(() -> faseService.reclamar(libre.id(), recienLlegado.getId()))
+                .isInstanceOf(org.springframework.web.server.ResponseStatusException.class)
+                .hasMessageContaining("formar parte del equipo");
     }
 
     @Test
@@ -317,6 +322,7 @@ class FuncionalidadesNuevasTests {
         Long id = tareasDe("cognitiva").get(0).id();
 
         assertThat(faseService.cambiarEstado(id, "en-revision").estadoEtiqueta()).isEqualTo("En revisión");
+        tareaService.marcarCompletada(id, "Resultado de prueba", null);
         assertThat(faseService.cambiarEstado(id, "terminada").estadoEtiqueta()).isEqualTo("Terminada");
         assertThat(faseService.cambiarEstado(id, "sin-empezar").estadoEtiqueta()).isEqualTo("Sin empezar");
         assertThat(faseService.cambiarEstado(id, "en-proceso").estadoEtiqueta()).isEqualTo("En proceso");
@@ -326,6 +332,7 @@ class FuncionalidadesNuevasTests {
     void losNombresAntiguosDeEstadoSeSiguenEntendiendo() {
         Long id = tareasDe("cognitiva").get(0).id();
         // Datos guardados antes del cambio de estados.
+        tareaService.marcarCompletada(id, "Resultado migrado", null);
         assertThat(faseService.cambiarEstado(id, "done").estado()).isEqualTo("terminada");
         assertThat(faseService.cambiarEstado(id, "in-progress").estado()).isEqualTo("en-proceso");
         assertThat(faseService.cambiarEstado(id, "pending").estado()).isEqualTo("sin-empezar");

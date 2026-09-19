@@ -102,7 +102,7 @@ public class PaginaController {
     /** Listado de canales agrupados por proyecto. */
     @GetMapping("/chats")
     public String chats() {
-        return conSesion("chats");
+        return "redirect:/proyectos";
     }
 
     /** Espacio de canales de un proyecto. */

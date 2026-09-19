@@ -62,6 +62,21 @@ public class ProyectoApiController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{codigo}/reparto")
+    public ProyectoDTO actualizarReparto(@PathVariable String codigo,
+                                         @Valid @RequestBody PeticionReparto peticion) {
+        return proyectoService.actualizarReparto(codigo, peticion.modoReparto(),
+                usuarioService.obtenerActual().getId());
+    }
+
+    /** Creates, renames, reorders and removes empty phases from the diagram editor. */
+    @PutMapping("/{codigo}/fases")
+    public ProyectoDTO actualizarFases(@PathVariable String codigo,
+                                       @Valid @RequestBody PeticionFases peticion) {
+        return proyectoService.actualizarFases(codigo, peticion,
+                usuarioService.obtenerActual().getId());
+    }
+
     @GetMapping("/{codigo}/tareas")
     public List<TareaDTO> tareas(@PathVariable String codigo) {
         return tareaService.listarPorProyecto(codigo);

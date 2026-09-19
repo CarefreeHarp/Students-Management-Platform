@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Resumen de una conversacion generado por el asistente conversacional.
+ * Resumen de una conversación generado localmente a partir de sus mensajes.
  * Guarda el rango de mensajes que cubre para poder repetirlo o auditarlo.
  */
 @Entity
@@ -42,9 +42,9 @@ public class ResumenChat {
     @Column(name = "hasta_mensaje_id")
     private Long hastaMensajeId;
 
-    /** Modelo que lo produjo: "simulado" mientras la API de OpenAI no este conectada. */
+    /** Origen del resumen: "Local" cuando se genera sin proveedor externo. */
     @Column(length = 60)
-    private String modelo = "simulado";
+    private String modelo = "Local";
 
     @Column(name = "fecha_generacion", nullable = false)
     private LocalDateTime fechaGeneracion = LocalDateTime.now();

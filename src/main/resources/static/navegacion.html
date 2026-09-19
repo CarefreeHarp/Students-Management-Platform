@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyFlow · Mapa de navegación</title>
+  <meta name="description" content="Mapa de pantallas, botones, diálogos y rutas de StudyFlow.">
+  <style>
+    :root { color-scheme: light; --ink:#242431; --muted:#686879; --line:#e2e2ea; --accent:#5653ce; --soft:#eeedff; --paper:#fff; --canvas:#f7f7fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--canvas); color:var(--ink); font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,input,select { font:inherit; }
+    button,a,input,select { -webkit-tap-highlight-color:transparent; }
+    button { cursor:pointer; }
+    a { color:var(--accent); text-underline-offset:3px; }
+    button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible { outline:3px solid #a7a4fc; outline-offset:3px; }
+    button:disabled { cursor:default; }
+    [hidden] { display:none!important; }
+    h1,h2,h3,p { margin:0; }
+    header,main,footer { max-width:1480px; margin:auto; padding-inline:36px; }
+    header { padding-top:42px; padding-bottom:26px; }
+    .eyebrow { text-transform:uppercase; letter-spacing:.15em; font-size:11px; font-weight:750; color:var(--accent); margin-bottom:10px; }
+    h1 { font-size:clamp(27px,3vw,42px); line-height:1.15; letter-spacing:-.045em; font-weight:700; }
+    .intro { margin-top:13px; color:var(--muted); max-width:880px; }
+    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:24px; }
+    .search { flex:1 1 300px; }
+    input { width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink); }
+    .button { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink); text-decoration:none; font-weight:600; font-size:13px; }
+    .button:hover { border-color:#bbb9dd; }
+    .button.primary { background:var(--accent); border-color:var(--accent); color:white; }
+    .button[aria-pressed="true"] { background:var(--soft); color:var(--accent); border-color:#b4b0ee; }
+    .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+    .panel { background:var(--paper); border:1px solid var(--line); border-radius:13px; }
+    .map-panel { padding:24px; }
+    .section-heading { display:flex; gap:18px; justify-content:space-between; align-items:start; flex-wrap:wrap; margin-bottom:22px; }
+    h2 { font-size:20px; letter-spacing:-.025em; }
+    .muted { color:var(--muted); }
+    .small { font-size:12px; }
+    .legend { display:flex; flex-wrap:wrap; gap:18px; font-size:12px; color:var(--muted); }
+    .legend span { display:flex; align-items:center; gap:7px; }
+    .legend i { display:inline-block; width:20px; height:2px; background:var(--accent); }
+    .legend .inbound { background:#aaa6bb; }
+    .legend .public { width:8px; height:8px; border-radius:50%; background:#378471; }
+    .graph { position:relative; }
+    .graph-columns { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:52px; position:relative; z-index:1; }
+    .group h3 { text-transform:uppercase; font-size:10px; letter-spacing:.11em; color:var(--muted); margin:0 0 14px; }
+    .nodes { display:grid; gap:12px; }
+    .node { width:100%; min-height:87px; position:relative; text-align:left; display:block; padding:14px; border:1px solid var(--line); border-radius:9px; background:white; color:var(--ink); transition:border-color .15s,background .15s,opacity .15s; }
+    .node strong { display:block; font-size:14px; font-weight:650; padding-right:25px; }
+    .node .route { display:block; color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; margin-top:6px; overflow-wrap:anywhere; }
+    .node .index { position:absolute; right:12px; top:15px; color:#9996ac; font-size:10px; }
+    .node.public strong::before { content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:#378471; margin-right:7px; vertical-align:middle; }
+    .node.selected { background:var(--soft); border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+    .node.destination { border-color:#9790dd; }
+    .node.origin { border-color:#b8b4c7; }
+    .node.dimmed { opacity:.3; }
+    #connections { position:absolute; inset:0; width:100%; height:100%; z-index:0; overflow:visible; pointer-events:none; }
+    .graph-caption { margin-top:19px; padding-top:15px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+    .inspect-layout { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:20px; margin-top:20px; align-items:start; }
+    .inspector { padding:25px; min-width:0; scroll-margin-top:20px; }
+    .inspector-head { display:flex; align-items:start; justify-content:space-between; gap:18px; margin-bottom:18px; }
+    .route-label { display:inline-block; font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; color:var(--accent); background:var(--soft); border-radius:5px; padding:4px 7px; margin-top:9px; overflow-wrap:anywhere; }
+    .screen-description { color:var(--muted); font-size:14px; margin-bottom:16px; }
+    .access { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
+    .badge { display:inline-block; padding:3px 7px; border-radius:4px; background:#f1f1f5; color:#5d5b6e; font-size:10px; font-weight:650; white-space:nowrap; }
+    .badge.page { background:var(--soft); color:var(--accent); }
+    .badge.dialog { background:#eaf3ef; color:#356951; }
+    .badge.pending { background:#f8efdf; color:#795b23; }
+    .actions { width:100%; border-collapse:collapse; font-size:13px; }
+    .actions th { text-align:left; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); padding:12px 10px; border-bottom:1px solid var(--line); }
+    .actions td { padding:14px 10px; border-bottom:1px solid #ededf2; vertical-align:top; }
+    .actions tr:last-child td { border:0; }
+    .actions th:first-child,.actions td:first-child { padding-left:0; width:35%; }
+    .actions td:first-child strong { display:block; font-weight:600; margin-bottom:5px; }
+    .actions .destination-button { padding:0; border:0; background:none; color:var(--accent); text-align:left; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+    .action-description { display:block; color:var(--muted); margin-top:5px; }
+    .incoming { margin-top:18px; padding-top:17px; border-top:1px solid var(--line); }
+    .incoming h3 { font-size:12px; margin-bottom:9px; }
+    .incoming-list { display:flex; flex-wrap:wrap; gap:8px; }
+    .incoming-list button { border:1px solid var(--line); border-radius:5px; padding:6px 9px; font-size:11px; background:var(--paper); color:var(--muted); }
+    .side-panel { padding:21px; }
+    .side-panel + .side-panel { margin-top:16px; }
+    .side-panel h2 { font-size:15px; margin-bottom:12px; }
+    .global-links { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .global-links button { text-align:left; border:1px solid var(--line); border-radius:6px; background:var(--paper); padding:8px; color:var(--ink); font-size:12px; }
+    .side-panel p { font-size:12px; color:var(--muted); margin-top:12px; }
+    .side-panel li { margin-bottom:9px; font-size:12px; color:var(--muted); }
+    .side-panel ul,.side-panel ol { padding-left:18px; margin:10px 0 0; }
+    .field-label { display:block; font-size:11px; color:var(--muted); margin:16px 0 6px; }
+    .tour-path { display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:12px; }
+    .tour-path button { background:var(--soft); color:var(--accent); border:0; border-radius:4px; padding:5px 7px; font-size:11px; }
+    .tour-path span { color:#9c98af; }
+    #catalog { margin-top:20px; }
+    #catalog > .panel { margin-bottom:12px; padding:22px; }
+    #catalog summary { font-size:16px; font-weight:650; cursor:pointer; }
+    #catalog summary small { font-size:11px; font-weight:400; color:var(--muted); margin-left:12px; }
+    #catalog .screen-description { margin-top:15px; }
+    .no-results { padding:20px; color:var(--muted); }
+    footer { padding-top:24px; padding-bottom:36px; color:var(--muted); font-size:11px; }
+    html { scroll-padding-top:20px; }
+    .panel,.group,.nodes,.sidebar,.inspector-head > * { min-width:0; }
+    h1,h2,h3,.button,.badge,.screen-description,.actions,.side-panel p,.side-panel li,.intro { overflow-wrap:anywhere; }
+    input { min-width:0; }
+    .button,.destination-button,.incoming-list button,.global-links button,.tour-path button { min-height:44px; }
+    .badge { white-space:normal; }
+    .actions { table-layout:fixed; }
+    .inspector-head > div { flex:1 1 220px; }
+    .inspector-head > .button { flex-shrink:0; }
+    .inspector-links { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
+    .map-shortcut { display:inline-flex; align-items:center; min-height:44px; margin-top:10px; font-size:13px; }
+    @media (max-width:1100px) { .graph-columns { gap:24px; } .inspect-layout { grid-template-columns:minmax(0,1fr) 275px; } header,main,footer { padding-inline:22px; } }
+    @media (max-width:820px) { .graph-columns { grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; } .inspect-layout { grid-template-columns:1fr; } .sidebar { display:grid; grid-template-columns:1fr 1fr; gap:14px; } .side-panel + .side-panel { margin:0; } .side-panel:last-child { grid-column:1/-1; } #connections { display:none; } }
+    @media (max-width:520px) { header,main,footer { padding-inline:14px; } header { padding-top:26px; } .map-panel,.inspector { padding:17px; } .graph-columns { gap:18px 12px; } .node { padding:11px; min-height:95px; } .node strong { font-size:12px; } .node .route { font-size:10px; } .sidebar { grid-template-columns:1fr; } .inspector-head { flex-wrap:wrap; } .actions td { padding-inline:7px; } .actions { font-size:12px; } .legend { gap:11px; } }
+    @media (max-width:600px) {
+      .toolbar { gap:8px; }
+      .toolbar > .button { flex:1 1 130px; }
+      .search { flex-basis:100%; }
+      input { font-size:16px; }
+      .actions,.actions tbody { display:block; width:100%; }
+      .actions thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+      .actions tr { display:grid; gap:8px; border-top:1px solid var(--line); padding-block:17px; }
+      .actions td,.actions td:first-child { display:block; width:100%; padding:0; border:0; font-size:14px; }
+      .actions td:first-child { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; }
+      .actions td:first-child strong { margin:0; }
+      .actions .destination-button { font-size:14px; }
+      .actions td:last-child::before { content:'Destino y comportamiento'; display:block; margin-bottom:4px; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+      #catalog > .panel { padding:17px; }
+      #catalog summary small { display:block; margin:5px 0 0; overflow-wrap:anywhere; }
+      .inspector-head > .button { width:100%; }
+    }
+    @media (max-width:380px) {
+      .graph-columns { grid-template-columns:1fr; }
+      .node { min-height:76px; }
+      .node strong { font-size:14px; }
+      .node .route { font-size:11px; }
+      .legend { flex-direction:column; gap:7px; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } }
+    @media print { body { background:white; } header,main,footer { padding:0; } header { padding-bottom:20px; } .toolbar,.map-panel,.inspect-layout { display:none; } #catalog { display:block!important; } #catalog details { break-inside:avoid; } .button { display:none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">StudyFlow / Producto</p>
+    <h1>Mapa de navegación</h1>
+    <p class="intro">Cada pantalla y el control que te lleva a la siguiente. Selecciona una pantalla para ver sus conexiones, formularios y acciones. Las flechas muestran navegación entre páginas; los diálogos y cambios dentro de una pantalla se detallan debajo.</p>
+    <div class="toolbar">
+      <label class="search"><span class="visually-hidden">Buscar pantalla, botón o ruta</span><input id="search" type="search" placeholder="Buscar pantalla, botón o ruta…" autocomplete="off"></label>
+      <button class="button" id="catalog-toggle" type="button" aria-pressed="false">Todos los controles</button>
+      <button class="button" id="print" type="button">Imprimir mapa</button>
+      <a class="button" id="open-app" href="/" target="_blank" rel="noopener">Abrir StudyFlow</a>
+    </div>
+  </header>
+  <main>
+    <section class="panel map-panel" aria-labelledby="map-title">
+      <div class="section-heading">
+        <div><h2 id="map-title" tabindex="-1">Las pantallas</h2><p class="small muted" id="screen-count"></p><a class="map-shortcut" href="#inspector">Ver controles de la selección</a></div>
+        <div class="legend"><span><i></i> Sale de la seleccionada</span><span><i class="inbound"></i> Llega a ella</span><span><i class="public"></i> Acceso público</span></div>
+      </div>
+      <div class="graph" id="graph"><svg id="connections" aria-hidden="true"></svg><div id="map-columns" class="graph-columns"></div></div>
+      <p class="graph-caption">La barra superior conecta todas las pantallas privadas con Inicio, Proyectos, Horarios y Recordatorios. Se muestra por separado para mantener legible el mapa. Canales pertenece a un proyecto.</p>
+    </section>
+    <div class="inspect-layout">
+      <section class="panel inspector" id="inspector" aria-live="polite" aria-labelledby="screen-title"></section>
+      <aside class="sidebar">
+        <section class="panel side-panel">
+          <h2>Navegación compartida</h2>
+          <div class="global-links" id="global-links"></div>
+          <p>El logo también abre Inicio. El menú de perfil incluye Ver mi perfil, Editar perfil, Recorrido guiado y Cerrar sesión. En móvil, el botón de menú despliega los mismos enlaces.</p>
+          <p>Cambiar tema modifica claro/oscuro sin salir de la pantalla. Cerrar sesión finaliza el acceso y abre <a href="#login" data-select="login">/login</a>.</p>
+        </section>
+        <section class="panel side-panel">
+          <h2>Rutas y acceso</h2>
+          <p>Una ruta privada sin sesión redirige a <a href="#login" data-select="login">/login</a>. Después del acceso se abre Inicio; la aplicación no conserva automáticamente el destino anterior.</p>
+          <p><code>{codigo}</code> representa el identificador de un proyecto. Las tres secciones de ese proyecto conservan el mismo código.</p>
+          <label class="field-label" for="project-code">Código para «Abrir pantalla»</label>
+          <input id="project-code" value="cognitiva" placeholder="Código del proyecto" autocomplete="off">
+          <p>Los botones del mapa solo cambian la selección. «Abrir pantalla» abre la aplicación en otra pestaña.</p>
+        </section>
+        <section class="panel side-panel">
+          <h2>Tour de prueba: un espacio temporal</h2>
+          <div class="tour-path" id="tour-path"></div>
+          <p>Desde «Tour por la app» se abre <code>/sandbox</code>: un espacio vacío, sin cuentas de ejemplo. Los cambios solo viven en memoria mientras se prueba la app. No se guardan ni se envían mensajes.</p>
+          <ol>
+            <li><strong>Inicio:</strong> tu espacio, todavía vacío.</li>
+            <li><strong>Crear proyecto:</strong> nombre, equipo, tareas y modo de reparto.</li>
+            <li><strong>Tu proyecto:</strong> tareas y accesos a las secciones.</li>
+            <li><strong>Fases:</strong> ramas verticales y dependencias.</li>
+            <li><strong>Canales:</strong> una conversación de prueba.</li>
+            <li><strong>Documentos:</strong> registrar un entregable.</li>
+            <li><strong>Horarios:</strong> Añadir materia y preferencias de organización.</li>
+            <li><strong>Recordatorios:</strong> Añadir recordatorio y Configurar recordatorios.</li>
+            <li><strong>Todo listo:</strong> crear una cuenta real o seguir probando.</li>
+          </ol>
+          <p><strong>Siguiente / Anterior</strong> desplazan suavemente el foco de luz y la tarjeta. Solo se muestran título, descripción breve, cerrar y los dos controles de navegación.</p>
+          <p>La interfaz iluminada sigue siendo interactiva. Crear el primer proyecto continúa automáticamente en sus tareas. Si se prefiere no crearlo, Siguiente permite pasar a Horarios sin quedar atrapado.</p>
+          <p><strong>Cerrar</strong> pausa la guía; puedes seguir explorando. <strong>Terminar</strong> ofrece crear tu cuenta, sin trasladar los datos de prueba. <strong>Escape</strong> respeta los diálogos nativos abiertos.</p>
+          <p>La cuenta real conserva su recorrido breve desde el perfil, aplicado a sus propios datos. La prueba pública nunca abre una sesión de demostración.</p>
+        </section>
+      </aside>
+    </div>
+    <section id="catalog" hidden aria-label="Catálogo completo de controles"></section>
+    <noscript><p class="no-results">Activa JavaScript para explorar el mapa interactivo y el catálogo de controles.</p></noscript>
+  </main>
+  <footer>Mapa de la interfaz revisada en esta entrega. Describe rutas y controles implementados; una etiqueta «Pendiente» indica un botón sin integración activa. No ejecuta acciones ni modifica datos de la aplicación.</footer>
+  <script>
+  (() => {
+    'use strict';
+    const action = (label, type, destination, description, target) => ({label,type,destination,description,target});
+    const screens = [
+      {id:'landing',name:'Landing page',route:'/',group:'public',public:true,description:'Presentación pública del producto. Las secciones de la landing se recorren por anclas, sin abrir otra pantalla.',actions:[
+        action('Logo StudyFlow','page','Landing page','Vuelve al comienzo de la página pública.','landing'),
+        action('Ingresa','page','Acceso · /login','Abre las opciones Tour por la app, Crear mi cuenta y Ya tengo mi cuenta.','login'),
+        action('Ya tengo mi cuenta / Entra a tu espacio','page','Acceso con contraseña','Abre /login?acceso=cuenta con el formulario desplegado.','login'),
+        action('Encuentra tu flow','page','Tour por la app','Abre el espacio temporal vacío.','sandbox'),
+        action('Empieza a organizarte / Crea tu cuenta','page','Registro completo','Abre el formulario de registro.','registro'),
+        action('Así funciona / Descubre cómo / Explora a tu ritmo / Tu organización','local','#tu-semana','Desplaza a la sección de organización personal.'),
+        action('Por qué StudyFlow','local','#por-que','Desplaza a los motivos y preguntas frecuentes.'),
+        action('Tus proyectos / Tus recordatorios','local','#tus-proyectos / #tus-recordatorios','Enlaces del pie a secciones de esta misma página.'),
+        action('Organiza tu horario','page','Horarios','Ruta privada: requiere sesión.','horarios'),
+        action('Dale forma a tu proyecto','page','Mis proyectos','Ruta privada: requiere sesión.','proyectos'),
+        action('Prepara tus recordatorios','page','Recordatorios','Ruta privada: requiere sesión.','recordatorios'),
+        action('Ir al acceso','page','Acceso','Enlace dentro de las preguntas frecuentes.','login'),
+        action('Preguntas frecuentes','local','Respuesta desplegada','Cada pregunta expande o contrae su respuesta.'),
+        action('YouTube / Instagram','external','Sitios externos','Abre los enlaces sociales del pie.'),
+        action('Volver arriba / Saltar al contenido','local','#contenido','Desplaza al contenido principal.'),
+        action('Control de movimiento','local','Animación de la landing','Activa o pausa el movimiento visual.')
+      ]},
+      {id:'login',name:'Ingresa',route:'/login',group:'public',public:true,description:'Elige una prueba temporal sin cuenta, crea tu cuenta o inicia sesión con correo y contraseña.',actions:[
+        action('Comenzar tour','page','Tour por la app','Abre /sandbox sin iniciar sesión ni crear una cuenta.','sandbox'),
+        action('Ingresar','page','Inicio','Envía correo y contraseña. Solo abre Inicio si las credenciales son válidas.','panel'),
+        action('Crear mi cuenta','page','Registro completo','Abre el formulario de creación de cuenta.','registro'),
+        action('Ya tengo mi cuenta','local','Formulario de acceso','Sustituye las opciones por el formulario de correo y contraseña.'),
+        action('Volver','local','Opciones de acceso','Regresa a las dos tarjetas sin enviar el formulario.'),
+        action('Mostrar contraseña','local','Contraseña visible u oculta','Alterna la visibilidad del campo.'),
+        action('Logo StudyFlow / Volver al inicio','page','Landing page','Regresa a la presentación pública.','landing'),
+        action('Cambiar tema','local','Claro / oscuro','No abandona la pantalla.')
+      ]},
+      {id:'sandbox',name:'Tour por la app',route:'/sandbox',group:'public',public:true,description:'Espacio de prueba vacío y aislado en memoria. Permite crear proyectos, tareas, canales, entregables, horarios y recordatorios sin persistencia ni mensajes reales.',actions:[
+        action('Siguiente / Anterior','local','Siguiente enfoque o pantalla de prueba','El foco y la tarjeta se desplazan con una transición suave entre nueve etapas.'),
+        action('Cerrar guía','local','Exploración libre','Oculta la guía y mantiene el espacio temporal utilizable.'),
+        action('Recorrido','local','Última etapa','Reabre la guía en la etapa actual.'),
+        action('Crear y ver planificación','local','Proyecto temporal creado','Continúa en el detalle del proyecto de prueba, sin escribir en el servidor.'),
+        action('Crear cuenta / Terminar','dialog','Fin del recorrido','Ofrece crear una cuenta real o seguir probando.'),
+        action('Crear mi cuenta, al terminar','page','Registro','Descarta el espacio temporal antes de abrir el registro.','registro'),
+        action('Seguir probando','local','Exploración libre','Cierra la invitación a registrarse y conserva los datos solo en memoria.'),
+        action('Reiniciar','dialog','Confirmación de reinicio','Tras confirmar, descarta la memoria y vuelve al espacio vacío.'),
+        action('Salir','page','Ingresa','Descarta lo probado y regresa al acceso.','login')
+      ]},
+      {id:'registro',name:'Registro completo',route:'/registro',group:'public',public:true,description:'Crea la cuenta con los datos personales y académicos.',actions:[
+        action('Crear mi cuenta','page','Inicio','Valida los campos, crea la cuenta y abre sesión. Un error mantiene el formulario visible.','panel'),
+        action('Ingresa a tu espacio / logo StudyFlow','page','Acceso','El enlace de cuenta existente abre el formulario con contraseña.','login'),
+        action('Mostrar contraseña','local','Contraseña visible u oculta','Alterna la visibilidad del campo.'),
+        action('Cambiar tema','local','Claro / oscuro','No abandona la pantalla.')
+      ]},
+      {id:'panel',name:'Inicio',route:'/panel',group:'main',description:'Agenda académica y un único Estado general con pendientes y progreso de los proyectos.',actions:[
+        action('Mi horario','page','Horarios','Abre el registro de materias y sus opciones.','horarios'),
+        action('Nuevo proyecto / Crear proyecto (estado vacío)','page','Crear proyecto','Abre el formulario de un nuevo trabajo.','nuevo'),
+        action('Evento de la agenda','page','Proyecto correspondiente','Cada evento conserva el código del proyecto al que pertenece.','proyecto'),
+        action('Nombre de proyecto / tarea pendiente / Ver más pendientes','page','Proyecto correspondiente','Desde Estado general se abre el detalle con calendario y tareas.','proyecto'),
+        action('Ver todos los proyectos / Ver proyectos finalizados','page','Mis proyectos','Abre el listado completo.','proyectos'),
+        action('Semana anterior / siguiente / Hoy','local','Agenda de otra semana','Actualiza la cuadrícula sin cambiar la página.'),
+        action('Pasar sobre una tarea / enfocarla','local','Detalle flotante del evento','Muestra proyecto, responsable, fecha y estado; no abre un diálogo de edición.')
+      ]},
+      {id:'proyectos',name:'Mis proyectos',route:'/proyectos',group:'main',description:'Cuenta de proyectos activos y tarjetas con progreso, pendientes y días que faltan para cada entrega.',actions:[
+        action('Crear proyecto','page','Crear proyecto','Abre el formulario.','nuevo'),
+        action('Tarjeta / Ver proyecto','page','Proyecto seleccionado','Toda la tarjeta es un enlace a /proyectos/{codigo}.','proyecto'),
+        action('Buscar por nombre o integrante','local','Listado filtrado','Filtra por nombre, descripción e integrantes.'),
+        action('Todos / En curso / Finalizados','local','Listado filtrado','Cambia qué proyectos aparecen sin cambiar de pantalla.'),
+        action('Iniciar recorrido guiado (cuenta vacía)','page','Tour por la app','Abre un espacio vacío de prueba sin utilizar datos de una cuenta ajena.','sandbox')
+      ]},
+      {id:'horarios',name:'Horarios',route:'/horarios',group:'main',description:'Materias con varias opciones de horario; cada opción puede contener sesiones en varios días. Las preferencias preparan una futura generación con IA.',actions:[
+        action('Volver al inicio','page','Inicio','Regresa a la agenda.','panel'),
+        action('Añadir materia / Editar materia','local','Editor desplegado','Abre el formulario en esta pantalla: nombre, créditos y opciones con sus sesiones.'),
+        action('Añadir día o franja','local','Nueva sesión dentro de la opción','Una opción agrupa los días y horas que se cursan juntos.'),
+        action('Añadir otra opción','local','Alternativa de horario','Crea otra opción para cursar la misma materia.'),
+        action('Quitar clase / Quitar opción','local','Formulario actualizado','Retira únicamente la sesión o alternativa seleccionada.'),
+        action('Guardar materia','local','Lista y calendario actualizados','Guarda el borrador en el navegador y cierra el editor.'),
+        action('Cancelar','local','Editor cerrado','Cierra el formulario sin guardar los cambios.'),
+        action('Opción N / No incluir por ahora','local','Vista previa del horario','Selecciona una alternativa por materia o excluye esa materia del horario actual.'),
+        action('Eliminar materia','local','Lista actualizada','Quita la materia y sus sesiones del borrador.'),
+        action('Limpiar','dialog','Confirmación','Vacía el borrador de materias si se confirma.'),
+        action('Añadir ejemplos de otras carreras','local','Materias de ejemplo','Carga seis ejemplos sin duplicar los que ya existen.'),
+        action('Guardar horario','local','Horario guardado en el navegador','Conserva la selección manual. Está deshabilitado cuando hay cruces o no se eligieron materias.'),
+        action('Recuperar horario guardado','local','Horario guardado restaurado','Recupera la selección manual guardada previamente en el navegador.'),
+        action('Preferencias de organización','local','Preferencias seleccionadas','Empezar temprano, más créditos, terminar tarde, sin pausas largas o con pausas largas.'),
+        action('Generación con IA','pending','Próxima integración','La interfaz permite preparar materias y preferencias; la IA no genera horarios en esta entrega.')
+      ]},
+      {id:'recordatorios',name:'Recordatorios',route:'/recordatorios',group:'main',description:'Lista de avisos por WhatsApp y dos formularios separados: aviso personal y configuración de anticipación habitual.',actions:[
+        action('Añadir recordatorio','dialog','Formulario de nuevo recordatorio','Título, fecha y hora, anticipación en minutos/horas/días y detalle opcional.'),
+        action('Guardar recordatorio','local','Lista de recordatorios','Valida y guarda el aviso, cierra el diálogo y actualiza la lista.'),
+        action('Configurar recordatorios','dialog','Configuración de WhatsApp y anticipación','Teléfono, Recibir recordatorios y anticipación estándar para tareas, entregas y pendientes de clase.'),
+        action('Guardar configuración','local','Lista actualizada','Guarda las preferencias, cierra el diálogo y recalcula los avisos automáticos.'),
+        action('Enviar prueba','local','Resultado de la prueba','Solicita un mensaje de prueba y conserva abierto el diálogo de configuración.'),
+        action('Actualizar desde mis pendientes','local','Avisos automáticos recalculados','Actualiza tareas y entregas; conserva los avisos personales.'),
+        action('Ver detalle','local','Detalle del recordatorio','Expande el contenido dentro de la lista.'),
+        action('Cancelar recordatorio','local','Lista actualizada','Retira el aviso seleccionado.'),
+        action('Historial de avisos / Pendientes de clase guardados','local','Sección desplegada','Secciones plegables que aparecen cuando hay datos.'),
+        action('Resolver pendiente de clase','local','Pendiente resuelto','Actualiza el apunte guardado desde la misma pantalla.'),
+        action('Cancelar / Cerrar / Escape','local','Cierra el diálogo','Regresa a la lista sin guardar el formulario.')
+      ]},
+      {id:'nuevo',name:'Crear proyecto',route:'/proyectos/nuevo',group:'project',description:'Formulario de nombre, descripción, entrega, integrantes y tareas, con una previsualización de la planificación.',actions:[
+        action('Volver a proyectos / Cancelar','page','Mis proyectos','Abandona el formulario sin crear el proyecto.','proyectos'),
+        action('Crear y ver planificación','page','Nuevo proyecto creado','Guarda el proyecto y navega a su código devuelto por el servidor.','proyecto'),
+        action('Integrante / Tarea','local','Nueva fila en el formulario','Añade una fila editable al equipo o a la planificación.'),
+        action('Eliminar integrante / Eliminar tarea','local','Formulario actualizado','Quita la fila correspondiente; se conserva al menos una fila válida.'),
+        action('Tareas asignadas / Elección libre','local','Modo de reparto','Decide si el equipo recibe tareas asignadas o toma las que estén disponibles.'),
+        action('Organizar con IA','local','Plan de tareas actualizado','Solicita al servicio un plan según el proyecto, plazo y número de tareas.'),
+        action('Rellenar con IA','local','Campos de ejemplo rellenados','Actualmente rellena una propuesta predefinida en el navegador; no llama al servicio de IA.'),
+        action('Mes anterior / Mes siguiente','pending','Previsualización estática','Los botones del calendario previo están deshabilitados.')
+      ]},
+      {id:'proyecto',name:'Detalle del proyecto',route:'/proyectos/{codigo}',group:'project',description:'El centro de cada trabajo: tareas, calendario, progreso y equipo. Desde aquí se entra a sus conversaciones y documentos.',actions:[
+        action('Todos los proyectos / Volver a proyectos (error)','page','Mis proyectos','Regresa al listado.','proyectos'),
+        action('Canales del proyecto','page','Canales de este proyecto','Botón principal en la cabecera. Abre la conversación y la lista de canales del mismo código.','canales'),
+        action('Fases y dependencias','page','Fases del proyecto','Abre el diagrama de fases y tareas.','fases'),
+        action('Documentos y entregables','page','Entregables del proyecto','Abre el registro de documentos.','entregables'),
+        action('Archivos, en una tarjeta de tarea','page','Canales del proyecto','Los archivos del equipo se comparten en los canales.','canales'),
+        action('Nueva tarea','dialog','Añadir tarea','Nombre, descripción, responsable, fecha, etapa y estado.'),
+        action('Editar tarea / tarea del calendario','dialog','Editar tarea','Carga los campos de la tarea seleccionada.'),
+        action('Guardar tarea','local','Detalle actualizado','Crea o modifica la tarea, cierra el diálogo y actualiza el proyecto.'),
+        action('Marcar tarea como completada','local','Estado de la tarea actualizado','Alterna Terminada / Sin empezar y recalcula el progreso.'),
+        action('Filtrar por estado','local','Tareas filtradas','Todas, Sin empezar, En proceso, En revisión o Terminadas.'),
+        action('Modificar integrantes','dialog','Equipo del proyecto','Abre la edición de integrantes; el líder no se edita desde este formulario.'),
+        action('Añadir integrante / Eliminar integrante','local','Equipo en edición','Modifica las filas del diálogo.'),
+        action('Guardar equipo','local','Detalle actualizado','Guarda integrantes y actualiza las opciones de responsables.'),
+        action('Cancelar / Cerrar / Escape','local','Cierra el diálogo','Vuelve al detalle sin guardar la edición.')
+      ]},
+      {id:'canales',name:'Canales del proyecto',route:'/proyectos/{codigo}/canales',group:'project',description:'Conversaciones agrupadas dentro de un proyecto; incluye mensajes, adjuntos, galería, documentos y resumen.',actions:[
+        action('Volver al proyecto','page','Detalle del mismo proyecto','Conserva el código del proyecto.','proyecto'),
+        action('Nombre de un canal','local','Conversación seleccionada','Cambia mensajes y archivos sin abrir otra página. También admite ?canal=slug.'),
+        action('Nuevo canal / Crear primer canal','dialog','Crear canal','Nombre, descripción y tarea asociada opcional.'),
+        action('Crear canal','local','Nuevo canal seleccionado','Guarda el canal, cierra el diálogo y abre su conversación.'),
+        action('Enviar mensaje / Enter','local','Conversación actualizada','Envía el mensaje y el archivo adjunto si existe; Shift+Enter permite otra línea.'),
+        action('Adjuntar archivo','dialog','Selector de archivos del dispositivo','Selecciona el adjunto que se enviará con el siguiente mensaje.'),
+        action('Quitar adjunto','local','Mensaje sin adjunto pendiente','Retira el archivo seleccionado antes de enviarlo.'),
+        action('Archivo, imagen o documento','external','URL del archivo','Abre el adjunto en otra pestaña desde el mensaje, la galería o la lista de documentos.'),
+        action('Resumir','local','Resumen del canal','Solicita el resumen y lo muestra en el panel de la misma pantalla.'),
+        action('Añadir reacción','local','Selector de reacciones de texto','Permite elegir De acuerdo, Hecho o Gracias.'),
+        action('De acuerdo / Hecho / Gracias','local','Reacciones del mensaje','Añade o retira la reacción elegida; se muestra como texto, sin emojis.'),
+        action('Eliminar canal','dialog','Confirmación de eliminación','Si se confirma, elimina el canal y abre otro disponible o el estado vacío.'),
+        action('Cancelar / Cerrar / Escape','local','Cierra Crear canal','Mantiene la conversación actual.')
+      ]},
+      {id:'fases',name:'Fases y dependencias',route:'/proyectos/{codigo}/fases',group:'project',description:'Ramas verticales de tareas y dependencias, inspiradas en un historial Git. Se recorre hacia abajo, sin desplazamiento horizontal.',actions:[
+        action('Volver al proyecto','page','Detalle del mismo proyecto','Regresa al calendario y tablero de tareas.','proyecto'),
+        action('Entregables','page','Entregables del mismo proyecto','Enlace directo entre las dos secciones.','entregables'),
+        action('Tarea del diagrama','dialog','Detalle y dependencias de la tarea','Muestra descripción, estado, tareas previas y asignación.'),
+        action('Configurar / Guardar modo','local','Reparto del trabajo','El líder cambia entre tareas asignadas y elección libre; conserva responsables actuales.'),
+        action('Tomar tarea disponible / Tomar esta tarea','local','Asignación actualizada','En elección libre, asigna al usuario una tarea libre y sin dependencias pendientes.'),
+        action('Liberar tarea','local','Asignación actualizada','Deja disponible la tarea para otra persona.'),
+        action('Estado de la tarea','local','Diagrama actualizado','Guarda el nuevo estado desde el diálogo.'),
+        action('Añadir dependencia / Quitar dependencia','local','Dependencias actualizadas','Modifica la relación entre tareas del proyecto.'),
+        action('Cerrar / Escape','local','Diagrama de fases','Cierra el detalle de tarea.')
+      ]},
+      {id:'entregables',name:'Documentos y entregables',route:'/proyectos/{codigo}/entregables',group:'project',description:'Registro de enlaces de documentos y entregables con responsable, tipo y estado.',actions:[
+        action('Volver al proyecto','page','Detalle del mismo proyecto','Regresa al calendario y las tareas.','proyecto'),
+        action('Ver fases','page','Fases del mismo proyecto','Enlace directo a fases y dependencias.','fases'),
+        action('Registrar documento / Editar','dialog','Formulario de documento','Enlace, nombre, descripción, tipo, estado y responsable.'),
+        action('Guardar','local','Registro actualizado','Guarda el documento, cierra el diálogo y refresca la lista.'),
+        action('Nombre o enlace de documento','external','Documento externo','Abre su URL en una nueva pestaña: por ejemplo Docs, Canva o GitHub.'),
+        action('Estado: Borrador / En revisión / Final','local','Estado actualizado','Actualiza el documento desde su tarjeta.'),
+        action('Eliminar','dialog','Confirmación','Tras confirmar, retira el documento del registro.'),
+        action('Cancelar / Cerrar / Escape','local','Lista de documentos','Cierra el formulario sin guardar.')
+      ]},
+      {id:'perfil',name:'Mi perfil',route:'/perfil',group:'account',description:'Datos personales, académicos y tarjetas de proyectos. Accesible desde el menú del avatar.',actions:[
+        action('Volver al inicio','page','Inicio','Regresa a la agenda.','panel'),
+        action('Editar perfil / Actualizar','page','Editar perfil','Abre los datos personales, académicos y la foto.','editar'),
+        action('Ver todos','page','Mis proyectos','Abre el listado completo.','proyectos'),
+        action('Ver proyecto / tarjeta de proyecto','page','Proyecto asociado','Los enlaces utilizan el identificador de la tarjeta; el destacado actual apunta a campus-verde.','proyecto'),
+        action('Crea el primero (estado vacío)','page','Crear proyecto','Aparece cuando no hay proyectos para mostrar.','nuevo')
+      ]},
+      {id:'editar',name:'Editar perfil',route:'/perfil/editar',group:'account',description:'Edición de foto, nombre, correo, descripción y datos académicos.',actions:[
+        action('Volver a mi perfil / Cancelar','page','Mi perfil','Vuelve sin guardar el formulario.','perfil'),
+        action('Guardar cambios','page','Mi perfil','Valida y guarda los datos antes de navegar. Los errores mantienen el formulario abierto.','perfil'),
+        action('Cambiar foto','dialog','Selector de imagen','Acepta PNG, JPG y WEBP de hasta 2 MB; muestra una previsualización.'),
+        action('Editar descripción','local','Contador de caracteres','Actualiza el contador hasta 180 caracteres.')
+      ]},
+      {id:'paleta',name:'Guía de estilo',route:'/paleta',group:'account',public:true,description:'Página auxiliar de referencia visual; no aparece como sección en la barra principal.',actions:[
+        action('Volver al panel','page','Inicio','Si no hay sesión, se redirige al acceso.','panel'),
+        action('Muestra de color','local','Color copiado','Copia el valor del color al portapapeles.'),
+        action('Cambiar tema','local','Muestras claras u oscuras','Alterna el tema de la guía.')
+      ]},
+      {id:'chats',name:'Canales (ruta anterior)',route:'/chats',group:'account',public:true,description:'Ruta de compatibilidad. Ya no es una pantalla ni un enlace de la barra de navegación.',actions:[
+        action('Visitar /chats','redirect','Mis proyectos','Redirige a /proyectos; sin sesión, esa ruta redirige después a /login.','proyectos')
+      ]}
+    ];
+    const groups = [{id:'public',label:'01 · Descubrir y entrar'},{id:'main',label:'02 · Navegación principal'},{id:'project',label:'03 · Dentro de un proyecto'},{id:'account',label:'04 · Cuenta y rutas auxiliares'}];
+    const types = {page:'Pantalla',dialog:'Diálogo',local:'En esta pantalla',external:'Enlace externo',pending:'Pendiente',redirect:'Redirección'};
+    const byId = Object.fromEntries(screens.map(screen => [screen.id,screen]));
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    let selected = 'proyectos';
+    let query = '';
+    let showCatalog = false;
+    const $ = selector => document.querySelector(selector);
+    function matches(screen) { return !query || [screen.name,screen.route,screen.description,...screen.actions.flatMap(a => [a.label,a.destination,a.description])].join(' ').toLocaleLowerCase('es').includes(query); }
+    const appOrigin = location.protocol === 'file:' ? 'http://localhost:6767' : location.origin;
+    const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    $('#open-app').href = appOrigin + '/';
+    function routeFor(screen) { return appOrigin + screen.route.replace('{codigo}',encodeURIComponent($('#project-code').value.trim() || 'cognitiva')); }
+    function actionTable(screen) {
+      return `<table class="actions" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Botón o control</th><th scope="col" role="columnheader">Destino y comportamiento</th></tr></thead><tbody role="rowgroup">${screen.actions.map(a => `<tr role="row"><td role="cell"><strong>${esc(a.label)}</strong><span class="badge ${esc(a.type)}">${types[a.type]}</span></td><td role="cell">${a.target ? `<button class="destination-button" type="button" data-select="${a.target}">${esc(a.destination)}</button>` : `<strong>${esc(a.destination)}</strong>`}<span class="action-description">${esc(a.description)}</span></td></tr>`).join('')}</tbody></table>`;
+    }
+    function renderMap() {
+      const destinations = new Set(byId[selected].actions.map(a=>a.target).filter(Boolean));
+      const origins = new Set(screens.filter(s=>s.actions.some(a=>a.target===selected)).map(s=>s.id));
+      $('#map-columns').innerHTML = groups.map(group => `<section class="group" aria-label="${esc(group.label)}"><h3>${esc(group.label)}</h3><div class="nodes">${screens.filter(s=>s.group===group.id).map(screen => `<button type="button" class="node${screen.public?' public':''}${screen.id===selected?' selected':''}${destinations.has(screen.id)?' destination':''}${origins.has(screen.id)?' origin':''}${!matches(screen)?' dimmed':''}" data-select="${screen.id}" id="node-${screen.id}" aria-pressed="${screen.id===selected}"><strong>${esc(screen.name)}</strong><span class="route">${esc(screen.route)}</span><span class="index">${String(screens.indexOf(screen)+1).padStart(2,'0')}</span></button>`).join('')}</div></section>`).join('');
+      $('#screen-count').textContent = `${screens.length - 1} pantallas y 1 redirección · ${screens.filter(matches).length} coincidencias · ${screens.reduce((n,s)=>n+s.actions.length,0)} controles documentados`;
+      requestAnimationFrame(drawConnections);
+    }
+    function renderInspector() {
+      const screen = byId[selected];
+      const origins = screens.filter(s=>s.id!==selected&&s.actions.some(a=>a.target===selected));
+      $('#inspector').innerHTML = `<div class="inspector-head"><div><p class="eyebrow">Pantalla seleccionada</p><h2 id="screen-title" tabindex="-1">${esc(screen.name)}</h2><span class="route-label">${esc(screen.route)}</span><div class="access"><span class="badge">${screen.id==='chats'?'Redirección de compatibilidad':screen.public?'Acceso público':'Requiere sesión'}</span>${!screen.public?'<span class="badge">Incluye navegación compartida</span>':''}</div></div><a class="button primary" href="${esc(routeFor(screen))}" target="_blank" rel="noopener">Abrir pantalla</a></div><p class="screen-description">${esc(screen.description)}</p>${actionTable(screen)}<div class="incoming"><h3>Se puede llegar desde</h3><div class="incoming-list">${origins.map(s=>`<button type="button" data-select="${s.id}">${esc(s.name)}</button>`).join('')}${!screen.public?'<span class="badge">Barra o menú compartido cuando existe su enlace</span>':''}${!origins.length?'<span class="small muted">Acceso directo por URL.</span>':''}</div></div><div class="inspector-links"><a class="button" href="#map-title">Volver a las pantallas</a></div>`;
+    }
+    function renderCatalog() {
+      $('#catalog').hidden = !showCatalog;
+      if (!showCatalog) return;
+      const visible = screens.filter(matches);
+      $('#catalog').innerHTML = visible.map(screen=>`<details class="panel"${query?' open':''}><summary>${esc(screen.name)}<small>${esc(screen.route)}</small></summary><p class="screen-description">${esc(screen.description)}</p>${actionTable(screen)}</details>`).join('') || '<p class="no-results">No hay pantallas ni controles que coincidan.</p>';
+    }
+    function select(id,scroll) {
+      if (!byId[id]) return;
+      selected=id;
+      renderMap(); renderInspector();
+      history.replaceState(null,'',`#${id}`);
+      if (scroll) {
+        $('#screen-title').focus({preventScroll:true});
+        $('#inspector').scrollIntoView({behavior:scrollBehavior(),block:'start'});
+      }
+    }
+    function drawConnections() {
+      const svg = $('#connections');
+      const graph = $('#graph').getBoundingClientRect();
+      const pairs = new Map();
+      screens.forEach(screen=>screen.actions.forEach(a=>{
+        if (!a.target||a.target===screen.id) return;
+        if (screen.id===selected||a.target===selected) pairs.set(`${screen.id}:${a.target}`,{from:screen.id,to:a.target,out:screen.id===selected});
+      }));
+      svg.setAttribute('viewBox',`0 0 ${graph.width} ${graph.height}`);
+      svg.innerHTML = '<defs><marker id="arrow-out" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7770d8"/></marker><marker id="arrow-in" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c0bacd"/></marker></defs>';
+      pairs.forEach(({from,to,out})=>{
+        const a=$(`#node-${from}`).getBoundingClientRect(),b=$(`#node-${to}`).getBoundingClientRect();
+        const sameColumn=Math.abs(a.left-b.left)<8;
+        let x1,y1,x2,y2,path;
+        if(sameColumn){
+          x1=a.right-graph.left; x2=b.right-graph.left; y1=a.top+a.height/2-graph.top; y2=b.top+b.height/2-graph.top;
+          path=`M ${x1} ${y1} C ${x1+24} ${y1}, ${x2+24} ${y2}, ${x2} ${y2}`;
+        }else{
+          const forward=b.left>a.left;
+          x1=(forward?a.right:a.left)-graph.left; x2=(forward?b.left:b.right)-graph.left; y1=a.top+a.height/2-graph.top; y2=b.top+b.height/2-graph.top;
+          const curve=Math.max(25,Math.abs(x2-x1)*.45)*(forward?1:-1);
+          path=`M ${x1} ${y1} C ${x1+curve} ${y1}, ${x2-curve} ${y2}, ${x2} ${y2}`;
+        }
+        const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+        line.setAttribute('d',path);line.setAttribute('fill','none');line.setAttribute('stroke',out?'#7770d8':'#c0bacd');line.setAttribute('stroke-width',out?'1.7':'1.2');line.setAttribute('marker-end',out?'url(#arrow-out)':'url(#arrow-in)');
+        if(!out) line.setAttribute('stroke-dasharray','4 4');
+        svg.append(line);
+      });
+    }
+    $('#global-links').innerHTML = [['panel','Inicio'],['proyectos','Proyectos'],['horarios','Horarios'],['recordatorios','Recordatorios'],['nuevo','+ Proyecto'],['perfil','Ver mi perfil'],['editar','Editar perfil'],['login','Cerrar sesión']].map(([id,label])=>`<button type="button" data-select="${id}">${esc(label)}</button>`).join('');
+    $('#tour-path').innerHTML = [['panel','Inicio'],['nuevo','Crear proyecto'],['proyecto','Tu proyecto'],['fases','Fases'],['canales','Canales'],['entregables','Documentos'],['horarios','Horarios'],['recordatorios','Recordatorios'],['sandbox','Todo listo']].map(([id,label],index)=>`${index?'<span aria-hidden="true">→</span>':''}<button type="button" data-select="${id}" aria-label="Ver pantalla de la etapa ${index+1}: ${esc(label)}">${index+1}. ${esc(label)}</button>`).join('');
+    document.addEventListener('click',event=>{
+      const control=event.target.closest('[data-select]');
+      if(!control) return;
+      event.preventDefault();
+      const shouldScroll=!control.classList.contains('node')||matchMedia('(max-width:820px)').matches;
+      select(control.dataset.select,shouldScroll);
+      if(!shouldScroll)$(`#node-${selected}`).focus({preventScroll:true});
+    });
+    $('#search').addEventListener('input',event=>{
+      query=event.target.value.trim().toLocaleLowerCase('es');
+      if(query&&!matches(byId[selected])) {const first=screens.find(matches);if(first)selected=first.id;}
+      renderMap();renderInspector();renderCatalog();
+    });
+    $('#catalog-toggle').addEventListener('click',()=>{
+      showCatalog=!showCatalog;
+      $('#catalog-toggle').setAttribute('aria-pressed',String(showCatalog));
+      renderCatalog();
+      if(showCatalog)$('#catalog').scrollIntoView({behavior:scrollBehavior()});
+    });
+    $('#project-code').addEventListener('input',renderInspector);
+    function preparePrint(){showCatalog=true;renderCatalog();$('#catalog').querySelectorAll('details').forEach(d=>d.open=true);}
+    $('#print').addEventListener('click',()=>{preparePrint();window.print();});
+    window.addEventListener('beforeprint',preparePrint);
+    window.addEventListener('resize',drawConnections);
+    select(byId[location.hash.slice(1)]?location.hash.slice(1):selected,false);
+  })();
+  </script>
+</body>
+</html>

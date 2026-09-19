@@ -1,115 +1,67 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/layout :: head('Entrar', 'Entra a StudyFlow y empieza a organizar tu semestre.')}"></head>
-  <body data-page="login">
-    <main class="auth-layout">
-      <section class="auth-showcase" aria-labelledby="auth-showcase-title">
-        <a class="auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow">
-          <span class="brand-mark" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></span>
-          <span>StudyFlow</span>
-        </a>
-
-        <div class="max-w-[30ch]">
-          <p class="eyebrow">Tu semestre, en orden</p>
-          <h1 id="auth-showcase-title">Haz espacio para aprender, no para perseguir pendientes.</h1>
-          <p class="mt-3">Proyectos, tareas, canales de equipo y recordatorios en un solo sitio.</p>
-        </div>
-
-        <ul class="benefit-list" aria-label="Qué incluye StudyFlow">
-          <li><span><i class="bi bi-chat-dots" aria-hidden="true"></i></span><div><strong>Canales por proyecto</strong><small>#general, #tarea1… un hilo por tema.</small></div></li>
-          <li><span><i class="bi bi-diagram-3" aria-hidden="true"></i></span><div><strong>Diagrama de fases</strong><small>Dependencias entre tareas y reparto libre.</small></div></li>
-          <li><span><i class="bi bi-whatsapp" aria-hidden="true"></i></span><div><strong>Recordatorios</strong><small>Avisos por WhatsApp antes de cada entrega.</small></div></li>
-        </ul>
-
-        <p class="showcase-note"><i class="bi bi-shield-check" aria-hidden="true"></i> Tu planificación siempre a tu alcance.</p>
-      </section>
-
-        <button class="tema-boton tema-boton--suelto" type="button" data-action="tema" aria-label="Cambiar entre modo claro y oscuro"><i class="bi" aria-hidden="true"></i></button>
-      <section class="auth-panel" aria-labelledby="login-title">
-        <div class="auth-card">
-          <a class="mobile-brand auth-brand" th:href="@{/login}" href="/login" aria-label="StudyFlow">
-            <span class="brand-mark" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></span>
-            <span>StudyFlow</span>
-          </a>
-
-          <div class="auth-heading">
-            <p class="eyebrow">Empieza en un paso</p>
-            <h2 id="login-title">¿Cómo te llamas?</h2>
-            <p>Con tu nombre basta para entrar. Los demás datos los completas cuando quieras.</p>
+  <head th:replace="~{fragments/layout :: head('Ingresa', 'Explora StudyFlow sin crear una cuenta o entra a tu espacio.')}"></head>
+  <body data-page="login" class="entry-page">
+    <header class="entry-header">
+      <a class="auth-brand" href="/" aria-label="StudyFlow, inicio">
+        <img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="48" height="48" alt="">
+        <span>StudyFlow</span>
+      </a>
+      <button class="tema-boton" type="button" data-action="tema" aria-label="Cambiar entre modo claro y oscuro"><i class="bi" aria-hidden="true"></i></button>
+    </header>
+    <main class="entry-main">
+      <div class="entry-heading">
+        <h1 id="entry-title">Encuentra tu flow.</h1>
+        <p id="entry-description">Conócelo primero. Hazlo tuyo cuando quieras.</p>
+      </div>
+      <div id="entry-options" class="entry-options">
+        <section class="entry-card entry-card--tour" aria-labelledby="tour-entry-title">
+          <div class="entry-preview" aria-hidden="true">
+            <span class="entry-preview-line"></span>
+            <span class="entry-preview-node entry-preview-node--first"></span>
+            <span class="entry-preview-node entry-preview-node--middle"></span>
+            <span class="entry-preview-node entry-preview-node--last"></span>
+            <span class="entry-preview-task entry-preview-task--first"></span>
+            <span class="entry-preview-task entry-preview-task--second"></span>
+            <span class="entry-preview-task entry-preview-task--third"></span>
           </div>
-
-          <!-- Acceso rápido: un solo campo obligatorio -->
-          <form id="quick-form" class="cuadro-formulario auth-form" novalidate>
-            <div class="form-field">
-              <label for="quick-name">Tu nombre</label>
-              <span class="input-wrap">
-                <i class="bi bi-person" aria-hidden="true"></i>
-                <input id="quick-name" name="nombre" type="text" autocomplete="name" placeholder="Valentina Rojas" required autofocus>
-              </span>
-            </div>
-            <div class="form-field">
-              <label for="quick-email">Correo <span class="font-normal text-muted">(opcional)</span></label>
-              <span class="input-wrap">
-                <i class="bi bi-envelope" aria-hidden="true"></i>
-                <input id="quick-email" name="correo" type="email" autocomplete="email" placeholder="tu.correo@universidad.edu">
-              </span>
-              <span class="field-hint">Solo si quieres recuperar tu cuenta más adelante.</span>
-            </div>
-
-            <p id="login-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
-            <button class="btn btn-primary w-full" type="submit">Entrar <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
-          </form>
-
-          <!--
-            Una cuenta nueva empieza sin proyectos, que es lo correcto. Para ver
-            la aplicación con contenido hace falta entrar con la cuenta sembrada.
-          -->
-          <div class="grid gap-2 rounded-sm border border-line bg-canvas/70 p-3.5">
-            <p class="text-[13px] text-muted">
-              ¿Solo quieres echar un vistazo? Entra con la cuenta de ejemplo y verás
-              proyectos, canales y tareas ya cargados.
-            </p>
-            <button id="demo-button" class="btn btn-secondary w-full" type="button">
-              <i class="bi bi-box-seam" aria-hidden="true"></i>
-              Explorar con datos de ejemplo
-            </button>
+          <h2 id="tour-entry-title">Tour por la app</h2>
+          <p>Un espacio vacío para crear y probar, sin cuenta.</p>
+          <a id="sandbox-button" class="btn btn-primary entry-action" href="/sandbox">Comenzar tour <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          <small>Temporal. Nada de lo que pruebes se guarda.</small>
+        </section>
+        <section class="entry-card entry-card--account" aria-labelledby="account-entry-title">
+          <span class="entry-account-icon" aria-hidden="true"><i class="bi bi-person-plus"></i></span>
+          <h2 id="account-entry-title">Tu propio espacio</h2>
+          <p>Organiza tus proyectos y empieza a trabajar con tu equipo.</p>
+          <a class="btn btn-secondary entry-action" href="/registro">Crear mi cuenta <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          <button id="show-signin" class="entry-signin-link" type="button" aria-controls="signin-panel" aria-expanded="false">Ya tengo mi cuenta</button>
+        </section>
+      </div>
+      <section id="signin-panel" class="entry-signin" aria-labelledby="entry-title" hidden>
+        <form id="password-form" class="cuadro-formulario auth-form" novalidate>
+          <div class="form-field">
+            <label for="login-email">Correo</label>
+            <span class="input-wrap">
+              <i class="bi bi-envelope" aria-hidden="true"></i>
+              <input id="login-email" name="correo" type="email" autocomplete="email" placeholder="tu.correo@universidad.edu" required>
+            </span>
           </div>
-
-          <div class="auth-divider"><span>o continúa con</span></div>
-          <div class="social-actions" aria-label="Opciones de acceso social">
-            <button class="social-button" type="button" data-provider="Google"><i class="bi bi-google" aria-hidden="true"></i><span>Google</span></button>
-            <button class="social-button" type="button" data-provider="GitHub"><i class="bi bi-github" aria-hidden="true"></i><span>GitHub</span></button>
-            <button class="social-button" type="button" data-provider="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i><span>Facebook</span></button>
+          <div class="form-field">
+            <label for="login-password">Contraseña</label>
+            <span class="input-wrap">
+              <i class="bi bi-lock" aria-hidden="true"></i>
+              <input id="login-password" name="contrasena" type="password" autocomplete="current-password" placeholder="Tu contraseña" required>
+              <button class="password-toggle" type="button" data-password-toggle="login-password" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+            </span>
           </div>
-
-          <!-- Acceso clásico, plegado para no estorbar a quien entra por primera vez -->
-          <details class="rounded-sm border border-line bg-[var(--superficie)] p-3.5">
-            <summary class="cursor-pointer text-[13px] font-bold text-muted">Ya tengo cuenta con contraseña</summary>
-            <form id="password-form" class="cuadro-formulario mt-3.5 grid gap-3" novalidate>
-              <div class="form-field">
-                <label for="login-email">Correo</label>
-                <span class="input-wrap">
-                  <i class="bi bi-envelope" aria-hidden="true"></i>
-                  <input id="login-email" name="correo" type="email" autocomplete="email" placeholder="tu.correo@universidad.edu">
-                </span>
-              </div>
-              <div class="form-field">
-                <label for="login-password">Contraseña</label>
-                <span class="input-wrap">
-                  <i class="bi bi-lock" aria-hidden="true"></i>
-                  <input id="login-password" name="contrasena" type="password" autocomplete="current-password" placeholder="Tu contraseña">
-                  <button class="password-toggle" type="button" data-password-toggle="login-password" aria-label="Mostrar contraseña"><i class="bi bi-eye" aria-hidden="true"></i></button>
-                </span>
-              </div>
-              <button class="btn btn-secondary" type="submit">Acceder</button>
-            </form>
-          </details>
-
-          <p class="auth-switch">¿Quieres dar todos tus datos ahora? <a th:href="@{/registro}" href="/registro">Registro completo</a></p>
-        </div>
+          <p id="login-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+          <button id="signin-submit" class="btn btn-primary entry-action" type="submit">Ingresar <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+        </form>
+        <button id="hide-signin" class="entry-back" type="button"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver</button>
       </section>
     </main>
-
+    <footer class="entry-footer"><a href="/">Volver al inicio</a></footer>
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
     <script th:src="@{/js/login.js}" src="/js/login.js" defer></script>
   </body>

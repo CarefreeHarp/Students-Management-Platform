@@ -9,8 +9,8 @@
       <section class="page-heading" aria-labelledby="dashboard-title">
         <div>
           <p class="eyebrow" id="dashboard-date">Miércoles, 12 de agosto</p>
-          <h1 id="dashboard-title">Hola, <span data-user-first-name>Valentina</span> <span aria-hidden="true">👋</span></h1>
-          <p class="mt-2 text-muted">Así va tu semana. Tienes <strong id="pending-count" class="text-ink">0 tareas</strong> por avanzar.</p>
+          <h1 id="dashboard-title">Hola, <span data-user-first-name>Estudiante</span></h1>
+          <p class="mt-2 text-muted">Tu agenda y el avance de tus proyectos, en un solo lugar.</p>
         </div>
         <div class="flex flex-wrap gap-2.5">
           <a class="btn btn-secondary" th:href="@{/horarios}" href="/horarios"><i class="bi bi-calendar-plus"></i> Mi horario</a>
@@ -18,7 +18,7 @@
         </div>
       </section>
 
-      <section class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <section class="dashboard-overview">
         <div class="panel">
           <div class="section-head flex-wrap">
             <div>
@@ -30,41 +30,13 @@
           <div id="dashboard-calendar" aria-label="Calendario semanal de tareas"></div>
         </div>
 
-        <aside class="grid content-start gap-4">
-          <section class="tarjeta-color tono-cian">
-            <div class="section-head"><h2>Tu ritmo</h2><i class="bi bi-activity text-primary"></i></div>
-            <div class="rhythm-score mb-2.5"><span id="completion-score">0%</span><small>completado</small></div>
-            <div class="progress-track"><div id="completion-progress" class="progress-bar" style="--progress:0%"></div></div>
-            <p id="completion-caption" class="mt-2.5 text-[13px] text-muted">Vamos paso a paso.</p>
-          </section>
-
-          <section class="tarjeta-color tono-indigo">
-            <div class="section-head">
-              <div><h2>Próximamente</h2><p>Prioridades de la semana</p></div>
-              <a th:href="@{/proyectos}" href="/proyectos" class="text-action" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right"></i></a>
-            </div>
-            <div id="upcoming-tasks" class="upcoming-list"></div>
-          </section>
-        </aside>
-      </section>
-
-      <section class="mt-4 grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <section class="tarjeta-color tono-rosa flex flex-col items-start gap-3" aria-labelledby="complete-title">
-          <div class="complete-icon"><i class="bi bi-check2"></i></div>
-          <div>
-            <h2 id="complete-title">¿Terminaste algo?</h2>
-            <p class="mt-1 text-[13px] text-muted">Registra el avance y mantenemos al día tus proyectos.</p>
-          </div>
-          <button id="open-complete-task" class="btn btn-soft" type="button">Marcar tarea terminada <i class="bi bi-arrow-right"></i></button>
-        </section>
-
-        <section class="tarjeta-color tono-verde" aria-labelledby="projects-snapshot-title">
+        <aside class="panel project-overview" aria-labelledby="projects-snapshot-title">
           <div class="section-head">
-            <div><h2 id="projects-snapshot-title">Tus proyectos</h2><p>Estado general</p></div>
-            <a class="btn btn-primary btn-sm" th:href="@{/proyectos}" href="/proyectos">Ver todos <i class="bi bi-arrow-right"></i></a>
+            <div><h2 id="projects-snapshot-title">Estado general</h2><p id="pending-count">Cargando tus pendientes…</p></div>
+            <a class="text-action" th:href="@{/proyectos}" href="/proyectos" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
           </div>
-          <div id="project-snapshot-list" class="project-snapshot-list"></div>
-        </section>
+          <div id="project-snapshot-list" class="overview-projects" aria-live="polite"></div>
+        </aside>
       </section>
     </main>
 

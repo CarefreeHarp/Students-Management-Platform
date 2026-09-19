@@ -49,6 +49,12 @@ public class RecordatorioApiController {
         return recordatorioService.listar(usuarioActual());
     }
 
+    @PostMapping("/recordatorios")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RecordatorioDTO crear(@Valid @RequestBody PeticionRecordatorio peticion) {
+        return recordatorioService.crearPersonal(usuarioActual(), peticion);
+    }
+
     /** Recalcula la agenda completa a partir de tareas, entregas y apuntes. */
     @PostMapping("/recordatorios/reprogramar")
     public Map<String, Object> reprogramar() {

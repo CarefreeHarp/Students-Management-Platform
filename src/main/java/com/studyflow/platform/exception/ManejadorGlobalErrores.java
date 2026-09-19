@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,15 +53,28 @@ public class ManejadorGlobalErrores {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, error.getMessage());
     }
 
+    /** Una regla de dominio puede devolver su mensaje junto al campo afectado. */
+    @ExceptionHandler(CampoInvalidoException.class)
+    public ProblemDetail campoInvalido(CampoInvalidoException error) {
+        ProblemDetail respuesta = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, error.getMessage());
+        respuesta.setProperty("errores", Map.of(error.getCampo(), error.getMessage()));
+        return respuesta;
+    }
+
     /** Validación del cuerpo de la petición (@Valid sobre un DTO). */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail camposInvalidos(MethodArgumentNotValidException error) {
-        String detalle = error.getBindingResult().getFieldErrors().stream()
-                .map(campo -> "%s %s".formatted(enCastellano(campo.getField()), campo.getDefaultMessage()))
+        Map<String, String> erroresPorCampo = error.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(campo -> campo.getField(), campo -> campo.getDefaultMessage(),
+                        (primero, ignorado) -> primero, LinkedHashMap::new));
+        String detalle = erroresPorCampo.entrySet().stream()
+                .map(campo -> "%s %s".formatted(enCastellano(campo.getKey()), campo.getValue()))
                 .distinct()
                 .collect(Collectors.joining("; "));
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+        ProblemDetail respuesta = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 detalle.isBlank() ? "Revisa los datos del formulario." : "Revisa " + detalle + ".");
+        respuesta.setProperty("errores", erroresPorCampo);
+        return respuesta;
     }
 
     /** Validación al guardar la entidad, que salta más tarde que la anterior. */

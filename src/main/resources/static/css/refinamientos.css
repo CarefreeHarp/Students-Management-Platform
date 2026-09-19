@@ -1,0 +1,16 @@
+/* Shared identity and quiet surfaces; landing keeps its own visual language. */
+.brand-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.auth-brand .brand-logo { width: 48px; height: 48px; }
+.profile-dropdown { background: var(--superficie); border-color: var(--linea-tarjeta); }
+.profile-menu .profile-dropdown, .profile-menu:hover .profile-dropdown, .profile-menu:focus-within .profile-dropdown { opacity: 0; visibility: hidden; pointer-events: none; }
+.profile-menu.is-open .profile-dropdown { opacity: 1; visibility: visible; pointer-events: auto; transform: none; display: grid; }
+.app-nav { box-shadow: none; }
+@media (max-width: 620px) { .nav-links { background: var(--superficie); } }
+.reaction-label { padding: 3px 8px; font-size: 11px; border: 1px solid #c9c7e5; border-radius: 999px; }
+#emoji-picker { flex-wrap: wrap; width: 230px; gap: 6px; padding: 10px; }
+@media (max-width: 700px) { .brand-logo { width: 34px; height: 34px; } }
+.project-field-error{display:none;margin-top:5px;color:var(--estado-danger);font-size:12px;font-weight:600}.project-field-error.is-visible{display:block}.form-field:has(.project-field-error.is-visible) :is(input,textarea){border-color:var(--estado-danger)}
+.task-form-error{display:flex;align-items:flex-start;gap:8px;margin:0;padding:11px 12px;border:1px solid color-mix(in srgb,var(--estado-danger) 62%,var(--linea-tarjeta));border-radius:10px;background:rgb(var(--c-danger-soft) / .58);color:var(--estado-danger);font-size:13px;font-weight:700;line-height:1.45}.task-form-error::before{content:"!";display:grid;flex:0 0 18px;width:18px;height:18px;place-items:center;border-radius:50%;background:var(--estado-danger);color:white;font-size:12px;line-height:1}
+.project-phases-editor{display:grid;gap:10px;padding:14px;border:1px solid var(--linea-tarjeta);border-radius:12px;background:var(--superficie-suave)}.project-phases-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.project-phases-heading h3{font-size:14px}.project-phases-heading p,.form-field small{display:block;margin-top:3px;color:rgb(var(--c-muted));font-size:12px;line-height:1.45}.project-phases-list{display:grid;gap:8px}.project-phase-row{display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:8px;align-items:end}.project-phase-row .icon-button{height:40px}@media(max-width:520px){.project-phases-heading{align-items:stretch;flex-direction:column}.project-phases-heading .btn{align-self:flex-start}}
+#add-project-phase .bi-plus,#add-member .bi-plus{font-size:1.3rem;font-weight:700;line-height:1;transform:translateY(-.5px)}
+.is-date-previewing{animation:delivery-preview-pulse .7s ease-out}@keyframes delivery-preview-pulse{0%{box-shadow:0 0 0 0 rgb(168 151 255 / .48)}65%{box-shadow:0 0 0 9px rgb(168 151 255 / 0),0 0 34px rgb(168 151 255 / .38)}100%{box-shadow:none}}

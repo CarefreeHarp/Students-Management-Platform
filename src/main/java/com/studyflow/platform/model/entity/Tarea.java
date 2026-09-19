@@ -77,6 +77,10 @@ public class Tarea {
     @Column(name = "fecha_completada")
     private LocalDateTime fechaCompletada;
 
+    /** Explicación o conclusión que respalda el cierre de la tarea. */
+    @Column(name = "resultado_texto", length = 2000)
+    private String resultadoTexto;
+
     /** Marca si la tarea fue propuesta por el asistente de IA. */
     @Column(name = "generada_por_ia", nullable = false)
     private boolean generadaPorIa = false;
@@ -86,6 +90,11 @@ public class Tarea {
 
     public boolean estaCompletada() {
         return estado == EstadoTarea.TERMINADA;
+    }
+
+    /** Una tarea cerrada debe dejar una evidencia escrita o un archivo. */
+    public boolean tieneResultado() {
+        return resultadoTexto != null && !resultadoTexto.isBlank() || !archivos.isEmpty();
     }
 
     /**

@@ -28,10 +28,14 @@
   const $ = (selector) => document.querySelector(selector);
 
   async function pedir(url, opciones = {}) {
-    const respuesta = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opciones });
+    const esFormulario = opciones.body instanceof FormData;
+    const respuesta = await fetch(url, {
+      ...opciones,
+      headers: { ...(esFormulario ? {} : { "Content-Type": "application/json" }), ...(opciones.headers || {}) }
+    });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      window.location.assign("/login");
+      app.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) {
@@ -44,6 +48,20 @@
   const avisar = (mensaje, tipo = "info") => {
     if (typeof app.showToast === "function") app.showToast(mensaje, tipo);
   };
+
+  function limpiarErrorTarea() {
+    const aviso = $("#task-form-error");
+    if (!aviso) return;
+    aviso.hidden = true;
+    aviso.textContent = "";
+  }
+
+  function mostrarErrorTarea(mensaje) {
+    const aviso = $("#task-form-error");
+    if (!aviso) return avisar(mensaje, "error");
+    aviso.textContent = mensaje;
+    aviso.hidden = false;
+  }
 
   const iniciales = (nombre) => String(nombre || "?").trim().split(/\s+/).slice(0, 2)
     .map((parte) => parte[0]).join("").toUpperCase();
@@ -58,10 +76,14 @@
 
   function diasRestantes(iso) {
     if (!iso) return "";
-    const dias = Math.ceil((new Date(`${iso}T12:00:00`) - new Date()) / 86400000);
-    if (dias < 0) return `Hace ${Math.abs(dias)} día${Math.abs(dias) === 1 ? "" : "s"}`;
+    const fecha = new Date(`${iso}T00:00:00`);
+    if (Number.isNaN(fecha.getTime())) return "";
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const dias = Math.round((fecha - hoy) / 86400000);
+    if (dias < 0) return `Venció hace ${Math.abs(dias)} día${Math.abs(dias) === 1 ? "" : "s"}`;
     if (dias === 0) return "Es hoy";
-    return `Faltan ${dias} día${dias === 1 ? "" : "s"}`;
+    return dias === 1 ? "Falta 1 día" : `Faltan ${dias} días`;
   }
 
   /* ------------------------------------------------------------ cabecera */
@@ -204,11 +226,14 @@
   }
 
   async function alternarTerminada(tarea) {
-    const nuevo = tarea.estado === "terminada" ? "sin-empezar" : "terminada";
+    if (tarea.estado !== "terminada") {
+      abrirDialogoTarea(tarea.id, true);
+      return;
+    }
     try {
       await pedir(`/api/tareas/${tarea.id}/estado`, {
         method: "PATCH",
-        body: JSON.stringify({ estado: nuevo })
+        body: JSON.stringify({ estado: "sin-empezar" })
       });
       await cargar();
     } catch (error) {
@@ -225,26 +250,67 @@
         ).join("");
   }
 
-  function abrirDialogoTarea(tareaId) {
+  function opcionesEtapa(seleccionada) {
+    $("#task-stage-input").innerHTML = estado.proyecto.etapas.map((etapa) =>
+      `<option value="${esc(etapa)}"${etapa === seleccionada ? " selected" : ""}>${esc(etapa)}</option>`
+    ).join("");
+  }
+
+  function mostrarResultado(tarea = null) {
+    const vaATerminar = $("#task-status-input").value === "terminada";
+    const seccion = $("#task-result-section");
+    seccion.hidden = !vaATerminar;
+    if (!vaATerminar) return;
+    const enlace = $("#task-result-file-link");
+    enlace.hidden = !tarea?.archivoResultadoUrl;
+    if (tarea?.archivoResultadoUrl) {
+      enlace.href = tarea.archivoResultadoUrl;
+      enlace.querySelector("span").textContent = tarea.archivoResultadoNombre || "Archivo de resultado";
+    }
+  }
+
+  async function completarConResultado(tareaId, resultado, archivo) {
+    const datos = new FormData();
+    if (resultado) datos.append("resultado", resultado);
+    if (archivo) datos.append("archivo", archivo);
+    return pedir(`/api/tareas/${tareaId}/completar`, { method: "PATCH", body: datos });
+  }
+
+  function abrirDialogoTarea(tareaId, marcarComoTerminada = false) {
     const tarea = tareaId ? estado.proyecto.tareas.find((item) => item.id === tareaId) : null;
 
+    limpiarErrorTarea();
     $("#task-dialog-kicker").textContent = tarea ? "Editar tarea" : "Nueva tarea";
     $("#task-dialog-title").textContent = tarea ? tarea.titulo : "Añadir tarea";
     $("#editing-task-id").value = tarea ? tarea.id : "";
     $("#task-title-input").value = tarea ? tarea.titulo : "";
     $("#task-description-input").value = tarea ? tarea.descripcion || "" : "";
     $("#task-date-input").value = tarea ? tarea.fechaLimite || "" : "";
-    $("#task-stage-input").value = tarea ? tarea.etapa || "Planeación" : "Planeación";
-    $("#task-status-input").value = tarea ? tarea.estado : "sin-empezar";
+    $("#task-status-input").value = marcarComoTerminada ? "terminada" : (tarea ? tarea.estado : "sin-empezar");
+    $("#task-result-input").value = tarea ? tarea.resultadoTexto || "" : "";
+    $("#task-result-file").value = "";
     opcionesResponsable($("#task-assignee-input"), tarea ? tarea.responsable : "");
+    opcionesEtapa(tarea ? tarea.etapa : estado.proyecto.etapaActual);
+    mostrarResultado(tarea);
     $("#task-dialog").showModal();
   }
 
   async function guardarTarea(evento) {
     evento.preventDefault();
+    limpiarErrorTarea();
     const titulo = $("#task-title-input").value.trim();
     if (!titulo) {
-      avisar("La tarea necesita un nombre.", "error");
+      mostrarErrorTarea("La tarea necesita un nombre.");
+      return;
+    }
+    const quiereTerminar = $("#task-status-input").value === "terminada";
+    const resultado = $("#task-result-input").value.trim();
+    const archivo = $("#task-result-file").files[0];
+    const tareaPrevia = $("#editing-task-id").value
+      ? estado.proyecto.tareas.find((item) => item.id === Number($("#editing-task-id").value))
+      : null;
+    if (quiereTerminar && !resultado && !archivo && !tareaPrevia?.tieneResultado) {
+      mostrarErrorTarea("Para terminar la tarea debes escribir un resultado o adjuntar un archivo.");
       return;
     }
     const cuerpo = {
@@ -254,21 +320,27 @@
       etapa: $("#task-stage-input").value,
       fechaLimite: $("#task-date-input").value || null,
       horaLimite: "09:00",
-      estado: $("#task-status-input").value
+      estado: quiereTerminar && !tareaPrevia?.tieneResultado
+        ? tareaPrevia?.estado || "sin-empezar"
+        : $("#task-status-input").value
     };
     const id = $("#editing-task-id").value;
 
     try {
+      let guardada;
       if (id) {
-        await pedir(`/api/tareas/${id}`, { method: "PUT", body: JSON.stringify(cuerpo) });
+        guardada = await pedir(`/api/tareas/${id}`, { method: "PUT", body: JSON.stringify(cuerpo) });
       } else {
-        await pedir(`/api/proyectos/${codigo}/tareas`, { method: "POST", body: JSON.stringify(cuerpo) });
+        guardada = await pedir(`/api/proyectos/${codigo}/tareas`, { method: "POST", body: JSON.stringify(cuerpo) });
+      }
+      if (quiereTerminar && (!tareaPrevia?.tieneResultado || resultado || archivo)) {
+        await completarConResultado(guardada.id, resultado, archivo);
       }
       $("#task-dialog").close();
       await cargar();
       avisar(id ? "Tarea actualizada." : "Tarea creada.", "success");
     } catch (error) {
-      avisar(error.message, "error");
+      mostrarErrorTarea(error.message);
     }
   }
 
@@ -319,6 +391,9 @@
   /* ------------------------------------------------------------ carga */
 
   function enlazarDetalle() {
+    document.querySelectorAll("[data-project-section]").forEach((enlace) => {
+      enlace.href = `/proyectos/${encodeURIComponent(codigo)}/${enlace.dataset.projectSection}`;
+    });
     document.querySelectorAll("[data-new-task]").forEach((boton) =>
       boton.addEventListener("click", () => abrirDialogoTarea(null)));
     $("[data-manage-members]").addEventListener("click", abrirDialogoEquipo);
@@ -353,6 +428,9 @@
     if (typeof app.renderNavigation === "function") app.renderNavigation();
 
     $("#task-form").addEventListener("submit", guardarTarea);
+    $("#task-status-input").addEventListener("change", () => mostrarResultado(
+      estado.proyecto.tareas.find((item) => item.id === Number($("#editing-task-id").value))
+    ));
     $("#members-form").addEventListener("submit", guardarEquipo);
     $("#dialog-add-member").addEventListener("click", () => filaIntegrante());
     document.querySelectorAll("[data-close-dialog]").forEach((boton) =>

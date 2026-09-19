@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex"><title>Tu espacio de prueba · StudyFlow</title>
+  <link rel="icon" href="/assets/img/studyflow-isotipo.png"><link rel="stylesheet" href="/css/sandbox.css">
+  <script src="/js/sandbox-store.js" defer></script><script src="/js/sandbox.js" defer></script>
+</head>
+<body>
+  <script>
+    (function () {
+      try {
+        var tema = localStorage.getItem('studyflow-tema');
+        var claro = tema ? tema === 'claro' : !window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('sandbox-light', claro);
+      } catch (_) { /* Conserva el tono oscuro si el navegador no permite leer la preferencia. */ }
+    })();
+  </script>
+  <header class="sandbox-bar">
+    <p class="sandbox-label"><span class="sandbox-dot"></span>En este momento te encuentras en una prueba de la aplicación, cualquier dato que crees es solo de muestra y se borrará al finalizar el recorrido</p>
+    <nav aria-label="Opciones de la prueba"><button id="sandbox-theme" type="button" aria-pressed="true">Cambiar a modo claro</button><button id="sandbox-reset">Reiniciar</button><button id="sandbox-register" class="sandbox-primary">Crear cuenta</button><a href="/login" id="sandbox-exit">Salir del recorrido inicial</a></nav>
+  </header>
+  <main id="sandbox-stage" aria-label="Aplicación de prueba"></main>
+  <button id="sandbox-tour" class="sandbox-tour-fab">Abrir guía</button>
+  <div id="sandbox-curtain" class="sandbox-curtain" role="status"><div class="sandbox-arrival"><img src="/assets/img/studyflow-isotipo.png" alt="" width="72" height="72"><h1>Tu flow empieza aquí.</h1><p>Explora. Crea. Hazlo tuyo.</p></div></div>
+  <dialog id="sandbox-finish"><form method="dialog"><button class="sandbox-close" aria-label="Cerrar">×</button></form><img src="/assets/img/studyflow-isotipo.png" alt="" width="48" height="48"><h2>Ahora, hazlo tuyo.</h2><p>Crea tu cuenta para empezar a guardar tus proyectos. Esta prueba no se transfiere.</p><button class="sandbox-primary" id="sandbox-finish-register">Crear mi cuenta</button><button id="sandbox-keep">Seguir probando</button></dialog>
+  <noscript>Activa JavaScript para usar el espacio de prueba. <a href="/login">Volver</a></noscript>
+</body></html>

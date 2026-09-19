@@ -8,20 +8,6 @@
     <main id="contenido" class="page-shell">
       <a class="back-link" th:href="@{/proyectos}" href="/proyectos"><i class="bi bi-arrow-left"></i> Todos los proyectos</a>
 
-      <!-- Secciones del espacio de trabajo. Los enlaces los resuelve Thymeleaf
-           con el código del proyecto, sin depender del JavaScript de la página. -->
-      <nav class="mb-5 flex flex-wrap gap-2.5" aria-label="Secciones del proyecto">
-        <a class="btn btn-secondary btn-sm" th:href="@{'/proyectos/' + ${projectId} + '/canales'}" href="#">
-          <i class="bi bi-chat-dots"></i> Canales
-        </a>
-        <a class="btn btn-secondary btn-sm" th:href="@{'/proyectos/' + ${projectId} + '/fases'}" href="#">
-          <i class="bi bi-diagram-3"></i> Fases y dependencias
-        </a>
-        <a class="btn btn-secondary btn-sm" th:href="@{'/proyectos/' + ${projectId} + '/entregables'}" href="#">
-          <i class="bi bi-folder2-open"></i> Documentos y entregables
-        </a>
-      </nav>
-
       <div id="project-content" aria-live="polite">
         <section class="empty-state"><div><i class="bi bi-arrow-repeat text-2xl text-primary"></i><p>Cargando el proyecto…</p></div></section>
       </div>
@@ -38,12 +24,19 @@
         <label class="form-field">Descripción<textarea id="task-description-input" rows="3" maxlength="400" placeholder="Añade detalles o criterios de entrega."></textarea></label>
         <div class="form-grid-two">
           <label class="form-field">Responsable<select id="task-assignee-input"></select></label>
-          <label class="form-field">Fecha límite<input id="task-date-input" type="date"></label>
+          <label class="form-field">Fase<select id="task-stage-input"></select></label>
         </div>
         <div class="form-grid-two">
-          <label class="form-field">Etapa<select id="task-stage-input"><option>Planeación</option><option>Investigación</option><option>Diseño</option><option>Desarrollo</option><option>Entrega</option></select></label>
+          <label class="form-field">Fecha límite<input id="task-date-input" type="date"></label>
           <label class="form-field">Estado<select id="task-status-input"><option value="sin-empezar">Sin empezar</option><option value="en-proceso">En proceso</option><option value="en-revision">En revisión</option><option value="terminada">Terminada</option></select></label>
         </div>
+        <p id="task-form-error" class="task-form-error" role="alert" aria-live="assertive" hidden></p>
+        <section id="task-result-section" class="task-result-form" hidden aria-labelledby="task-result-title">
+          <div><p class="eyebrow">Resultado requerido</p><h3 id="task-result-title">¿Qué entregaste?</h3><p>Para terminar la tarea, escribe el resultado, adjunta un archivo o haz ambas cosas.</p></div>
+          <label class="form-field">Resultado o comentario<textarea id="task-result-input" rows="3" maxlength="2000" placeholder="Explica brevemente qué se completó o comparte el enlace y las conclusiones."></textarea></label>
+          <label class="form-field">Archivo de resultado<input id="task-result-file" type="file"><span class="field-hint">Opcional si ya escribiste un resultado. Máximo 10 MB.</span></label>
+          <a id="task-result-file-link" class="text-link" hidden download><i class="bi bi-paperclip" aria-hidden="true"></i> <span></span></a>
+        </section>
         <div class="dialog-actions">
           <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
           <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar tarea</button>
@@ -78,19 +71,24 @@
           <p class="detail-project-description mt-2 max-w-[64ch] text-muted"></p>
         </div>
         <div class="flex flex-wrap gap-2.5">
-          <a class="btn btn-secondary" href="/proyectos"><i class="bi bi-grid"></i> Ver proyectos</a>
-          <button class="btn btn-primary" type="button" data-new-task><i class="bi bi-plus-lg"></i> Nueva tarea</button>
+          <button class="btn btn-secondary" type="button" data-new-task><i class="bi bi-plus-lg"></i> Nueva tarea</button>
+          <a class="btn btn-primary project-channels-link" data-project-section="canales" th:href="@{'/proyectos/' + ${projectId} + '/canales'}" href="#"><i class="bi bi-chat-dots" aria-hidden="true"></i> Canales del proyecto <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
       </section>
 
+      <nav class="project-sections" aria-label="Secciones del proyecto">
+        <a class="btn btn-secondary btn-sm" data-project-section="fases" th:href="@{'/proyectos/' + ${projectId} + '/fases'}" href="#"><i class="bi bi-diagram-3" aria-hidden="true"></i> Fases y dependencias</a>
+        <a class="btn btn-secondary btn-sm" data-project-section="entregables" th:href="@{'/proyectos/' + ${projectId} + '/entregables'}" href="#"><i class="bi bi-folder2-open" aria-hidden="true"></i> Documentos y entregables</a>
+      </nav>
+
       <section class="mb-6 grid gap-4 md:grid-cols-3" aria-label="Resumen del proyecto">
-        <article class="tarjeta-color tono-indigo">
+        <article class="panel">
           <span class="overview-label text-xs font-extrabold uppercase text-muted">Avance general</span>
           <strong class="detail-progress-value my-1.5 block font-display text-3xl"></strong>
           <div class="progress-track" aria-hidden="true"><span class="progress-fill"></span></div>
           <span class="progress-caption mt-2 block text-xs text-muted"></span>
         </article>
-        <article class="tarjeta-color tono-ambar flex items-center gap-3.5">
+        <article class="panel flex items-center gap-3.5">
           <span class="overview-icon"><i class="bi bi-calendar-event"></i></span>
           <div>
             <span class="overview-label text-xs font-extrabold uppercase text-muted">Entrega final</span>
@@ -98,7 +96,7 @@
             <span class="detail-days-left text-xs text-muted"></span>
           </div>
         </article>
-        <article class="tarjeta-color tono-verde flex items-center gap-3.5">
+        <article class="panel flex items-center gap-3.5">
           <span class="overview-icon"><i class="bi bi-people"></i></span>
           <div>
             <span class="overview-label text-xs font-extrabold uppercase text-muted">Equipo</span>
@@ -110,9 +108,9 @@
       <section class="mb-6" aria-labelledby="project-calendar-title">
         <div class="section-heading">
           <div><p class="eyebrow">Planificación</p><h2 id="project-calendar-title">Calendario del proyecto</h2></div>
-          <span class="calendar-helper"><i class="bi bi-cursor"></i> Pasa sobre una tarea para verla</span>
+          <span class="calendar-helper"><i class="bi bi-cursor"></i> Selecciona una tarea para ver sus detalles</span>
         </div>
-        <div class="detail-calendar-wrap"><div id="detail-calendar" class="detail-calendar"></div></div>
+        <div class="detail-calendar-wrap" role="region" aria-label="Calendario semanal del proyecto; desplázate horizontalmente para ver todos los días" tabindex="0"><div id="detail-calendar" class="detail-calendar"></div></div>
         <div class="calendar-legend"><span><i class="legend-dot legend-due"></i> Entrega</span><span id="calendar-member-legend" class="legend-members"></span></div>
       </section>
 
@@ -133,15 +131,12 @@
         <div id="project-tasks" class="task-cards-grid"></div>
       </section>
 
-      <section class="tarjeta-color tono-indigo flex flex-wrap items-center justify-between gap-4" aria-label="Administrar proyecto">
+      <section class="project-team-settings" aria-label="Administrar proyecto">
         <div>
-          <p class="eyebrow">Ajustes rápidos</p>
-          <h2>Mantén tu proyecto al día</h2>
-          <p class="mt-1 text-[13px] text-muted">Actualiza el equipo o amplía la planificación cuando lo necesites.</p>
+          <h2>Equipo del proyecto</h2>
         </div>
         <div class="flex flex-wrap gap-2.5">
           <button class="btn btn-secondary" type="button" data-manage-members><i class="bi bi-people"></i> Modificar integrantes</button>
-          <button class="btn btn-primary" type="button" data-new-task><i class="bi bi-plus-lg"></i> Crear nueva tarea</button>
         </div>
       </section>
     </template>

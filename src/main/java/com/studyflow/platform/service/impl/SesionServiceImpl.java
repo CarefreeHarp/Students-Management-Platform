@@ -22,15 +22,19 @@ public class SesionServiceImpl implements SesionService {
     private final HttpSession sesion;
     /** Correo de la cuenta sembrada con los proyectos de ejemplo. */
     private final String correoDemostracion;
+    private final boolean demostracionHabilitada;
 
     public SesionServiceImpl(UsuarioRepository usuarioRepository,
                              HttpSession sesion,
                              @org.springframework.beans.factory.annotation.Value(
                                  "${studyflow.demo.correo:valentina.rojas@universidad.edu.co}")
-                             String correoDemostracion) {
+                             String correoDemostracion,
+                             @org.springframework.beans.factory.annotation.Value("${studyflow.demo.enabled:false}")
+                             boolean demostracionHabilitada) {
         this.usuarioRepository = usuarioRepository;
         this.sesion = sesion;
         this.correoDemostracion = correoDemostracion;
+        this.demostracionHabilitada = demostracionHabilitada;
     }
 
     @Override
@@ -102,6 +106,9 @@ public class SesionServiceImpl implements SesionService {
 
     @Override
     public Usuario entrarComoDemostracion() {
+        if (!demostracionHabilitada) {
+            throw new RecursoNoEncontradoException("acceso de demostración", "deshabilitado");
+        }
         Usuario demo = cuentaDemostracion();
         iniciarSesion(demo);
         return demo;
@@ -110,22 +117,13 @@ public class SesionServiceImpl implements SesionService {
     @Override
     @Transactional(readOnly = true)
     public String nombreCuentaDemostracion() {
+        if (!demostracionHabilitada) return "";
         return cuentaDemostracion().getNombreCompleto();
     }
 
-    /** La cuenta sembrada; si no estuviera, la primera que exista. */
+    /** Only the explicitly configured fixture can be used in demo-enabled environments. */
     private Usuario cuentaDemostracion() {
         return usuarioRepository.findByCorreoIgnoreCase(correoDemostracion)
-                .orElseGet(this::primerUsuario);
-    }
-
-    /**
-     * Usuario de demostracion. Permite abrir la aplicacion y verla con datos
-     * antes de que nadie se registre.
-     */
-    private Usuario primerUsuario() {
-        return usuarioRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new RecursoNoEncontradoException("usuario", "actual"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("usuario", "demostración"));
     }
 }

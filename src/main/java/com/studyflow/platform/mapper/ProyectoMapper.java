@@ -6,6 +6,7 @@ import com.studyflow.platform.model.dto.ProyectoDTO;
 import com.studyflow.platform.model.dto.TareaDTO;
 import com.studyflow.platform.model.dto.TareaFaseDTO;
 import com.studyflow.platform.model.entity.Entregable;
+import com.studyflow.platform.model.entity.ArchivoTarea;
 import com.studyflow.platform.model.entity.Integrante;
 import com.studyflow.platform.model.entity.Proyecto;
 import com.studyflow.platform.model.entity.Tarea;
@@ -35,7 +36,9 @@ public class ProyectoMapper {
                 proyecto.getEtapaActual(),
                 calcularProgreso(proyecto),
                 proyecto.getIntegrantes().stream().map(this::aDTO).toList(),
-                proyecto.getTareas().stream().map(this::aDTO).toList()
+                proyecto.getTareas().stream().map(this::aDTO).toList(),
+                proyecto.getEtapas().stream().map(etapa -> etapa.getNombre()).toList(),
+                proyecto.getModoReparto().getClave()
         );
     }
 
@@ -52,6 +55,9 @@ public class ProyectoMapper {
 
     public TareaDTO aDTO(Tarea tarea) {
         Integrante responsable = tarea.getResponsable();
+        ArchivoTarea archivoResultado = tarea.getArchivos().isEmpty()
+                ? null
+                : tarea.getArchivos().get(tarea.getArchivos().size() - 1);
         return new TareaDTO(
                 tarea.getId(),
                 tarea.getCodigo(),
@@ -64,7 +70,11 @@ public class ProyectoMapper {
                 tarea.getHoraLimite() != null ? tarea.getHoraLimite().format(HORA) : null,
                 tarea.getEstado().getClave(),
                 tarea.getEstado().getEtiqueta(),
-                tarea.isGeneradaPorIa()
+                tarea.isGeneradaPorIa(),
+                tarea.tieneResultado(),
+                tarea.getResultadoTexto(),
+                archivoResultado != null ? archivoResultado.getNombre() : null,
+                archivoResultado != null ? "/api/tareas/%d/resultado/archivo".formatted(tarea.getId()) : null
         );
     }
 
@@ -88,7 +98,9 @@ public class ProyectoMapper {
                 tarea.getFechaLimite(),
                 tarea.getDependencias().stream().map(Tarea::getId).toList(),
                 tarea.bloqueantes().stream().map(Tarea::getTitulo).toList(),
-                tarea.estaDisponible()
+                tarea.getProyecto().getModoReparto() == com.studyflow.platform.model.enums.ModoReparto.LIBRE
+                        && tarea.estaDisponible(),
+                tarea.tieneResultado()
         );
     }
 

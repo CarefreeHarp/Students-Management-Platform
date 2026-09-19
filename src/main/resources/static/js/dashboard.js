@@ -19,7 +19,7 @@
     const respuesta = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opciones });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      window.location.assign("/login");
+      app.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) {
@@ -92,8 +92,22 @@
     });
     rejilla += "</div>";
 
+    const agenda = dias.map((fecha) => {
+      const dia = iso(fecha);
+      const pendientes = tareas.filter((tarea) => tarea.fechaLimite === dia)
+        .sort((a, b) => (a.horaLimite || "09:00").localeCompare(b.horaLimite || "09:00"));
+      const titulo = new Intl.DateTimeFormat("es-CO", { weekday: "long", day: "numeric", month: "short" }).format(fecha);
+      return `<section class="dashboard-agenda-day${dia === hoy ? " is-today" : ""}" aria-label="${esc(titulo)}">
+        <h3>${esc(titulo)}${dia === hoy ? " · Hoy" : ""}</h3>
+        ${pendientes.length ? `<ul>${pendientes.map((tarea) => `<li><a class="dashboard-agenda-task${tarea.estado === "terminada" ? " esta-terminada" : ""}" href="/proyectos/${encodeURIComponent(tarea.proyecto.codigo)}" style="--event-color:${esc(tarea.proyecto.color || "#5b5ce2")}">
+          <strong>${esc(tarea.titulo)}</strong>
+          <span>${esc(tarea.horaLimite || "09:00")} · ${esc(tarea.proyecto.nombre)}${tarea.estado === "terminada" ? " · Terminada" : ""}</span>
+        </a></li>`).join("")}</ul>` : '<p class="dashboard-agenda-empty">Sin pendientes para este día.</p>'}
+      </section>`;
+    }).join("");
+
     $("#dashboard-calendar").innerHTML =
-      `<div class="calendar-shell">${encabezado}<div class="week-calendar">${rejilla}</div></div>`;
+      `<div class="calendar-shell">${encabezado}<div class="week-calendar" tabindex="0" role="region" aria-label="Calendario semanal, desplazable">${rejilla}</div><div class="dashboard-agenda" aria-label="Agenda de la semana">${agenda}</div></div>`;
 
     $("#dashboard-calendar").querySelectorAll(".calendar-event").forEach(enlazarVentana);
 
@@ -127,6 +141,7 @@
   function enlazarVentana(elemento) {
     let ventana;
     const mostrar = () => {
+      ventana?.remove();
       const tarea = JSON.parse(decodeURIComponent(elemento.dataset.task));
       ventana = document.createElement("div");
       ventana.className = "calendar-popover";
@@ -137,7 +152,7 @@
       document.body.append(ventana);
 
       const marco = elemento.getBoundingClientRect();
-      const izquierda = Math.min(window.innerWidth - 250, Math.max(12, marco.left));
+      const izquierda = Math.max(12, Math.min(window.innerWidth - ventana.offsetWidth - 12, marco.left));
       const arriba = marco.bottom + 8 > window.innerHeight - 120
         ? marco.top - ventana.offsetHeight - 8
         : marco.bottom + 8;
@@ -154,96 +169,32 @@
 
   function pintarResumen(tareas) {
     const pendientes = tareas.filter((tarea) => tarea.estado !== "terminada");
-    const terminadas = tareas.length - pendientes.length;
-    const porcentaje = tareas.length ? Math.round((terminadas / tareas.length) * 100) : 0;
-
     $("#pending-count").textContent =
-      `${pendientes.length} tarea${pendientes.length === 1 ? "" : "s"} pendientes`;
-    $("#completion-score").textContent = `${porcentaje}%`;
-    $("#completion-progress").style.setProperty("--progress", `${porcentaje}%`);
-    $("#completion-caption").textContent = porcentaje >= 60
-      ? "¡Vas muy bien esta semana!"
-      : "Cada pequeña tarea cuenta.";
+      `${pendientes.length} tarea${pendientes.length === 1 ? " pendiente" : "s pendientes"}`;
 
     $("#project-legend").innerHTML = proyectos.slice(0, 4).map((proyecto) =>
       `<span class="legend-item"><i class="legend-dot" style="--legend-color:${esc(proyecto.color)}"></i>${esc(proyecto.nombre)}</span>`
     ).join("");
 
-    $("#upcoming-tasks").innerHTML = pendientes
-      .filter((tarea) => tarea.fechaLimite)
-      .sort((a, b) => a.fechaLimite.localeCompare(b.fechaLimite))
-      .slice(0, 4)
-      .map((tarea) => `<div class="upcoming-task">
-          <i class="upcoming-color" style="--task-color:${esc(tarea.proyecto.color)}"></i>
-          <div>
-            <a href="/proyectos/${encodeURIComponent(tarea.proyecto.codigo)}">${esc(tarea.titulo)}</a>
-            <span>${esc(tarea.proyecto.nombre)} · ${esc(fechaCorta(tarea.fechaLimite))}</span>
-          </div>
-        </div>`).join("") || '<p class="muted">No hay tareas próximas.</p>';
-
-    $("#project-snapshot-list").innerHTML = proyectos.slice(0, 3).map((proyecto) =>
-      `<div class="snapshot-row">
-        <i class="snapshot-line" style="--project-color:${esc(proyecto.color)}"></i>
-        <div>
-          <a href="/proyectos/${encodeURIComponent(proyecto.codigo)}">${esc(proyecto.nombre)}</a>
-          <small>Entrega ${esc(fechaCorta(proyecto.fechaEntrega))}</small>
+    const activos = proyectos.filter((proyecto) => proyecto.progreso < 100);
+    $("#project-snapshot-list").innerHTML = activos.map((proyecto) => {
+      const porHacer = proyecto.tareas.filter((tarea) => tarea.estado !== "terminada")
+        .sort((a, b) => (a.fechaLimite || "9999").localeCompare(b.fechaLimite || "9999"));
+      const progreso = Math.max(0, Math.min(100, Number(proyecto.progreso) || 0));
+      const url = `/proyectos/${encodeURIComponent(proyecto.codigo)}`;
+      return `<article class="overview-project">
+        <div class="overview-project-heading">
+          <a href="${url}">${esc(proyecto.nombre)}</a>
+          <strong>${progreso}%</strong>
         </div>
-        <span class="snapshot-percent">${proyecto.progreso}%</span>
-      </div>`).join("") || '<p class="muted">Crea tu primer proyecto.</p>';
-  }
-
-  /** Formulario para registrar una tarea terminada con su nota de avance. */
-  function abrirFormularioCierre() {
-    const pendientes = todasLasTareas().filter((tarea) => tarea.estado !== "terminada");
-    if (!pendientes.length) {
-      if (typeof app.showToast === "function") {
-        app.showToast("Todo al día", "No tienes tareas pendientes para marcar.");
-      }
-      return;
-    }
-
-    const modal = app.showModal(`<section class="modal" role="dialog" aria-modal="true" aria-labelledby="complete-modal-title">
-        <div class="modal-header">
-          <h2 id="complete-modal-title">Registrar tarea terminada</h2>
-          <button class="modal-close" type="button" data-close-modal aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
-        </div>
-        <form id="complete-task-form">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="completed-task">¿Qué tarea terminaste?</label>
-              <select id="completed-task" required>
-                ${pendientes.map((tarea) =>
-                  `<option value="${tarea.id}">${esc(tarea.titulo)} — ${esc(tarea.proyecto.nombre)}</option>`).join("")}
-              </select>
-            </div>
-            <div class="form-group" style="margin-top:14px">
-              <label for="complete-note">Nota de avance <span class="muted">(opcional)</span></label>
-              <textarea id="complete-note" placeholder="¿Qué quedó listo?"></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-close-modal>Cancelar</button>
-            <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Marcar terminada</button>
-          </div>
-        </form>
-      </section>`);
-
-    modal.element.querySelector("#complete-task-form").addEventListener("submit", async (evento) => {
-      evento.preventDefault();
-      const id = modal.element.querySelector("#completed-task").value;
-      const nota = modal.element.querySelector("#complete-note").value.trim();
-      try {
-        await pedir(`/api/tareas/${id}/completar`, {
-          method: "PATCH",
-          body: JSON.stringify({ nota })
-        });
-        modal.close();
-        await cargar();
-        if (typeof app.showToast === "function") app.showToast("¡Avance registrado!");
-      } catch (error) {
-        if (typeof app.showToast === "function") app.showToast(error.message, "error");
-      }
-    });
+        <div class="progress-track" role="progressbar" aria-label="Avance de ${esc(proyecto.nombre)}" aria-valuenow="${progreso}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill" style="--progress:${progreso}%"></span></div>
+        <p class="overview-pending-label">${porHacer.length ? `${porHacer.length} tarea${porHacer.length === 1 ? " pendiente" : "s pendientes"}` : "Aún no hay tareas pendientes"}</p>
+        ${porHacer.length ? `<ul class="overview-pending-tasks">${porHacer.slice(0, 2).map((tarea) => `<li><a href="${url}">${esc(tarea.titulo)}</a></li>`).join("")}</ul>` : ""}
+        ${porHacer.length > 2 ? `<a class="overview-more" href="${url}">Ver ${porHacer.length - 2} pendiente${porHacer.length - 2 === 1 ? " más" : "s más"} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>` : ""}
+      </article>`;
+    }).join("") || (proyectos.length
+      ? '<p class="text-muted">Tus proyectos están al día.</p><a class="text-action" href="/proyectos">Ver proyectos finalizados <i class="bi bi-arrow-right" aria-hidden="true"></i></a>'
+      : '<p class="text-muted">Todavía no tienes proyectos. Crea uno para organizar tus tareas.</p><a class="text-action" href="/proyectos/nuevo">Crear proyecto <i class="bi bi-arrow-right" aria-hidden="true"></i></a>');
   }
 
   async function cargar() {
@@ -255,11 +206,12 @@
 
   async function init() {
     if (typeof app.renderNavigation === "function") app.renderNavigation();
+    window.addEventListener("resize", () => {
+      document.querySelectorAll(".calendar-popover").forEach((ventana) => ventana.remove());
+    }, { passive: true });
 
     $("#dashboard-date").textContent = new Intl.DateTimeFormat("es-CO",
       { weekday: "long", day: "numeric", month: "long" }).format(new Date());
-
-    $("#open-complete-task").addEventListener("click", abrirFormularioCierre);
 
     try {
       const sesion = await pedir("/api/sesion/actual");
@@ -268,6 +220,7 @@
       });
       await cargar();
     } catch (error) {
+      $("#pending-count").textContent = "No se pudieron cargar los pendientes.";
       $("#dashboard-calendar").innerHTML =
         `<p class="text-[13px] text-danger">No se pudo cargar la agenda: ${esc(error.message)}</p>`;
     }

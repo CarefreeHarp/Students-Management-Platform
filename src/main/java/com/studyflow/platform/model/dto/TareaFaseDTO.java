@@ -20,6 +20,7 @@ public record TareaFaseDTO(
         /** Títulos de las dependencias que aún bloquean esta tarea. */
         List<String> bloqueantes,
         /** Nadie la ha tomado y sus dependencias están listas. */
-        boolean disponible
+        boolean disponible,
+        boolean tieneResultado
 ) {
 }

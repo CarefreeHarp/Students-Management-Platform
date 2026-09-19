@@ -9,7 +9,7 @@
     const respuesta = await fetch(url, { headers: { "Content-Type": "application/json" } });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      window.location.assign("/login");
+      app.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) throw new Error(`Error ${respuesta.status}`);

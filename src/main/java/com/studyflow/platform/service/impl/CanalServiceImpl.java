@@ -7,33 +7,32 @@ import com.studyflow.platform.model.entity.*;
 import com.studyflow.platform.model.enums.TipoCanal;
 import com.studyflow.platform.repository.*;
 import com.studyflow.platform.service.CanalService;
-import com.studyflow.platform.service.ClienteIaConversacional;
 import com.studyflow.platform.service.ProyectoService;
 import com.studyflow.platform.service.UsuarioService;
 import com.studyflow.platform.util.TextoUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Implementacion de los canales de conversacion y sus resumenes. */
 @Service
 @Transactional
 public class CanalServiceImpl implements CanalService {
 
-    private static final String INSTRUCCION = """
-            Eres un asistente que resume conversaciones de equipos de estudiantes.
-            Redacta un resumen breve en español, indicando de qué se habló,
-            qué se acordó y qué queda pendiente.
-            """;
+    /** Identifica que el resumen se produjo aquí, sin proveedor ni red externa. */
+    private static final String MODELO_RESUMEN_LOCAL = "Local";
 
     /** Marcas que identifican un mensaje relevante para la lista de puntos clave. */
     private static final List<String> MARCAS = List.of(
             "quedamos", "acordamos", "hagamos", "me encargo", "yo hago", "listo",
             "entrega", "fecha", "pendiente", "falta", "necesito", "revisar", "?");
 
-    /** Emojis admitidos en las reacciones, los mismos que ofrece la interfaz. */
-    private static final List<String> EMOJIS = List.of("👍", "🎉", "❤️", "🚀", "👀", "✅", "😅", "🔥");
+    /** Reacciones de texto admitidas, las mismas que ofrece la interfaz. */
+    private static final List<String> REACCIONES = List.of("acuerdo", "hecho", "gracias");
 
     private final CanalRepository canalRepository;
     private final MensajeChatRepository mensajeRepository;
@@ -41,7 +40,6 @@ public class CanalServiceImpl implements CanalService {
     private final ReaccionMensajeRepository reaccionRepository;
     private final UsuarioService usuarioService;
     private final ProyectoService proyectoService;
-    private final ClienteIaConversacional clienteIa;
     private final CanalMapper mapper;
 
     public CanalServiceImpl(CanalRepository canalRepository,
@@ -50,7 +48,6 @@ public class CanalServiceImpl implements CanalService {
                             ReaccionMensajeRepository reaccionRepository,
                             UsuarioService usuarioService,
                             ProyectoService proyectoService,
-                            ClienteIaConversacional clienteIa,
                             CanalMapper mapper) {
         this.canalRepository = canalRepository;
         this.mensajeRepository = mensajeRepository;
@@ -58,7 +55,6 @@ public class CanalServiceImpl implements CanalService {
         this.reaccionRepository = reaccionRepository;
         this.usuarioService = usuarioService;
         this.proyectoService = proyectoService;
-        this.clienteIa = clienteIa;
         this.mapper = mapper;
     }
 
@@ -186,15 +182,15 @@ public class CanalServiceImpl implements CanalService {
 
     @Override
     public MensajeChatDTO alternarReaccion(Long mensajeId, Long usuarioId, String emoji) {
-        if (emoji == null || !EMOJIS.contains(emoji)) {
-            throw new IllegalArgumentException("Ese emoji no está disponible para reaccionar.");
+        if (emoji == null || !REACCIONES.contains(emoji)) {
+            throw new IllegalArgumentException("Esa reacción no está disponible.");
         }
         MensajeChat mensaje = mensajeRepository.findById(mensajeId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("mensaje", mensajeId));
 
         reaccionRepository.findByMensajeIdAndUsuarioIdAndEmoji(mensajeId, usuarioId, emoji)
                 .ifPresentOrElse(
-                        // Volver a pulsar el mismo emoji retira la reacción.
+                        // Volver a pulsar la misma opción retira la reacción.
                         existente -> {
                             mensaje.getReacciones().remove(existente);
                             reaccionRepository.delete(existente);
@@ -219,18 +215,20 @@ public class CanalServiceImpl implements CanalService {
             throw new IllegalArgumentException("El canal aún no tiene mensajes que resumir.");
         }
 
-        String conversacion = mensajes.stream()
-                .map(mensaje -> "%s: %s".formatted(mensaje.getAutorNombre(), mensaje.getContenido()))
-                .reduce("", (acumulado, linea) -> acumulado + linea + "\n");
+        List<MensajeChat> mensajesClave = seleccionarMensajesClave(mensajes);
+        List<String> puntosClave = mensajesClave.stream()
+                .limit(5)
+                .map(mensaje -> "%s: %s".formatted(mensaje.getAutorNombre(), recortar(mensaje.getContenido())))
+                .toList();
 
         ResumenChat resumen = new ResumenChat();
         resumen.setCanal(canal);
-        resumen.setContenido(clienteIa.completar(INSTRUCCION, conversacion));
-        resumen.setPuntosClave(extraerPuntosClave(mensajes));
+        resumen.setContenido(resumirLocalmente(mensajes, mensajesClave));
+        resumen.setPuntosClave(String.join("\n", puntosClave));
         resumen.setMensajesResumidos(mensajes.size());
         resumen.setDesdeMensajeId(mensajes.get(0).getId());
         resumen.setHastaMensajeId(mensajes.get(mensajes.size() - 1).getId());
-        resumen.setModelo(clienteIa.getModelo());
+        resumen.setModelo(MODELO_RESUMEN_LOCAL);
 
         ResumenChat guardado = resumenRepository.save(resumen);
         canal.getResumenes().add(0, guardado);
@@ -264,18 +262,37 @@ public class CanalServiceImpl implements CanalService {
     }
 
     /**
-     * Selecciona hasta cinco mensajes que contienen acuerdos, fechas o preguntas.
-     * Es una heuristica local: no depende del modelo y sirve igual con la API real.
+     * Prioriza acuerdos, plazos y preguntas. Si no hay marcadores, resume los
+     * mensajes existentes igualmente para que el control sea útil en cualquier
+     * conversación y no dependa de un servicio externo.
      */
-    private String extraerPuntosClave(List<MensajeChat> mensajes) {
-        return mensajes.stream()
+    private List<MensajeChat> seleccionarMensajesClave(List<MensajeChat> mensajes) {
+        List<MensajeChat> relevantes = mensajes.stream()
                 .filter(mensaje -> {
                     String texto = mensaje.getContenido().toLowerCase();
                     return MARCAS.stream().anyMatch(texto::contains);
                 })
-                .limit(5)
-                .map(mensaje -> "%s: %s".formatted(mensaje.getAutorNombre(), recortar(mensaje.getContenido())))
-                .reduce("", (acumulado, linea) -> acumulado.isEmpty() ? linea : acumulado + "\n" + linea);
+                .toList();
+        return relevantes.isEmpty() ? mensajes : relevantes;
+    }
+
+    /** Resumen breve y determinista construido a partir de los mensajes reales. */
+    private String resumirLocalmente(List<MensajeChat> mensajes, List<MensajeChat> mensajesClave) {
+        Set<String> participantes = mensajes.stream()
+                .map(MensajeChat::getAutorNombre)
+                .filter(nombre -> nombre != null && !nombre.isBlank())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        String autores = participantes.isEmpty()
+                ? ""
+                : " entre " + String.join(", ", participantes.stream().limit(4).toList());
+        String cantidad = mensajes.size() == 1 ? "1 mensaje" : mensajes.size() + " mensajes";
+        String extractos = mensajesClave.stream()
+                .limit(3)
+                .map(mensaje -> recortar(mensaje.getContenido()))
+                .collect(Collectors.joining(" · "));
+
+        return "Se revisaron %s%s. Aspectos principales: %s"
+                .formatted(cantidad, autores, extractos);
     }
 
     private String recortar(String texto) {

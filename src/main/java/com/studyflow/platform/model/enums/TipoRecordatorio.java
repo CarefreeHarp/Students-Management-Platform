@@ -11,7 +11,9 @@ public enum TipoRecordatorio {
     /** Fecha de entrega final de un proyecto. */
     ENTREGA_PROYECTO("Entrega de proyecto"),
     /** Punto importante anotado despues de una clase. */
-    APUNTE_CLASE("Pendiente de clase");
+    APUNTE_CLASE("Pendiente de clase"),
+    /** Aviso creado directamente por el estudiante. */
+    PERSONAL("Personal");
 
     private final String etiqueta;
 

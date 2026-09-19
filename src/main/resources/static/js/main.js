@@ -64,11 +64,14 @@
   };
 
   Tema.seguirAlSistema();
+  window.addEventListener('studyflow:tema-cambiar', (event) => {
+    if (typeof event.detail?.oscuro === 'boolean') Tema.aplicar(event.detail.oscuro, true);
+  });
 
   /* Rutas servidas por la capa Controlador de Spring MVC. Centralizarlas aquí
      evita enlaces sueltos y facilita cambiar el enrutado en un solo punto. */
   const ROUTES = {
-    dashboard: '/',
+    dashboard: '/panel',
     login: '/login',
     registro: '/registro',
     perfil: '/perfil',
@@ -87,7 +90,6 @@
       usuario: '/api/usuarios/actual',
       sesion: '/api/sesion/actual',
       salir: '/api/sesion/salir',
-      demostracion: '/api/sesion/demostracion',
       materias: '/api/materias',
       preferenciasRecordatorio: '/api/recordatorios/preferencias',
       recordatorios: '/api/recordatorios',
@@ -110,59 +112,11 @@
     return response.status === 204 ? null : response.json();
   }
 
-  const demoUser = {
-    firstName: 'Valentina', lastName: 'Rojas', name: 'Valentina Rojas',
-    email: 'valentina.rojas@universidad.edu.co', age: '21',
-    university: 'Universidad Nacional de Colombia', career: 'Ingeniería de Sistemas',
-    semester: '6.º semestre', description: 'Diseño soluciones que hacen más fácil aprender, colaborar y crear.',
-    avatar: ''
+  const defaultUser = {
+    firstName: 'Estudiante', lastName: '', name: 'Estudiante', email: '', age: '',
+    university: '', career: '', semester: '', description: '', avatar: ''
   };
 
-  const demoProjects = [
-    {
-      id: 'proy-cogni', name: 'Cognitiva', description: 'Aplicación para visualizar hábitos de estudio y bienestar universitario.',
-      dueDate: '2026-08-21', color: '#5b5ce2', stage: 'Desarrollo',
-      members: [
-        { name: 'Valentina Rojas', initials: 'VR', color: '#5b5ce2' },
-        { name: 'Mateo Díaz', initials: 'MD', color: '#e2779b' },
-        { name: 'Sara Gómez', initials: 'SG', color: '#2ca89b' }
-      ],
-      tasks: [
-        { id: 'cog-1', title: 'Diseñar flujo de onboarding', description: 'Definir las pantallas y mensajes de bienvenida.', assignee: 'Valentina Rojas', dueDate: '2026-08-13', time: '09:00', status: 'progress', stage: 'Diseño' },
-        { id: 'cog-2', title: 'Entrevistas a estudiantes', description: 'Sintetizar hallazgos de las entrevistas realizadas.', assignee: 'Mateo Díaz', dueDate: '2026-08-14', time: '11:00', status: 'pending', stage: 'Investigación' },
-        { id: 'cog-3', title: 'Prototipo de analítica', description: 'Crear primera versión del tablero de hábitos.', assignee: 'Sara Gómez', dueDate: '2026-08-15', time: '14:00', status: 'pending', stage: 'Desarrollo' },
-        { id: 'cog-4', title: 'Presentación de avance', description: 'Preparar demo y narrativa para la revisión.', assignee: 'Valentina Rojas', dueDate: '2026-08-19', time: '10:00', status: 'done', stage: 'Entrega' }
-      ]
-    },
-    {
-      id: 'proy-redes', name: 'Redes inteligentes', description: 'Propuesta de optimización para una red de sensores del campus.',
-      dueDate: '2026-08-28', color: '#1ba7ba', stage: 'Investigación',
-      members: [
-        { name: 'Valentina Rojas', initials: 'VR', color: '#5b5ce2' },
-        { name: 'Daniela Ruiz', initials: 'DR', color: '#f0a33f' }
-      ],
-      tasks: [
-        { id: 'red-1', title: 'Mapa de actores', description: 'Identificar usuarios, áreas y responsables involucrados.', assignee: 'Daniela Ruiz', dueDate: '2026-08-13', time: '13:00', status: 'progress', stage: 'Investigación' },
-        { id: 'red-2', title: 'Modelo de datos', description: 'Definir entidades y métricas del sistema de sensores.', assignee: 'Valentina Rojas', dueDate: '2026-08-16', time: '08:00', status: 'pending', stage: 'Planeación' },
-        { id: 'red-3', title: 'Revisar bibliografía', description: 'Organizar fuentes y referencias principales.', assignee: 'Valentina Rojas', dueDate: '2026-08-18', time: '15:00', status: 'done', stage: 'Investigación' }
-      ]
-    },
-    {
-      id: 'proy-ux', name: 'Laboratorio UX', description: 'Rediseño colaborativo de la experiencia de préstamo de equipos.',
-      dueDate: '2026-09-04', color: '#dc7194', stage: 'Planeación',
-      members: [
-        { name: 'Valentina Rojas', initials: 'VR', color: '#5b5ce2' },
-        { name: 'Nicolás Vega', initials: 'NV', color: '#7c76d9' },
-        { name: 'Sara Gómez', initials: 'SG', color: '#2ca89b' }
-      ],
-      tasks: [
-        { id: 'ux-1', title: 'Auditoría de interfaz', description: 'Registrar hallazgos de accesibilidad y experiencia.', assignee: 'Nicolás Vega', dueDate: '2026-08-17', time: '10:00', status: 'pending', stage: 'Diagnóstico' },
-        { id: 'ux-2', title: 'Organizar pruebas de uso', description: 'Convocar estudiantes y preparar guion de pruebas.', assignee: 'Sara Gómez', dueDate: '2026-08-20', time: '14:00', status: 'pending', stage: 'Investigación' }
-      ]
-    }
-  ];
-
-  function clone(data) { return JSON.parse(JSON.stringify(data)); }
   function read(key, fallback) {
     try { const stored = localStorage.getItem(key); return stored ? JSON.parse(stored) : fallback; }
     catch (_) { return fallback; }
@@ -170,17 +124,18 @@
   function write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
   function uid(prefix = 'item') { return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`; }
   function normalizeUser(user) {
-    const result = { ...demoUser, ...(user || {}) };
-    result.name = result.name || `${result.firstName || ''} ${result.lastName || ''}`.trim() || demoUser.name;
+    const result = { ...defaultUser, ...(user || {}) };
+    result.name = user?.name || `${result.firstName || ''} ${result.lastName || ''}`.trim() || defaultUser.name;
     return result;
   }
-  function getUser() { return normalizeUser(read(KEYS.user, demoUser)); }
+  function getUser() { return normalizeUser(read(KEYS.user, defaultUser)); }
   function saveUser(user) { write(KEYS.user, normalizeUser(user)); }
   function getProjects() {
     const projects = read(KEYS.projects, null);
-    return Array.isArray(projects) && projects.length ? projects : clone(demoProjects);
+    return Array.isArray(projects) ? projects : [];
   }
   function saveProjects(projects) { write(KEYS.projects, projects); }
+  function navigate(url) { return window.SandboxBridge ? window.SandboxBridge.navigate(url) : window.location.assign(url); }
   function getProject(id) { return getProjects().find(project => project.id === id); }
   function updateProjectProgress(project) {
     const tasks = project.tasks || [];
@@ -227,14 +182,13 @@
     holder.className = 'app-nav';
     holder.innerHTML = `
       <div class="nav-inner">
-        <a class="brand" href="/panel" aria-label="StudyFlow, ir al inicio"><span class="brand-mark"><i class="bi bi-lightning-charge-fill"></i></span>StudyFlow</a>
+        <a class="brand" href="/panel" aria-label="StudyFlow, ir al inicio"><img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="40" height="40" alt="">StudyFlow</a>
         <button class="mobile-nav-toggle" type="button" aria-label="Abrir navegación" aria-expanded="false"><i class="bi bi-list"></i></button>
         <span class="nav-separador" aria-hidden="true"></span>
         <nav class="nav-links" aria-label="Navegación principal">
           <a class="nav-link ${active('dashboard')}" href="/panel"><i class="bi bi-grid-1x2"></i> <span>Inicio</span></a>
-          <a class="nav-link ${active('projects') || active('project') ? 'active' : ''}" href="/proyectos"><i class="bi bi-kanban"></i> <span>Proyectos</span></a>
+          <a class="nav-link ${['projects', 'project', 'canales', 'fases', 'entregables', 'crear-proyecto'].includes(page) ? 'active' : ''}" href="/proyectos"><i class="bi bi-kanban"></i> <span>Proyectos</span></a>
           <a class="nav-link ${active('schedule')}" href="/horarios"><i class="bi bi-calendar3"></i> <span>Horarios</span></a>
-          <a class="nav-link ${active('chats') || active('canales') ? 'active' : ''}" href="/chats"><i class="bi bi-chat-dots"></i> <span>Canales</span></a>
           <a class="nav-link ${active('recordatorios')}" href="/recordatorios"><i class="bi bi-bell"></i> <span>Recordatorios</span></a>
         </nav>
         <span class="nav-separador" aria-hidden="true"></span>
@@ -244,10 +198,11 @@
           </button>
           <a class="btn btn-primary btn-sm" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> <span>Proyecto</span></a>
           <div class="profile-menu">
-            <button class="profile-trigger" type="button" aria-label="Abrir menú de perfil">${avatarMarkup(user, 'nav-avatar')}<i class="bi bi-chevron-down"></i></button>
+            <button class="profile-trigger" type="button" aria-label="Abrir menú de perfil" aria-expanded="false">${avatarMarkup(user, 'nav-avatar')}<i class="bi bi-chevron-down"></i></button>
             <div class="profile-dropdown">
               <a href="/perfil"><i class="bi bi-person-circle"></i> Ver mi perfil</a>
               <a href="/perfil/editar"><i class="bi bi-sliders"></i> Editar perfil</a>
+              <a href="/panel?recorrido=1"><i class="bi bi-question-circle"></i> Recorrido guiado</a>
               <a href="/login" data-action="sign-out"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
             </div>
           </div>
@@ -255,9 +210,28 @@
       </div>`;
     const menuButton = holder.querySelector('.mobile-nav-toggle');
     const links = holder.querySelector('.nav-links');
+    holder.querySelectorAll('.nav-link').forEach(link => {
+      link.setAttribute('aria-label', link.textContent.trim());
+      link.querySelector('i')?.setAttribute('aria-hidden', 'true');
+      if (link.classList.contains('active')) link.setAttribute('aria-current', 'page');
+    });
     menuButton?.addEventListener('click', () => {
       const opened = links.classList.toggle('open');
       menuButton.setAttribute('aria-expanded', String(opened));
+      if (opened) {
+        holder.querySelector('.profile-menu')?.classList.remove('is-open');
+        holder.querySelector('.profile-trigger')?.setAttribute('aria-expanded', 'false');
+      }
+    });
+    holder.querySelector('.profile-trigger')?.addEventListener('click', event => {
+      const trigger = event.currentTarget;
+      const opened = trigger.getAttribute('aria-expanded') !== 'true';
+      trigger.setAttribute('aria-expanded', String(opened));
+      trigger.closest('.profile-menu').classList.toggle('is-open', opened);
+      if (opened) {
+        holder.querySelector('.nav-links')?.classList.remove('open');
+        menuButton?.setAttribute('aria-expanded', 'false');
+      }
     });
     /*
      * Cerrar sesión tiene que cerrarla también en el servidor. Antes solo
@@ -272,15 +246,20 @@
       } catch (_) {
         // Aunque falle la llamada, se lleva a la pantalla de acceso.
       }
-      window.location.assign(ROUTES.login);
+      navigate(ROUTES.login);
     });
+    Tema.pintarBotones();
   }
   function showToast(title, message = '') {
+    const tone = ['success', 'error', 'warning', 'info'].includes(message) ? message : 'success';
+    if (['success', 'error', 'warning', 'info'].includes(message)) message = '';
     let stack = document.querySelector('.toast-stack');
     if (!stack) { stack = document.createElement('div'); stack.className = 'toast-stack'; document.body.append(stack); }
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<i class="bi bi-check2-circle"></i><div><strong>${escapeHTML(title)}</strong>${message ? `<span>${escapeHTML(message)}</span>` : ''}</div>`;
+    const icon = tone === 'error' || tone === 'warning' ? 'exclamation-circle' : tone === 'info' ? 'info-circle' : 'check2-circle';
+    toast.setAttribute('role', tone === 'error' ? 'alert' : 'status');
+    toast.innerHTML = `<i class="bi bi-${icon}" aria-hidden="true"></i><div><strong>${escapeHTML(title)}</strong>${message ? `<span>${escapeHTML(message)}</span>` : ''}</div>`;
     stack.append(toast);
     setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 260); }, 3500);
   }
@@ -299,7 +278,7 @@
   function resetDemoData() { localStorage.removeItem(KEYS.projects); localStorage.removeItem(KEYS.user); }
 
   window.App = {
-    KEYS, ROUTES, api, demoProjects: clone(demoProjects), demoUser: clone(demoUser), uid, getUser, saveUser, getProjects,
+    KEYS, ROUTES, api, navigate, uid, getUser, saveUser, getProjects,
     saveProjects, getProject, updateProjectProgress, getProgress, escapeHTML, formatDate,
     statusLabel, statusClass, initials, memberFor, avatarMarkup, renderNavigation, showToast,
     showModal, requireAuth, resetDemoData, relative
@@ -325,7 +304,24 @@
     if (document.getElementById('main-nav')) renderNavigation();
     // Se enlazan todos, no solo el de la barra: acceso, registro y la guía de
     // estilo no tienen barra superior y llevan el suyo suelto.
-    document.querySelectorAll('[data-action="tema"]').forEach((boton) => Tema.enlazarBoton(boton));
+    Tema.pintarBotones();
+    document.addEventListener('click', event => {
+      if (event.target.closest('[data-action="tema"]')) Tema.aplicar(!Tema.esOscuro(), true);
+      if (!event.target.closest('.profile-menu')) {
+        document.querySelectorAll('.profile-menu.is-open').forEach(menu => {
+          menu.classList.remove('is-open');
+          menu.querySelector('.profile-trigger')?.setAttribute('aria-expanded', 'false');
+        });
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('.profile-menu.is-open').forEach(menu => {
+        menu.classList.remove('is-open');
+        const trigger = menu.querySelector('.profile-trigger');
+        trigger?.setAttribute('aria-expanded', 'false'); trigger?.focus();
+      });
+    });
     habilitarCierreAlPulsarFuera();
   });
 })();

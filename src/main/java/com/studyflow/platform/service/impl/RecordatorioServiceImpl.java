@@ -3,6 +3,7 @@ package com.studyflow.platform.service.impl;
 import com.studyflow.platform.exception.RecursoNoEncontradoException;
 import com.studyflow.platform.mapper.RecordatorioMapper;
 import com.studyflow.platform.model.dto.PeticionPreferenciaRecordatorio;
+import com.studyflow.platform.model.dto.PeticionRecordatorio;
 import com.studyflow.platform.model.dto.PreferenciaRecordatorioDTO;
 import com.studyflow.platform.model.dto.RecordatorioDTO;
 import com.studyflow.platform.model.entity.*;
@@ -99,11 +100,13 @@ public class RecordatorioServiceImpl implements RecordatorioService {
         if (peticion.minutosAntesApunte() != null) {
             preferencia.setMinutosAntesApunte(peticion.minutosAntesApunte());
         }
-        if (peticion.silencioDesde() != null && !peticion.silencioDesde().isBlank()) {
-            preferencia.setSilencioDesde(LocalTime.parse(peticion.silencioDesde()));
+        if (peticion.silencioDesde() != null) {
+            preferencia.setSilencioDesde(peticion.silencioDesde().isBlank()
+                    ? null : LocalTime.parse(peticion.silencioDesde()));
         }
-        if (peticion.silencioHasta() != null && !peticion.silencioHasta().isBlank()) {
-            preferencia.setSilencioHasta(LocalTime.parse(peticion.silencioHasta()));
+        if (peticion.silencioHasta() != null) {
+            preferencia.setSilencioHasta(peticion.silencioHasta().isBlank()
+                    ? null : LocalTime.parse(peticion.silencioHasta()));
         }
         // Cambiar la antelacion obliga a recalcular todos los avisos ya programados.
         reprogramarTodo(usuarioId);
@@ -120,12 +123,47 @@ public class RecordatorioServiceImpl implements RecordatorioService {
     }
 
     @Override
+    public RecordatorioDTO crearPersonal(Long usuarioId, PeticionRecordatorio peticion) {
+        if (peticion.titulo() == null || peticion.titulo().isBlank() || peticion.titulo().length() > 150) {
+            throw new IllegalArgumentException("Escribe un título de hasta 150 caracteres.");
+        }
+        if (peticion.mensaje() != null && peticion.mensaje().length() > 400) {
+            throw new IllegalArgumentException("El detalle debe tener hasta 400 caracteres.");
+        }
+        if (peticion.fechaVencimiento() == null || peticion.minutosAntes() == null
+                || peticion.minutosAntes() < 0 || peticion.minutosAntes() > 43200) {
+            throw new IllegalArgumentException("Indica el vencimiento y una antelación entre 0 y 30 días.");
+        }
+        LocalDateTime aviso = peticion.fechaVencimiento().minusMinutes(peticion.minutosAntes());
+        if (!aviso.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La hora del aviso ya pasó. Reduce la antelación o cambia el vencimiento.");
+        }
+        PreferenciaRecordatorio preferencia = preferenciaDe(usuarioId);
+        if (!preferencia.isActivo()) {
+            throw new IllegalArgumentException("Activa los avisos en Configurar recordatorios antes de añadir uno.");
+        }
+        Recordatorio recordatorio = new Recordatorio();
+        recordatorio.setUsuario(usuarioService.obtenerPorId(usuarioId));
+        recordatorio.setTipo(TipoRecordatorio.PERSONAL);
+        recordatorio.setCanal(CanalRecordatorio.WHATSAPP);
+        recordatorio.setTitulo(peticion.titulo().trim());
+        recordatorio.setMensaje(peticion.mensaje() == null || peticion.mensaje().isBlank()
+                ? null : peticion.mensaje().trim());
+        recordatorio.setFechaVencimiento(peticion.fechaVencimiento());
+        recordatorio.setFechaHora(aviso);
+        return mapper.aDTO(recordatorioRepository.save(recordatorio));
+    }
+
+    @Override
     public int reprogramarTodo(Long usuarioId) {
         Usuario usuario = usuarioService.obtenerPorId(usuarioId);
         PreferenciaRecordatorio preferencia = preferenciaDe(usuarioId);
 
-        // Se descartan los avisos aun no enviados; los ya entregados se conservan como historial.
+        // Los avisos personales conservan su hora al cambiar los estandares.
+        // Desactivar los recordatorios cancela tambien los personales pendientes.
         recordatorioRepository.findByUsuarioIdAndEstadoOrderByFechaHoraAsc(usuarioId, EstadoRecordatorio.PROGRAMADO)
+                .stream().filter(recordatorio -> !preferencia.isActivo()
+                        || recordatorio.getTipo() != TipoRecordatorio.PERSONAL)
                 .forEach(recordatorio -> recordatorio.setEstado(EstadoRecordatorio.CANCELADO));
 
         if (!preferencia.isActivo()) {
@@ -296,6 +334,11 @@ public class RecordatorioServiceImpl implements RecordatorioService {
 
     /** Texto final que recibe el estudiante en WhatsApp. */
     private String componer(Recordatorio recordatorio) {
+        if (recordatorio.getTipo() == TipoRecordatorio.PERSONAL) {
+            return "*StudyFlow · %s*\nVence: %s%s".formatted(recordatorio.getTitulo(),
+                    recordatorio.getFechaVencimiento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+                    recordatorio.getMensaje() == null ? "" : "\n" + recordatorio.getMensaje());
+        }
         return "*StudyFlow · %s*\n%s".formatted(
                 recordatorio.getTipo().getEtiqueta(),
                 recordatorio.getMensaje() != null ? recordatorio.getMensaje() : recordatorio.getTitulo());

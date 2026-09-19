@@ -18,7 +18,7 @@
     const respuesta = await fetch(url, { headers: { "Content-Type": "application/json" } });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      window.location.assign("/login");
+      app.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) {
@@ -28,12 +28,16 @@
     return respuesta.json();
   }
 
-  function fechaCorta(iso) {
-    if (!iso) return "Sin fecha";
-    const fecha = new Date(`${iso}T12:00:00`);
-    return Number.isNaN(fecha.getTime())
-      ? iso
-      : new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(fecha).replace(".", "");
+  function entregaRelativa(iso) {
+    if (!iso) return "Entrega sin definir";
+    const fecha = new Date(`${iso}T00:00:00`);
+    if (Number.isNaN(fecha.getTime())) return "Entrega sin definir";
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const dias = Math.round((fecha - hoy) / 86400000);
+    if (dias < 0) return `Entrega vencida hace ${Math.abs(dias)} día${dias === -1 ? "" : "s"}`;
+    if (dias === 0) return "La entrega es hoy";
+    return `Entrega: ${dias === 1 ? "falta 1 día" : `faltan ${dias} días`}`;
   }
 
   function coincide(proyecto) {
@@ -48,16 +52,8 @@
 
   function pintarResumen() {
     const activos = proyectos.filter((proyecto) => proyecto.progreso < 100);
-    const tareas = proyectos.flatMap((proyecto) => proyecto.tareas);
-
-    $("#total-projects").textContent = String(activos.length);
-    $("#completed-tasks").textContent =
-      String(tareas.filter((tarea) => tarea.estado === "terminada").length);
-
-    const proxima = activos
-      .filter((proyecto) => proyecto.fechaEntrega)
-      .sort((a, b) => a.fechaEntrega.localeCompare(b.fechaEntrega))[0];
-    $("#next-deadline").textContent = proxima ? fechaCorta(proxima.fechaEntrega) : "—";
+    $("#total-projects").textContent =
+      `${activos.length} proyecto${activos.length === 1 ? " activo" : "s activos"}`;
   }
 
   function pintarProyectos() {
@@ -76,13 +72,12 @@
         ? `<div class="empty-projects"><div>
              <i class="bi bi-folder2-open text-2xl text-primary"></i>
              <h3>Tu cuenta todavía no tiene proyectos</h3>
-             <p>Crea el primero, o entra con la cuenta de ejemplo si quieres ver la
-                aplicación con proyectos, canales y tareas ya cargados.</p>
+             <p>Crea tu primer proyecto o descubre cómo funciona StudyFlow con un recorrido guiado.</p>
              <div class="mt-3 flex flex-wrap justify-center gap-2.5">
                <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> Crear proyecto</a>
-               <button class="btn btn-secondary" type="button" id="ver-ejemplo">
-                 <i class="bi bi-box-seam"></i> Ver datos de ejemplo
-               </button>
+               <a class="btn btn-secondary" href="/sandbox">
+                 <i class="bi bi-play-circle"></i> Iniciar recorrido guiado
+               </a>
              </div>
            </div></div>`
         : `<div class="empty-projects"><div>
@@ -91,10 +86,6 @@
              <p>Ajusta la búsqueda o cambia el filtro.</p>
            </div></div>`;
 
-      document.querySelector("#ver-ejemplo")?.addEventListener("click", async () => {
-        await fetch("/api/sesion/demostracion", { method: "POST" });
-        window.location.reload();
-      });
       return;
     }
 
@@ -115,9 +106,15 @@
         proyecto.descripcion || "Sin descripción todavía.";
       fragmento.querySelector(".project-state").textContent =
         proyecto.progreso >= 100 ? "Finalizado" : proyecto.etapaActual || "En curso";
-      fragmento.querySelector(".project-deadline").textContent = fechaCorta(proyecto.fechaEntrega);
+      const entrega = fragmento.querySelector(".project-deadline");
+      entrega.textContent = entregaRelativa(proyecto.fechaEntrega);
+      if (proyecto.fechaEntrega) {
+        entrega.dateTime = proyecto.fechaEntrega;
+        entrega.title = `Fecha de entrega: ${proyecto.fechaEntrega}`;
+      }
+      const pendientes = proyecto.tareas.filter((tarea) => tarea.estado !== "terminada").length;
       fragmento.querySelector(".project-task-count").textContent =
-        `${proyecto.tareas.length} tarea${proyecto.tareas.length === 1 ? "" : "s"}`;
+        `${pendientes} pendiente${pendientes === 1 ? "" : "s"}`;
       fragmento.querySelector(".project-progress-value").textContent = `${proyecto.progreso}%`;
       fragmento.querySelector(".progress-fill").style.setProperty("--progress", `${proyecto.progreso}%`);
 
@@ -154,6 +151,7 @@
       pintarResumen();
       pintarProyectos();
     } catch (error) {
+      $("#total-projects").textContent = "No se pudo cargar el resumen.";
       $("#projects-grid").innerHTML =
         `<div class="empty-projects"><div><p class="text-danger">No se pudieron cargar los proyectos.</p><p>${esc(error.message)}</p></div></div>`;
     }

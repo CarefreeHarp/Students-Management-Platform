@@ -8,28 +8,12 @@
     <main id="contenido" class="page-shell">
       <section class="page-heading" aria-labelledby="projects-title">
         <div>
-          <p class="eyebrow"><i class="bi bi-kanban"></i> Espacio de trabajo</p>
           <h1 id="projects-title">Mis proyectos</h1>
-          <p class="mt-2 text-muted">Visualiza el avance de cada entrega y continúa donde lo dejaste.</p>
+          <p id="total-projects" class="mt-2 text-muted" aria-live="polite">Cargando proyectos…</p>
         </div>
         <a class="btn btn-primary" th:href="@{/proyectos/nuevo}" href="/proyectos/nuevo">
           <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear proyecto
         </a>
-      </section>
-
-      <section class="mb-6 grid gap-4 sm:grid-cols-3" aria-label="Resumen de proyectos">
-        <article class="summary-card tarjeta-color tono-indigo">
-          <span class="summary-icon"><i class="bi bi-collection"></i></span>
-          <div><strong id="total-projects">0</strong><span>proyectos activos</span></div>
-        </article>
-        <article class="summary-card tarjeta-color tono-cian">
-          <span class="summary-icon"><i class="bi bi-check2-circle"></i></span>
-          <div><strong id="completed-tasks">0</strong><span>tareas completadas</span></div>
-        </article>
-        <article class="summary-card tarjeta-color tono-ambar">
-          <span class="summary-icon"><i class="bi bi-calendar-event"></i></span>
-          <div><strong id="next-deadline">—</strong><span>próxima entrega</span></div>
-        </article>
       </section>
 
       <section class="mb-5 flex flex-wrap items-center justify-between gap-3" aria-label="Herramientas de proyectos">
@@ -47,7 +31,7 @@
 
       <section aria-labelledby="project-grid-title">
         <div class="section-heading">
-          <h2 id="project-grid-title">Tus espacios de trabajo</h2>
+          <div><h2 id="project-grid-title">Tus proyectos</h2><p class="project-list-help">Abre un proyecto para ver sus tareas, entregas y canales.</p></div>
           <span id="project-count-label" class="text-[13px] text-muted">0 proyectos</span>
         </div>
         <div id="projects-grid" class="projects-grid" aria-live="polite"></div>
@@ -65,7 +49,7 @@
           <h3 class="project-name"></h3>
           <p class="project-description"></p>
           <div class="project-meta">
-            <span><i class="bi bi-calendar3"></i><time class="project-deadline"></time></span>
+            <span class="project-delivery"><i class="bi bi-calendar3" aria-hidden="true"></i><time class="project-deadline"></time></span>
             <span><i class="bi bi-list-check"></i><span class="project-task-count"></span></span>
           </div>
           <div class="project-progress-copy"><span>Avance total</span><strong class="project-progress-value"></strong></div>

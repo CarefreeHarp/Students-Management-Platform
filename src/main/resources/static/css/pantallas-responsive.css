@@ -1,0 +1,135 @@
+/* Page-level reflow. Shared navigation and dialogs live in responsive.css. */
+body:is([data-page="dashboard"], [data-page="projects"], [data-page="schedule"], [data-page="recordatorios"], [data-page="perfil"], [data-page="editar-perfil"], [data-page="login"], [data-page="registro"], [data-page="paleta"]) :is(.page-heading > div, .section-head > div, .section-heading > div, .form-field, .edit-field, .input-wrap) {
+  min-width: 0;
+}
+
+body:is([data-page="dashboard"], [data-page="projects"], [data-page="recordatorios"], [data-page="perfil"], [data-page="editar-perfil"], [data-page="paleta"]) :is(h1, h2, h3, p, dd, .text-action, .field-hint) {
+  overflow-wrap: anywhere;
+}
+
+/* Agenda: a real small-screen view, not five unreadably narrow columns. */
+.dashboard-agenda { display: none; }
+body[data-page="dashboard"] .calendar-toolbar { flex-wrap: wrap; }
+body[data-page="dashboard"] .calendar-toolbar h2 { flex: 1 1 180px; }
+body[data-page="dashboard"] .calendar-actions { flex: none; }
+body[data-page="dashboard"] .week-calendar { max-width: 100%; overscroll-behavior-inline: contain; }
+body[data-page="dashboard"] :is(.legend-item, .overview-pending-tasks a) { min-width: 0; overflow-wrap: anywhere; }
+body[data-page="dashboard"] .calendar-popover { max-width: calc(100vw - 24px); overflow-wrap: anywhere; }
+body[data-page="dashboard"] .calendar-popover p { align-items: flex-start; }
+
+/* Project collections and profile grids respect the width of their panel. */
+body[data-page="projects"] .projects-grid,
+body[data-page="perfil"] .profile-project-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 285px), 1fr));
+}
+body[data-page="projects"] :is(.project-card, .project-card-link, .project-meta > span, .project-card-footer),
+body[data-page="perfil"] :is(.profile-project-card, .profile-details > div, .profile-stat > div) { min-width: 0; }
+body[data-page="projects"] .project-card-footer { flex-wrap: wrap; }
+body[data-page="projects"] .project-meta > span { overflow-wrap: anywhere; }
+body[data-page="projects"] [aria-label="Filtrar proyectos"] { max-width: 100%; flex-wrap: wrap; }
+body[data-page="projects"] [aria-label="Filtrar proyectos"] button { flex: 1 1 auto; }
+body[data-page="perfil"] .identity-copy { min-width: min(240px, 100%); overflow-wrap: anywhere; }
+body[data-page="perfil"] .profile-details { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+body[data-page="perfil"] .profile-stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
+body[data-page="perfil"] .profile-meta > span { min-width: 0; align-items: flex-start; }
+body[data-page="perfil"] .profile-meta > span > span { min-width: 0; overflow-wrap: anywhere; }
+body[data-page="perfil"] .profile-meta i { flex: none; }
+body[data-page="editar-perfil"] #edit-profile-form > section > .grid { min-width: 0; flex: 1 1 200px; }
+
+/* Keep long reminder titles/details and validation feedback within each card. */
+body[data-page="recordatorios"] .tarjeta-lista > div { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+body[data-page="recordatorios"] .tarjeta-lista > :is(.icon-button, .task-check, span) { flex-shrink: 0; }
+body[data-page="recordatorios"] .dialog-header { padding: 0 0 8px; align-items: flex-start; }
+body[data-page="recordatorios"] .dialog-header > div { min-width: 0; }
+
+/* Subject alternatives are forms, so their controls reflow before they shrink. */
+.schedule-builder :is(.schedule-subject-form, .schedule-options-editor, .schedule-subject-card, .schedule-subject-card h3, .schedule-preference-fields, .schedule-preference-fields fieldset) { min-width: 0; }
+.schedule-builder :is(.schedule-subject-card h3, .schedule-subject-sessions, .schedule-muted, .schedule-error, .schedule-examples) { overflow-wrap: anywhere; }
+.schedule-builder .schedule-subject-card > .schedule-row { flex-wrap: wrap; gap: 4px 12px; }
+.schedule-builder .schedule-subject-card > .schedule-row h3 { flex: 1 1 150px; }
+.schedule-builder .schedule-calendar-wrap {
+  max-width: 100%;
+  max-height: min(765px, 75vh);
+  max-height: min(765px, 75dvh);
+  overflow: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+}
+.schedule-builder .schedule-calendar-wrap:focus-visible,
+body[data-page="dashboard"] .week-calendar:focus-visible { outline: 2px solid var(--estado-primary); outline-offset: 3px; }
+.schedule-builder :is(.schedule-calendar__header-time, .schedule-calendar__day-name) { position: sticky; top: 0; z-index: 3; background: var(--cal-cabecera); }
+.schedule-builder .schedule-calendar__header-time { left: 0; z-index: 5; }
+.schedule-builder .schedule-calendar__time-axis { position: sticky; left: 0; z-index: 4; background: var(--cal-cuerpo); }
+.schedule-scroll-hint { margin: 0 0 10px; font-size: 12px; color: rgb(var(--c-muted)); }
+.schedule-builder .schedule-preference-options label { min-height: 44px; }
+.schedule-builder .schedule-preference-options input,
+.schedule-builder .schedule-credit-preference input { flex-shrink: 0; }
+.schedule-builder .schedule-credit-preference { min-height: 44px; }
+
+/* Auth should remain readable with the keyboard open and on short landscapes. */
+body:is([data-page="login"], [data-page="registro"]) .auth-layout { min-height: 100dvh; }
+body:is([data-page="login"], [data-page="registro"]) :is(.auth-panel, .auth-card, .auth-form, .cuadro-formulario, .auth-heading, .social-actions) { min-width: 0; }
+body:is([data-page="login"], [data-page="registro"]) :is(.auth-card p, .auth-card summary, .auth-switch, .auth-showcase p, .auth-showcase h1) { overflow-wrap: anywhere; }
+body:is([data-page="login"], [data-page="registro"]) .auth-card { max-width: 100%; }
+body:is([data-page="login"], [data-page="registro"]) .auth-showcase { padding: clamp(24px, 3vw, 56px); }
+body[data-page="paleta"] :is(.grid > figure, .grid > article) { min-width: 0; overflow-wrap: anywhere; }
+body[data-page="paleta"] code { overflow-wrap: anywhere; }
+body[data-page="paleta"] #aviso-copia { max-width: calc(100vw - 24px); text-align: center; overflow-wrap: anywhere; }
+
+@media (max-width: 940px) {
+  body:is([data-page="login"], [data-page="registro"]) .auth-panel { padding-top: 68px; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 620px) {
+  body[data-page="dashboard"] .week-calendar { display: none; }
+  .dashboard-agenda { display: grid; gap: 0; }
+  .dashboard-agenda-day { min-width: 0; padding: 16px; }
+  .dashboard-agenda-day + .dashboard-agenda-day { border-top: 1px solid var(--cal-borde); }
+  .dashboard-agenda-day h3 { margin-bottom: 10px; font-size: 13px; text-transform: capitalize; }
+  .dashboard-agenda-day.is-today h3 { color: var(--estado-primary); }
+  .dashboard-agenda-day ul { display: grid; gap: 8px; }
+  .dashboard-agenda-task { display: grid; gap: 5px; min-width: 0; min-height: 44px; padding: 12px; border-left: 3px solid var(--event-color); border-radius: 8px; background: var(--superficie-suave); }
+  .dashboard-agenda-task strong { font-size: 13px; overflow-wrap: anywhere; }
+  .dashboard-agenda-task span { font-size: 12px; color: rgb(var(--c-muted)); overflow-wrap: anywhere; }
+  .dashboard-agenda-task.esta-terminada strong { text-decoration: line-through; }
+  .dashboard-agenda-empty { font-size: 12px; color: rgb(var(--c-muted)); }
+  body[data-page="dashboard"] .calendar-actions .calendar-button { min-width: 44px; min-height: 44px; }
+  body[data-page="projects"] .section-heading { align-items: flex-start; flex-wrap: wrap; }
+  body[data-page="projects"] [aria-label="Filtrar proyectos"] { width: 100%; }
+  body[data-page="projects"] .filter-button { min-height: 44px; }
+  body[data-page="recordatorios"] .page-heading > .flex { width: 100%; }
+  body[data-page="recordatorios"] .page-heading > .flex > button { flex: 1 1 220px; }
+  body[data-page="recordatorios"] #reprogram { justify-content: flex-start; padding-left: 0; text-align: left; }
+  body[data-page="perfil"] :is(.section-heading, .profile-card-footer) { flex-wrap: wrap; }
+  body[data-page="perfil"] .profile-identity { padding: 20px; }
+  body[data-page="perfil"] .identity-copy { flex-basis: 100%; }
+  body[data-page="perfil"] .profile-meta { gap: 10px; }
+  body[data-page="editar-perfil"] .edit-header-icon { display: none; }
+  body[data-page="editar-perfil"] .form-actions > * { flex: 1 1 150px; }
+  .schedule-builder .schedule-subject-controls { flex-wrap: wrap; gap: 6px; }
+  .schedule-builder .schedule-subject-controls select { flex: 1 1 130px; min-height: 44px; }
+  .schedule-builder .schedule-subject-controls .btn { min-width: 44px; min-height: 44px; }
+  .schedule-builder .schedule-preference-options { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .schedule-builder .schedule-preference-options label { width: 100%; }
+  .schedule-builder .schedule-preference-actions > .btn { white-space: normal; }
+  body[data-page="paleta"] .section-head { flex-wrap: wrap; }
+  body[data-page="paleta"] #contenido .grid[class*="auto-fill"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+  body[data-page="paleta"] .grid-cols-3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 90px), 1fr)); }
+}
+
+@media (max-width: 420px) {
+  body:is([data-page="login"], [data-page="registro"]) .auth-panel { padding-inline: 12px; }
+  body:is([data-page="login"], [data-page="registro"]) .auth-card { padding: 16px; gap: 18px; }
+  body:is([data-page="login"], [data-page="registro"]) .cuadro-formulario { padding: 12px; }
+  body:is([data-page="login"], [data-page="registro"]) .auth-heading h2 { font-size: 24px; }
+  .schedule-builder .schedule-session-editor { grid-template-columns: minmax(0, 1fr); }
+  .schedule-builder .schedule-subject-form { padding-inline: 10px; }
+  .schedule-builder .schedule-option-editor { padding: 10px; }
+  .schedule-builder .schedule-actions > button { flex: 1 1 100%; }
+  .schedule-builder .schedule-option-editor > .schedule-row > button { width: 100%; justify-content: flex-start; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  body:is([data-page="login"], [data-page="registro"]) .auth-panel { align-items: start; }
+  .schedule-builder .schedule-calendar-wrap { max-height: 70dvh; }
+}

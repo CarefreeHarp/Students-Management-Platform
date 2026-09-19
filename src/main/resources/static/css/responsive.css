@@ -1,0 +1,70 @@
+/* Shared foundations. Dense content scrolls in its own region, not the page. */
+html { scroll-padding-top:88px; }
+body { min-width:0; }
+main, .page-shell, .panel, .form-field, .form-grid-two > *, .page-heading > *, .section-head > *, .section-heading > * { min-width:0; }
+img, video, canvas { max-width:100%; }
+.page-heading h1, .section-heading h2, .section-head h2, .dialog-header h2, .modal-header h2 { overflow-wrap:anywhere; }
+.page-shell { width:min(1360px, calc(100% - 48px)); }
+.btn { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+.btn > i, .icon-button, .btn-icon, .file-control { flex-shrink:0; }
+.section-head, .section-heading { flex-wrap:wrap; }
+.form-field input, .form-field textarea, .form-field select { width:100%; min-width:0; max-width:100%; }
+.dialog-header > div, .modal-header > div { min-width:0; }
+.dialog-header, .modal-header { gap:12px; align-items:flex-start; }
+.dialog-actions, .modal-footer { flex-wrap:wrap; }
+.app-dialog[open] { padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); }
+.app-dialog[open] .dialog-form { max-width:100%; max-height:calc(100dvh - 24px); overflow-y:auto; overscroll-behavior:contain; }
+.modal { max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); overflow:auto; }
+.dialog-form label, .dialog-form p, .modal p { overflow-wrap:anywhere; }
+.profile-dropdown { width:200px; max-width:calc(100vw - 24px); max-height:calc(100dvh - 90px); overflow:auto; }
+.profile-dropdown a { min-height:42px; display:flex; align-items:center; gap:8px; }
+.toast-stack { max-height:calc(100dvh - 32px); overflow-y:auto; right:max(16px,env(safe-area-inset-right)); bottom:max(16px,env(safe-area-inset-bottom)); }
+.toast { overflow-wrap:anywhere; }
+@media (max-width:760px) {
+  .app-nav { padding-inline:16px; }
+  .nav-inner { gap:10px; }
+  .nav-separador { display:none; }
+  .mobile-nav-toggle { display:grid; margin-left:auto; min-width:40px; min-height:44px; }
+  .nav-actions { gap:7px; }
+  .nav-actions > .btn { display:none; }
+  .nav-links { display:none; position:absolute; inset:62px 12px auto; margin:0; padding:8px; background:var(--superficie); border:1px solid var(--linea-tarjeta); border-radius:14px; box-shadow:0 10px 30px #17122426; max-height:calc(100dvh - 78px); overflow:auto; }
+  .nav-links.open { display:grid; }
+  .nav-link { min-height:44px; display:flex; align-items:center; gap:10px; }
+  .nav-link span { display:inline; }
+  .nav-link.active::after { display:none; }
+  .nav-link.active { background:rgb(var(--c-primary-soft)); }
+  .profile-trigger { min-height:40px; }
+  .profile-trigger > i { display:none; }
+}
+@media (max-width:620px) {
+  html { scroll-padding-top:78px; }
+  .page-shell { width:calc(100% - 32px); padding-top:24px; padding-bottom:max(32px,env(safe-area-inset-bottom)); }
+  .page-heading { flex-direction:column; align-items:stretch; gap:16px; }
+  .page-heading h1 { font-size:clamp(25px,7vw,34px); }
+  .panel { padding:18px; }
+  .btn, .icon-button, .calendar-button, .file-control, .tema-boton { min-height:44px; }
+  .icon-button, .calendar-button, .file-control, .tema-boton { min-width:40px; }
+  input:not([type=checkbox]):not([type=radio]), select, textarea { font-size:16px; }
+  .form-grid-two { grid-template-columns:minmax(0,1fr); }
+  .dialog-form { padding:20px 16px; }
+  .dialog-actions > .btn, .modal-footer > .btn { flex:1 1 110px; }
+  .dialog-header .icon-button { min-width:40px; }
+}
+@media (max-width:380px) {
+  .app-nav { padding-inline:12px; }
+  .nav-inner { gap:5px; }
+  .brand { font-size:14px; gap:6px; }
+  .brand-logo { width:28px; height:28px; }
+  .nav-actions { gap:4px; }
+  .profile-trigger { padding-right:3px; }
+  .page-shell { width:calc(100% - 24px); }
+  .panel { padding:16px; }
+}
+@media (max-height:500px) and (orientation:landscape) {
+  .app-nav { position:relative; }
+  .app-dialog[open] { align-items:start; }
+}
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+  .btn, .profile-dropdown, .nav-link { transition:none; }
+}

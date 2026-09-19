@@ -1,8 +1,11 @@
 package com.studyflow.platform.service.impl;
 
 import com.studyflow.platform.exception.RecursoNoEncontradoException;
+import com.studyflow.platform.exception.CampoInvalidoException;
 import com.studyflow.platform.mapper.ProyectoMapper;
 import com.studyflow.platform.model.dto.PeticionIntegrante;
+import com.studyflow.platform.model.dto.PeticionFase;
+import com.studyflow.platform.model.dto.PeticionFases;
 import com.studyflow.platform.model.dto.PeticionProyecto;
 import com.studyflow.platform.model.dto.PeticionTarea;
 import com.studyflow.platform.model.dto.ProyectoDTO;
@@ -12,6 +15,7 @@ import com.studyflow.platform.model.entity.Integrante;
 import com.studyflow.platform.model.entity.Proyecto;
 import com.studyflow.platform.model.entity.Tarea;
 import com.studyflow.platform.model.enums.EstadoTarea;
+import com.studyflow.platform.model.enums.ModoReparto;
 import com.studyflow.platform.model.enums.RolIntegrante;
 import com.studyflow.platform.model.enums.TipoCanal;
 import com.studyflow.platform.repository.ProyectoRepository;
@@ -19,10 +23,19 @@ import com.studyflow.platform.service.ProyectoService;
 import com.studyflow.platform.service.UsuarioService;
 import com.studyflow.platform.util.TextoUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /** Implementacion de la gestion de proyectos academicos. */
 @Service
@@ -65,21 +78,30 @@ public class ProyectoServiceImpl implements ProyectoService {
 
     @Override
     public ProyectoDTO crear(PeticionProyecto peticion, Long usuarioId) {
+        if (peticion.fechaEntrega() != null && !peticion.fechaEntrega().isAfter(LocalDate.now())) {
+            throw new CampoInvalidoException("fechaEntrega",
+                    "La fecha de entrega debe ser posterior a la fecha actual.");
+        }
+        if (peticion.modoReparto() == null || peticion.modoReparto().isBlank()) {
+            throw new CampoInvalidoException("modoReparto", "Elige cómo se repartirán las tareas.");
+        }
         Proyecto proyecto = new Proyecto();
         proyecto.setCodigo(generarCodigoUnico(peticion.nombre()));
         proyecto.setNombre(peticion.nombre());
         proyecto.setDescripcion(peticion.descripcion());
         proyecto.setFechaEntrega(peticion.fechaEntrega());
-        proyecto.setEtapaActual(peticion.etapaInicial() != null ? peticion.etapaInicial() : "Planeación");
         proyecto.setColor(peticion.color() != null ? peticion.color() : COLORES[0]);
         proyecto.setPropietario(usuarioService.obtenerPorId(usuarioId));
+        proyecto.setModoReparto(ModoReparto.desdeClave(peticion.modoReparto()));
 
         // El creador siempre queda como lider del equipo.
-        proyecto.agregarIntegrante(new Integrante(
+        Integrante creador = new Integrante(
                 proyecto.getPropietario().getNombreCompleto(),
                 proyecto.getPropietario().getCorreo(),
                 COLORES[0],
-                RolIntegrante.LIDER));
+                RolIntegrante.LIDER);
+        creador.setUsuario(proyecto.getPropietario());
+        proyecto.agregarIntegrante(creador);
 
         if (peticion.integrantes() != null) {
             int indice = 1;
@@ -94,7 +116,8 @@ public class ProyectoServiceImpl implements ProyectoService {
             }
         }
 
-        crearEtapasBase(proyecto);
+        List<String> etapas = crearEtapas(proyecto, peticion.etapas());
+        proyecto.setEtapaActual(etapas.get(0));
 
         if (peticion.tareas() != null) {
             int numero = 1;
@@ -145,6 +168,97 @@ public class ProyectoServiceImpl implements ProyectoService {
     }
 
     @Override
+    public ProyectoDTO actualizarReparto(String codigo, String modoReparto, Long usuarioId) {
+        Proyecto proyecto = obtenerEntidadPorCodigo(codigo);
+        exigirPropietario(proyecto, usuarioId, "cambiar el reparto");
+        if (modoReparto == null) {
+            throw new IllegalArgumentException("Elige reparto asignado o libre.");
+        }
+        // Switching does not erase existing owners, progress or dependencies.
+        proyecto.setModoReparto(ModoReparto.desdeClave(modoReparto));
+        return proyectoMapper.aDTO(proyecto);
+    }
+
+    /**
+     * Applies the phase editor as one transaction. Existing {@link Etapa}
+     * entities are kept when their name changes, therefore their tasks keep
+     * the same association. A phase containing tasks cannot be removed: the
+     * person must move those tasks first, which prevents a task from silently
+     * losing its phase.
+     */
+    @Override
+    public ProyectoDTO actualizarFases(String codigo, PeticionFases peticion, Long usuarioId) {
+        Proyecto proyecto = obtenerEntidadPorCodigo(codigo);
+        exigirPropietario(proyecto, usuarioId, "gestionar las fases");
+        if (peticion == null || peticion.fases() == null || peticion.fases().isEmpty()) {
+            throw new IllegalArgumentException("El proyecto debe conservar al menos una fase.");
+        }
+        if (peticion.etapaActualIndice() == null
+                || peticion.etapaActualIndice() < 0
+                || peticion.etapaActualIndice() >= peticion.fases().size()) {
+            throw new IllegalArgumentException("Elige una fase predeterminada válida para las tareas nuevas.");
+        }
+
+        Map<Long, Etapa> existentes = proyecto.getEtapas().stream()
+                .collect(java.util.stream.Collectors.toMap(Etapa::getId, etapa -> etapa));
+        Set<Long> idsSolicitados = new HashSet<>();
+        Set<String> nombres = new HashSet<>();
+        List<PlanFase> plan = new ArrayList<>();
+
+        for (int indice = 0; indice < peticion.fases().size(); indice++) {
+            PeticionFase entrada = peticion.fases().get(indice);
+            if (entrada == null) {
+                throw new IllegalArgumentException("Cada fase necesita un nombre.");
+            }
+            String nombre = nombreFase(entrada.nombre());
+            if (!nombres.add(nombre.toLowerCase(Locale.ROOT))) {
+                throw new IllegalArgumentException("No puede haber dos fases con el mismo nombre.");
+            }
+
+            Etapa etapa;
+            if (entrada.id() == null) {
+                etapa = new Etapa();
+            } else {
+                etapa = existentes.get(entrada.id());
+                if (etapa == null) {
+                    throw new IllegalArgumentException("La fase que intentas editar no pertenece a este proyecto.");
+                }
+                if (!idsSolicitados.add(etapa.getId())) {
+                    throw new IllegalArgumentException("Una fase solo puede aparecer una vez en el orden.");
+                }
+            }
+            plan.add(new PlanFase(etapa, nombre, indice + 1));
+        }
+
+        List<Etapa> eliminadas = proyecto.getEtapas().stream()
+                .filter(etapa -> !idsSolicitados.contains(etapa.getId()))
+                .toList();
+        for (Etapa etapa : eliminadas) {
+            long tareasEnFase = proyecto.getTareas().stream()
+                    .filter(tarea -> tarea.getEtapa() != null && etapa.getId().equals(tarea.getEtapa().getId()))
+                    .count();
+            if (tareasEnFase > 0) {
+                throw new IllegalArgumentException(("No puedes eliminar la fase «%s» porque tiene %d %s. "
+                        + "Mueve esas tareas a otra fase antes de guardarla.")
+                        .formatted(etapa.getNombre(), tareasEnFase, tareasEnFase == 1 ? "tarea" : "tareas"));
+            }
+        }
+
+        plan.forEach(item -> {
+            item.etapa().setNombre(item.nombre());
+            item.etapa().setOrden(item.orden());
+            if (item.etapa().getProyecto() == null) {
+                proyecto.agregarEtapa(item.etapa());
+            }
+        });
+        proyecto.getEtapas().removeAll(eliminadas);
+        proyecto.getEtapas().sort(Comparator.comparing(Etapa::getOrden));
+        proyecto.setEtapaActual(plan.get(peticion.etapaActualIndice()).etapa().getNombre());
+
+        return proyectoMapper.aDTO(proyecto);
+    }
+
+    @Override
     public void eliminar(String codigo) {
         proyectoRepository.delete(obtenerEntidadPorCodigo(codigo));
     }
@@ -155,12 +269,19 @@ public class ProyectoServiceImpl implements ProyectoService {
         return proyectoMapper.calcularProgreso(obtenerEntidadPorCodigo(codigo));
     }
 
-    /** Crea las etapas por defecto con las que se organiza el trabajo. */
-    private void crearEtapasBase(Proyecto proyecto) {
-        String[] nombres = {"Planeación", "Investigación", "Diseño", "Desarrollo", "Entrega"};
-        for (int i = 0; i < nombres.length; i++) {
-            proyecto.agregarEtapa(new Etapa(nombres[i], i + 1));
+    /** Crea únicamente las fases elegidas al iniciar el proyecto. */
+    private List<String> crearEtapas(Proyecto proyecto, List<String> solicitadas) {
+        List<String> nombres = new ArrayList<>();
+        if (solicitadas != null) {
+            for (String solicitada : solicitadas) {
+                if (solicitada == null || solicitada.isBlank()) continue;
+                String nombre = solicitada.trim();
+                if (nombres.stream().noneMatch(existente -> existente.equalsIgnoreCase(nombre))) nombres.add(nombre);
+            }
         }
+        if (nombres.isEmpty()) nombres.add("Planeación");
+        for (int i = 0; i < nombres.size(); i++) proyecto.agregarEtapa(new Etapa(nombres.get(i), i + 1));
+        return nombres;
     }
 
     private Tarea construirTarea(Proyecto proyecto, PeticionTarea entrada, int numero) {
@@ -191,5 +312,26 @@ public class ProyectoServiceImpl implements ProyectoService {
             candidato = base + "-" + sufijo++;
         }
         return candidato;
+    }
+
+    private void exigirPropietario(Proyecto proyecto, Long usuarioId, String accion) {
+        if (!proyecto.getPropietario().getId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Solo quien creó el proyecto puede " + accion + ".");
+        }
+    }
+
+    private String nombreFase(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("Cada fase necesita un nombre.");
+        }
+        String limpio = nombre.trim();
+        if (limpio.length() > 60) {
+            throw new IllegalArgumentException("El nombre de una fase no puede superar 60 caracteres.");
+        }
+        return limpio;
+    }
+
+    private record PlanFase(Etapa etapa, String nombre, int orden) {
     }
 }

@@ -55,11 +55,11 @@ public class PreferenciaRecordatorio {
 
     /** Inicio de la franja en la que no se envian mensajes. */
     @Column(name = "silencio_desde")
-    private LocalTime silencioDesde = LocalTime.of(22, 0);
+    private LocalTime silencioDesde;
 
     /** Fin de la franja de silencio. Un recordatorio que caiga dentro se aplaza. */
     @Column(name = "silencio_hasta")
-    private LocalTime silencioHasta = LocalTime.of(7, 0);
+    private LocalTime silencioHasta;
 
     public PreferenciaRecordatorio(Usuario usuario) {
         this.usuario = usuario;
@@ -71,6 +71,7 @@ public class PreferenciaRecordatorio {
             case TAREA -> minutosAntesTarea;
             case ENTREGA_PROYECTO -> minutosAntesEntrega;
             case APUNTE_CLASE -> minutosAntesApunte;
+            case PERSONAL -> minutosAntesTarea;
         };
     }
 

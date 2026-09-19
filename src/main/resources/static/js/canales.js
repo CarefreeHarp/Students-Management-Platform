@@ -9,7 +9,7 @@
   const app = window.App || {};
   const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
   const proyecto = document.body.dataset.projectId;
-  const EMOJIS = ["👍", "🎉", "❤️", "🚀", "👀", "✅", "😅", "🔥"];
+  const REACCIONES = { acuerdo: 'De acuerdo', hecho: 'Hecho', gracias: 'Gracias' };
 
   const estado = { canales: [], activo: null, archivoPendiente: null };
   const $ = (selector) => document.querySelector(selector);
@@ -22,7 +22,7 @@
     });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      window.location.assign("/login");
+      app.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) {
@@ -56,19 +56,19 @@
   /* ------------------------------------------------------------ mensajes */
 
   function burbujaReacciones(mensaje) {
-    const existentes = mensaje.reacciones.map((reaccion) => `
+    const existentes = mensaje.reacciones.filter(reaccion => REACCIONES[reaccion.emoji]).map((reaccion) => `
       <button class="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11px] transition-colors
                      ${reaccion.propia ? "border-primary bg-primary-soft text-[var(--estado-primary)]" : "border-line bg-[var(--superficie)] text-muted hover:border-primary"}"
               type="button" data-react="${mensaje.id}" data-emoji="${esc(reaccion.emoji)}"
               title="${esc(reaccion.personas.join(", "))}">
-        <span>${esc(reaccion.emoji)}</span><span>${reaccion.total}</span>
+        <span>${REACCIONES[reaccion.emoji]}</span><span>${reaccion.total}</span>
       </button>`).join("");
 
     return `<div class="mt-1.5 flex flex-wrap items-center gap-1">
         ${existentes}
         <button class="grid h-6 w-6 place-items-center rounded-full border border-line bg-[var(--superficie)] text-[11px] text-muted hover:border-primary hover:text-primary"
                 type="button" data-open-picker="${mensaje.id}" aria-label="Añadir reacción">
-          <i class="bi bi-emoji-smile"></i>
+          <i class="bi bi-plus" aria-hidden="true"></i>
         </button>
       </div>`;
   }
@@ -129,15 +129,23 @@
 
   function abrirSelector(evento, mensajeId) {
     const selector = $("#emoji-picker");
-    selector.innerHTML = EMOJIS.map((emoji) =>
-      `<button class="grid h-8 w-8 place-items-center rounded-lg text-lg hover:bg-primary-soft" type="button" data-emoji="${emoji}">${emoji}</button>`
+    selector.innerHTML = Object.entries(REACCIONES).map(([codigo, etiqueta]) =>
+      `<button class="reaction-label hover:bg-primary-soft" type="button" data-emoji="${codigo}">${etiqueta}</button>`
     ).join("");
     selector.classList.remove("hidden");
     selector.classList.add("flex");
 
     const rect = evento.currentTarget.getBoundingClientRect();
-    selector.style.left = `${Math.min(window.innerWidth - 300, rect.left)}px`;
-    selector.style.top = `${Math.max(8, rect.top - 48)}px`;
+    const viewport = window.visualViewport;
+    const left = viewport?.offsetLeft || 0;
+    const top = viewport?.offsetTop || 0;
+    const width = viewport?.width || window.innerWidth;
+    const height = viewport?.height || window.innerHeight;
+    const menu = selector.getBoundingClientRect();
+    const above = rect.top - menu.height - 8;
+    const preferredTop = above >= top + 8 ? above : rect.bottom + 8;
+    selector.style.left = `${Math.max(left + 8, Math.min(left + width - menu.width - 8, rect.left))}px`;
+    selector.style.top = `${Math.max(top + 8, Math.min(top + height - menu.height - 8, preferredTop))}px`;
 
     selector.querySelectorAll("[data-emoji]").forEach((boton) => {
       boton.addEventListener("click", () => {
@@ -200,10 +208,11 @@
   function pintarResumen(resumen) {
     const caja = $("#summary-body");
     if (!resumen) {
+      $("#summary-model").textContent = "Local";
       caja.innerHTML = '<p class="text-[13px] text-muted">Pulsa «Resumir» cuando haya conversación.</p>';
       return;
     }
-    $("#summary-model").textContent = resumen.modelo;
+    $("#summary-model").textContent = resumen.modelo || "Local";
     const puntos = (resumen.puntosClave || []).length
       ? `<ul class="mt-2.5 grid gap-1.5 text-xs text-muted">${resumen.puntosClave
           .map((punto) => `<li class="flex gap-1.5"><i class="bi bi-dot text-primary"></i><span>${esc(punto)}</span></li>`)
@@ -223,6 +232,7 @@
     $("#channel-description").textContent = canal.descripcion || "";
     $("#message-input").placeholder = `Escribe en #${canal.slug}…`;
     $("#delete-channel").hidden = !canal.borrable;
+    $("#summarize").disabled = !canal.mensajes.length;
 
     pintarMensajes(canal.mensajes);
     pintarResumen(canal.ultimoResumen);
@@ -326,12 +336,20 @@
     });
 
     $("#summarize").addEventListener("click", async () => {
-      if (!estado.activo) return;
+      const canal = estado.activo;
+      if (!canal) return;
+      const boton = $("#summarize");
+      boton.disabled = true;
+      boton.setAttribute("aria-busy", "true");
       try {
-        pintarResumen(await pedir(`/api/canales/${estado.activo.id}/resumen`, { method: "POST" }));
-        avisar("Resumen generado.", "success");
+        const resumen = await pedir(`/api/canales/${canal.id}/resumen`, { method: "POST" });
+        if (estado.activo?.id === canal.id) pintarResumen(resumen);
+        avisar("Resumen local generado.", "success");
       } catch (error) {
         avisar(error.message, "error");
+      } finally {
+        boton.removeAttribute("aria-busy");
+        boton.disabled = !estado.activo || !estado.activo.mensajes.length;
       }
     });
 
@@ -353,12 +371,19 @@
       $("#slug-preview").textContent = `#${aSlug(evento.target.value) || "canal"}`;
     });
 
-    // Cerrar el selector de emoji al pulsar fuera.
+    // Cerrar el selector de reacciones al pulsar fuera.
     document.addEventListener("click", (evento) => {
       if (!evento.target.closest("#emoji-picker") && !evento.target.closest("[data-open-picker]")) {
         cerrarSelector();
       }
     });
+    document.addEventListener("keydown", (evento) => {
+      if (evento.key === "Escape") cerrarSelector();
+    });
+    window.addEventListener("resize", cerrarSelector, { passive: true });
+    document.addEventListener("scroll", (evento) => {
+      if (!evento.target.closest?.("#emoji-picker")) cerrarSelector();
+    }, { capture: true, passive: true });
   }
 
   /** Mismo criterio que TextoUtil.aSlug en el servidor. */
@@ -374,6 +399,7 @@
     $("#channel-title").textContent = "Sin canales";
     $("#channel-description").textContent = "";
     $("#delete-channel").hidden = true;
+    $("#summarize").disabled = true;
     $("#channel-list").innerHTML =
       '<p class="px-2 py-1.5 text-xs text-muted">Ninguno todavía.</p>';
     $("#messages").innerHTML = `<div class="m-auto grid max-w-[36ch] gap-3 text-center">

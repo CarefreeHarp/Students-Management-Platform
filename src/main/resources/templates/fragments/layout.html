@@ -11,12 +11,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" th:content="${descripcion}">
   <title th:text="${titulo} + ' · StudyFlow'">StudyFlow</title>
+  <script th:if="${sandbox}" id="sandbox-preflight">
+    // Fail closed even if the external bridge fails to load or has no parent host.
+    (() => {
+      'use strict';
+      window.fetch = async () => { throw new Error('Network disabled in sandbox'); };
+      const memory = () => {
+        const values = new Map();
+        return {
+          get length() { return values.size; },
+          key: index => [...values.keys()][index] ?? null,
+          getItem: key => values.get(String(key)) ?? null,
+          setItem: (key, value) => values.set(String(key), String(value)),
+          removeItem: key => values.delete(String(key)),
+          clear: () => values.clear()
+        };
+      };
+      const temporaryLocal = memory(), temporarySession = memory();
+      try {
+        Object.defineProperty(window, 'localStorage', {
+          configurable: false, get: () => window.SandboxBridge?.storage || temporaryLocal
+        });
+        Object.defineProperty(window, 'sessionStorage', {
+          configurable: false, get: () => window.SandboxBridge?.sessionStorage || temporarySession
+        });
+        window.__sandboxIsolated = true;
+      } catch (_) {
+        window.stop();
+        window.location.replace('/sandbox');
+        throw new Error('Cannot isolate sandbox storage');
+      }
+    })();
+  </script>
+  <script th:if="${sandbox}" src="/js/sandbox-frame.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+  <link rel="icon" href="/assets/img/studyflow-isotipo.png">
+  <link rel="stylesheet" href="/css/refinamientos.css">
+  <link rel="stylesheet" href="/css/resumen.css">
+  <link rel="stylesheet" href="/css/horarios.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/pantallas-responsive.css">
+  <link rel="stylesheet" href="/css/proyectos-responsive.css">
+  <link rel="stylesheet" href="/css/fases-ramas.css">
+  <link rel="stylesheet" href="/css/recorrido.css">
+  <link rel="stylesheet" href="/css/acceso.css">
   <!--
     El tema se aplica aquí, antes de pintar nada y de forma síncrona. Si se
     dejara a main.js (que va con defer) la página se vería un instante en claro
@@ -44,6 +87,7 @@
 
 <th:block th:fragment="scripts">
   <script th:src="@{/js/main.js}" src="/js/main.js" defer></script>
+  <script src="/js/recorrido.js" defer></script>
 </th:block>
 </body>
 </html>

@@ -1,0 +1,35 @@
+/* A slowly moving window of light. All highlighted controls remain usable. */
+.tour-layer { position:fixed; inset:0; z-index:1500; pointer-events:none; isolation:isolate; opacity:1; transition:opacity .42s ease; animation:tour-arrive .9s ease backwards; }
+.tour-layer.is-leaving { opacity:0; }
+.tour-blocker { position:absolute; z-index:1; pointer-events:auto; background:transparent; touch-action:none; }
+.tour-spotlight { position:absolute; z-index:2; top:0; left:0; background:transparent; pointer-events:none; border:2px solid #c8c0ff; border-radius:20px; box-shadow:0 0 0 9999px rgb(12 11 25 / .64),0 0 0 6px rgb(168 151 255 / .16),0 0 38px rgb(168 151 255 / .28); will-change:transform,width,height; }
+.tour-companion-halo { position:absolute; z-index:2; pointer-events:none; border:2px solid #c8c0ff; border-radius:20px; background:transparent; box-shadow:0 0 0 6px rgb(168 151 255 / .16),0 0 38px rgb(168 151 255 / .28); }
+.tour-card { position:absolute; z-index:3; right:auto; bottom:auto; margin:0; padding:29px; border:1px solid color-mix(in srgb,#b2a6d8 40%,var(--linea-tarjeta)); border-radius:20px; box-shadow:0 18px 60px #0b081e44; background:var(--superficie); color:rgb(var(--c-ink)); pointer-events:auto; overflow:auto; overscroll-behavior:contain; opacity:0; transform:translateY(8px); transition:left .9s cubic-bezier(.22,.8,.24,1),top .9s cubic-bezier(.22,.8,.24,1),opacity .45s ease,transform .65s ease; scrollbar-width:thin; }
+.tour-card.is-ready { opacity:1; transform:translateY(0); }
+.tour-card.tour-card--wide { padding:34px; }
+.tour-card.tour-card--wide h2 { font-size:26px; }
+.tour-card.tour-card--wide p { font-size:17px; line-height:1.65; }
+.tour-card.tour-card--pulse { animation:tour-card-pulse 1.25s ease-in-out .65s 2; }
+.tour-card-content { min-width:0; opacity:1; transform:translateY(0); transition:opacity .24s ease,transform .32s ease; }
+.tour-card-content.is-changing { opacity:0; transform:translateY(5px); }
+.tour-card .tour-close { position:absolute; top:-12px; right:-12px; float:none; display:grid; place-items:center; width:36px; height:36px; border:0; border-radius:50%; color:rgb(var(--c-muted)); background:transparent; }
+.tour-card .tour-close:hover { background:var(--realce); color:var(--estado-primary); }
+.tour-close span { font-size:25px; line-height:1; font-weight:400; }
+.tour-card h2 { margin:0 29px 12px 0; font-family:'Plus Jakarta Sans',sans-serif; font-size:24px; font-weight:750; line-height:1.3; letter-spacing:-.5px; overflow-wrap:anywhere; }
+.tour-card h2:focus { outline:none; }
+.tour-card p { font-size:16px; line-height:1.6; margin:0; color:rgb(var(--c-muted)); }
+.tour-card nav { display:flex; align-items:center; justify-content:space-between; margin-top:26px; gap:14px; }
+.tour-card nav.is-auto { justify-content:flex-start; }
+.tour-card nav .btn { min-height:48px; font-size:14px; padding:11px 18px; border-radius:10px; }
+.tour-card nav .btn-secondary { border-color:transparent; background:transparent; }
+.tour-card nav .btn:disabled { opacity:.4; cursor:default; }
+@keyframes tour-arrive { from { opacity:0; } to { opacity:1; } }
+@keyframes tour-card-pulse { 0%,100% { box-shadow:0 18px 60px #0b081e44; } 50% { box-shadow:0 18px 60px #0b081e44,0 0 0 5px rgb(168 151 255 / .16),0 0 36px rgb(168 151 255 / .46); } }
+@media (max-width:600px), (max-height:560px) {
+  .tour-card { padding:24px; border-radius:17px; }
+  .tour-card h2,.tour-card.tour-card--wide h2 { font-size:22px; }
+  .tour-card p,.tour-card.tour-card--wide p { font-size:14px; line-height:1.5; }
+  .tour-card nav { margin-top:20px; }
+}
+@media (max-height:450px) and (min-width:600px) { .tour-card { padding:16px 20px; } .tour-card nav { margin-top:13px; } }
+@media (prefers-reduced-motion:reduce) { .tour-layer,.tour-card--pulse { animation:none; } .tour-layer { transition:none; } .tour-card,.tour-card-content { transition:none; } .tour-spotlight { will-change:auto; } }

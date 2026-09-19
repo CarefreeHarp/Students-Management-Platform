@@ -1,113 +1,71 @@
-/*
- * Acceso a StudyFlow.
- * El camino principal es el acceso rápido: con el nombre basta. El formulario
- * de correo y contraseña queda plegado para quien ya tenía cuenta.
- */
+/* Public entry chooser. Trying the app never opens or creates an account. */
 (() => {
   "use strict";
 
-  const app = window.App || {};
-
-  function feedback(mensaje, tipo) {
-    const caja = document.querySelector("#login-feedback");
-    caja.textContent = mensaje;
-    caja.classList.toggle("is-visible", Boolean(mensaje));
-    caja.classList.toggle("is-success", tipo === "success");
+  function feedback(message, type) {
+    const box = document.querySelector("#login-feedback");
+    box.textContent = message;
+    box.classList.toggle("is-visible", Boolean(message));
+    box.classList.toggle("is-success", type === "success");
   }
 
-  async function pedir(url, cuerpo) {
-    const respuesta = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cuerpo)
-    });
-    if (!respuesta.ok) {
-      const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || detalle.message || "No fue posible entrar.");
-    }
-    return respuesta.json();
+  function showSignIn(visible, moveFocus = true) {
+    document.querySelector("#entry-options").hidden = visible;
+    document.querySelector("#signin-panel").hidden = !visible;
+    document.querySelector("#show-signin").setAttribute("aria-expanded", String(visible));
+    document.querySelector("#entry-title").textContent = visible ? "Qué bueno verte." : "Encuentra tu flow.";
+    document.querySelector("#entry-description").textContent = visible ? "Entra a tu espacio." : "Conócelo primero. Hazlo tuyo cuando quieras.";
+    feedback("");
+    if (moveFocus) document.querySelector(visible ? "#login-email" : "#show-signin").focus();
   }
 
-  /** Acceso rápido: crea la cuenta si no existe y abre la sesión. */
-  async function entrar(evento) {
-    evento.preventDefault();
-    const nombre = document.querySelector("#quick-name").value.trim();
-    if (!nombre) {
-      feedback("Escribe tu nombre para entrar.", "error");
+  async function signIn(event) {
+    event.preventDefault();
+    const emailInput = document.querySelector("#login-email");
+    const passwordInput = document.querySelector("#login-password");
+    const submit = document.querySelector("#signin-submit");
+    if (submit.disabled) return;
+    if (!emailInput.checkValidity() || !passwordInput.value) {
+      feedback("Escribe un correo válido y tu contraseña.", "error");
+      (!emailInput.checkValidity() ? emailInput : passwordInput).focus();
       return;
     }
+    submit.disabled = true;
+    submit.setAttribute("aria-busy", "true");
+    feedback("");
     try {
-      const usuario = await pedir("/api/sesion/entrar", {
-        nombre,
-        correo: document.querySelector("#quick-email").value.trim()
+      const response = await fetch("/api/sesion/acceder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo: emailInput.value.trim(), contrasena: passwordInput.value })
       });
-      // Se guarda también en la capa local para las pantallas que aún la usan.
-      if (typeof app.saveUser === "function") {
-        app.saveUser({
-          firstName: usuario.nombre,
-          lastName: usuario.apellido,
-          name: usuario.nombreCompleto,
-          email: usuario.correo
-        });
-      }
-      feedback(`¡Hola, ${usuario.nombre}! Entrando…`, "success");
-      window.setTimeout(() => window.location.assign("/panel"), 350);
-    } catch (error) {
-      feedback(error.message, "error");
-    }
-  }
-
-  /** Acceso clásico para quien se registró con contraseña. */
-  async function acceder(evento) {
-    evento.preventDefault();
-    try {
-      const resultado = await pedir("/api/sesion/acceder", {
-        correo: document.querySelector("#login-email").value.trim(),
-        contrasena: document.querySelector("#login-password").value
-      });
-      if (!resultado.acceso) {
-        feedback(resultado.mensaje || "Correo o contraseña incorrectos.", "error");
-        return;
-      }
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.detail || result.message || "No fue posible ingresar. Inténtalo de nuevo.");
+      if (!result.acceso) throw new Error(result.mensaje || "Correo o contraseña incorrectos.");
       feedback("Sesión iniciada.", "success");
-      window.setTimeout(() => window.location.assign("/panel"), 350);
+      window.location.assign("/panel");
     } catch (error) {
       feedback(error.message, "error");
-    }
-  }
-
-  /** Entra con la cuenta sembrada, la que tiene los proyectos de ejemplo. */
-  async function explorarEjemplo() {
-    try {
-      const usuario = await pedir("/api/sesion/demostracion", {});
-      feedback(`Entrando como ${usuario.nombreCompleto}…`, "success");
-      window.setTimeout(() => window.location.assign("/panel"), 350);
-    } catch (error) {
-      feedback(error.message, "error");
+      submit.disabled = false;
+      submit.removeAttribute("aria-busy");
     }
   }
 
   function init() {
-    document.querySelector("#quick-form").addEventListener("submit", entrar);
-    document.querySelector("#password-form").addEventListener("submit", acceder);
-    document.querySelector("#demo-button").addEventListener("click", explorarEjemplo);
-
-    // Mostrar u ocultar la contraseña.
-    document.querySelectorAll("[data-password-toggle]").forEach((boton) => {
-      boton.addEventListener("click", () => {
-        const campo = document.getElementById(boton.dataset.passwordToggle);
-        const oculta = campo.type === "password";
-        campo.type = oculta ? "text" : "password";
-        boton.querySelector("i").className = `bi bi-eye${oculta ? "-slash" : ""}`;
+    document.querySelector("#show-signin").addEventListener("click", () => showSignIn(true));
+    document.querySelector("#hide-signin").addEventListener("click", () => showSignIn(false));
+    document.querySelector("#password-form").addEventListener("submit", signIn);
+    document.querySelectorAll("[data-password-toggle]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const field = document.getElementById(button.dataset.passwordToggle);
+        const reveal = field.type === "password";
+        field.type = reveal ? "text" : "password";
+        button.querySelector("i").className = `bi bi-eye${reveal ? "-slash" : ""}`;
+        button.setAttribute("aria-label", reveal ? "Ocultar contraseña" : "Mostrar contraseña");
+        button.setAttribute("aria-pressed", String(reveal));
       });
     });
-
-    // Los accesos sociales todavía no hacen OAuth: se avisa en lugar de fingir.
-    document.querySelectorAll("[data-provider]").forEach((boton) => {
-      boton.addEventListener("click", () => {
-        feedback(`El acceso con ${boton.dataset.provider} aún no está conectado. Entra con tu nombre.`, "error");
-      });
-    });
+    if (new URLSearchParams(window.location.search).get("acceso") === "cuenta") showSignIn(true, false);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

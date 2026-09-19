@@ -1,0 +1,190 @@
+/* Project workspaces: responsive content, not a clipped page. */
+body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) :is(main, section, article, aside, nav, form, .form-field, .form-grid, .form-grid-two, .panel-heading-content) {
+  min-width: 0;
+}
+
+body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) :is(h1, h2, h3, p, .tag, .task-assignee, .calendar-legend, .back-link) {
+  overflow-wrap: anywhere;
+}
+
+body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) :is(.page-heading, .section-heading, .section-head, .panel-heading) > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) :is(.btn, .icon-button) {
+  min-height: 44px;
+  white-space: normal;
+}
+
+body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) .icon-button {
+  min-width: 44px;
+  flex-shrink: 0;
+}
+
+body[data-page="project"] .task-cards-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 285px), 1fr));
+}
+body[data-page="project"] :is(.task-card-top, .task-card-footer) { flex-wrap: wrap; }
+body[data-page="project"] :is(.task-check, .task-menu-button) { min-width: 36px; min-height: 36px; }
+body[data-page="project"] .task-assignee { min-width: 0; }
+body[data-page="project"] .assignee-dot { flex-shrink: 0; }
+body[data-page="project"] .task-filter-wrap { max-width: 100%; }
+body[data-page="project"] .task-filter-wrap select { max-width: 100%; }
+body[data-page="project"] .detail-calendar-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+body[data-page="project"] .detail-calendar {
+  grid-template-columns: 64px repeat(7, minmax(92px, 1fr));
+}
+body[data-page="project"] .calendar-task { overflow-wrap: anywhere; }
+body[data-page="project"] .calendar-time-label { position: sticky; left: 0; z-index: 3; background: var(--cal-cuerpo); }
+body[data-page="project"] .detail-member-stack { flex-wrap: wrap; gap: 4px 0; }
+body[data-page="project"] .legend-members { min-width: 0; flex-wrap: wrap; }
+
+body[data-page="crear-proyecto"] #create-project-form,
+body[data-page="crear-proyecto"] #create-project-form > *,
+body[data-page="crear-proyecto"] main > .grid > *,
+body[data-page="crear-proyecto"] :is(.member-input-row, .task-input-row) > *,
+body[data-page="project"] .dialog-member-row > * { min-width: 0; }
+
+body[data-page="crear-proyecto"] .task-input-row {
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) 44px;
+}
+body[data-page="crear-proyecto"] .member-input-row,
+body[data-page="project"] .dialog-member-row {
+  grid-template-columns: 31px minmax(0, 1fr) minmax(0, 1fr) 44px;
+}
+body[data-page="crear-proyecto"] .planning-calendar { padding: clamp(4px, 1.5vw, 10px); }
+body[data-page="crear-proyecto"] .calendar-day { min-width: 0; }
+body[data-page="crear-proyecto"] .mini-calendar-header strong { text-align: center; overflow-wrap: anywhere; }
+body[data-page="crear-proyecto"] .mini-calendar-header--static { justify-content: center; }
+body[data-page="crear-proyecto"] .project-template-hint {
+  display: flex;
+  gap: .625rem;
+  margin-top: 1rem;
+  padding: .75rem;
+  border-radius: 10px;
+  background: rgb(var(--c-primary-soft) / .7);
+  color: var(--estado-primary);
+  font-size: .75rem;
+  line-height: 1rem;
+}
+
+/* The conversation always owns the most space; resource cards wrap below on tablets. */
+body[data-page="canales"] .channels-layout { grid-template-columns: minmax(0, 1fr); }
+body[data-page="canales"] .channels-layout > * { min-width: 0; max-width: 100%; }
+body[data-page="canales"] #channel-list {
+  display: flex;
+  gap: 6px;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 2px 0 6px;
+}
+body[data-page="canales"] #channel-list > button {
+  width: auto;
+  max-width: 220px;
+  min-height: 44px;
+  flex: 0 0 auto;
+}
+body[data-page="canales"] #messages {
+  min-height: 220px;
+  max-height: min(580px, 58dvh);
+  overflow-wrap: anywhere;
+  overscroll-behavior-y: contain;
+}
+body[data-page="canales"] #messages > * { min-width: 0; flex-shrink: 0; }
+body[data-page="canales"] #messages img { max-width: 100%; height: auto; }
+body[data-page="canales"] #messages [data-open-picker],
+body[data-page="canales"] #messages [data-react] { min-width: 36px; min-height: 36px; }
+body[data-page="canales"] :is(#summary-body, #documents, #gallery, #message-form, #pending-file) { min-width: 0; overflow-wrap: anywhere; }
+body[data-page="canales"] #message-input { min-width: 0; min-height: 44px; max-height: 160px; }
+body[data-page="canales"] #message-form button[type="submit"] { flex-shrink: 0; min-width: 44px; }
+body[data-page="canales"] .chat-attachment { position: relative; width: 44px; height: 44px; flex: 0 0 44px; justify-content: center; }
+body[data-page="canales"] .chat-attachment input[type="file"] {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+body[data-page="canales"] .chat-attachment:focus-within { outline: 2px solid var(--estado-primary); outline-offset: 2px; }
+body[data-page="canales"] #emoji-picker { max-width: calc(100vw - 16px); flex-wrap: wrap; }
+body[data-page="canales"] #emoji-picker button { min-height: 40px; }
+
+body[data-page="fases"] .phase-diagram-scroll { max-width: 100%; overflow-x: auto; padding-bottom: 10px; overscroll-behavior-x: contain; }
+body[data-page="fases"] .fase-columna { width: 242px; flex: 0 0 242px; }
+body[data-page="fases"] :is(.tarea-nodo, .fase-vacia) { width: 100%; min-width: 0; overflow-wrap: anywhere; }
+body[data-page="fases"] #task-dependency { min-width: 0; }
+body[data-page="fases"] #dependency-list .tag { max-width: 100%; white-space: normal; }
+body[data-page="fases"] #dependency-list button { min-width: 32px; min-height: 32px; flex-shrink: 0; }
+
+body[data-page="entregables"] .deliverable-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+}
+body[data-page="entregables"] .deliverable-card a { overflow-wrap: anywhere; }
+body[data-page="entregables"] .deliverable-actions { align-items: center; flex-wrap: wrap; }
+body[data-page="entregables"] .deliverable-actions select { min-height: 44px; }
+
+@media (min-width: 760px) {
+  body[data-page="canales"] .channels-layout { grid-template-columns: 180px minmax(0, 1fr); }
+  body[data-page="canales"] #channel-list { display: grid; max-height: 65dvh; overflow-y: auto; }
+  body[data-page="canales"] #channel-list > button { width: 100%; max-width: none; }
+  body[data-page="canales"] .channel-resources { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+  body[data-page="canales"] .channels-layout { grid-template-columns: 200px minmax(0, 1fr) minmax(230px, .55fr); }
+  body[data-page="canales"] .channel-resources { grid-column: auto; grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 1100px) {
+  body[data-page="entregables"] .deliverable-card { grid-template-columns: 44px minmax(0, 1fr); }
+  body[data-page="entregables"] .deliverable-actions { grid-column: 2; }
+}
+
+@media (max-width: 760px) {
+  body[data-page="crear-proyecto"] .task-input-row { grid-template-columns: minmax(0, 1fr) 44px; }
+  body[data-page="crear-proyecto"] .task-input-row > .form-field { grid-column: 1 / -1; }
+  body[data-page="crear-proyecto"] .task-input-row > .form-field:first-child { grid-column: 1; }
+  body[data-page="crear-proyecto"] .task-input-row > button { grid-column: 2; grid-row: 1; }
+  body[data-page="crear-proyecto"] .member-input-row,
+  body[data-page="project"] .dialog-member-row { grid-template-columns: 31px minmax(0, 1fr) 44px; }
+  body[data-page="crear-proyecto"] .member-input-row > .form-field,
+  body[data-page="project"] .dialog-member-row > .form-field { grid-column: 1 / -1; }
+  body[data-page="crear-proyecto"] .member-input-row > button,
+  body[data-page="project"] .dialog-member-row > button { grid-column: 3; grid-row: 1; }
+  body[data-page="project"] .project-sections > a { flex: 1 1 200px; }
+}
+
+@media (max-width: 480px) {
+  body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) :is(.section-head, .section-heading) { flex-wrap: wrap; }
+  body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) .dialog-form { padding: 16px; }
+  body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) .dialog-header { padding: 0 0 8px; align-items: flex-start; }
+  body:is([data-page="project"], [data-page="crear-proyecto"], [data-page="canales"], [data-page="fases"], [data-page="entregables"]) :is(.form-actions, .dialog-actions) > .btn { flex: 1 1 140px; }
+  body[data-page="project"] .page-heading > .flex > .btn { flex: 1 1 200px; }
+  body[data-page="canales"] #messages { padding: 12px; }
+  body[data-page="canales"] #messages > .flex { max-width: 100%; gap: 6px; }
+  body[data-page="canales"] #message-form { padding: 10px; }
+  body[data-page="canales"] #message-input { padding-inline: 9px; }
+  body[data-page="fases"] #available-list > article { flex-wrap: wrap; }
+  body[data-page="fases"] #available-list > article > div { flex-basis: 100%; }
+  body[data-page="entregables"] .deliverable-actions { grid-column: 1 / -1; justify-content: flex-end; }
+  body[data-page="entregables"] .deliverable-actions select { flex: 1 1 100px; }
+}
+
+@media (max-height: 620px) {
+  body[data-page="crear-proyecto"] main > .grid > aside { position: static; }
+  body[data-page="canales"] #messages { min-height: 160px; }
+}
+
+@media (hover: none) {
+  body[data-page="project"] .task-popover { display: none !important; }
+}

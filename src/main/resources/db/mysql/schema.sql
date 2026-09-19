@@ -370,7 +370,7 @@ CREATE TABLE resumen_chat (
     mensajes_resumidos INT          NOT NULL DEFAULT 0,
     desde_mensaje_id  BIGINT,
     hasta_mensaje_id  BIGINT,
-    modelo            VARCHAR(60)            DEFAULT 'simulado',
+    modelo            VARCHAR(60)            DEFAULT 'Local',
     fecha_generacion  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_resumen_canal FOREIGN KEY (canal_id) REFERENCES canal (id) ON DELETE CASCADE
 ) ENGINE = InnoDB;

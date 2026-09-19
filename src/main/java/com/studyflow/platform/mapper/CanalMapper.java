@@ -60,7 +60,7 @@ public class CanalMapper {
 
     /**
      * Agrupa las reacciones por emoji conservando el orden de aparicion, que es
-     * como se muestran bajo el mensaje: 👍 3 · 🎉 1
+     * como se muestran bajo el mensaje: De acuerdo 3 · Gracias 1
      */
     private List<ReaccionDTO> agruparReacciones(List<ReaccionMensaje> reacciones, Long usuarioActualId) {
         Map<String, List<ReaccionMensaje>> porEmoji = new LinkedHashMap<>();

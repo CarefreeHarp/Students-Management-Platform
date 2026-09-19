@@ -43,19 +43,22 @@
           alt=""
         /><span>Study<span class="brand-accent">Flow</span></span></a
       >
-      <nav aria-label="Navegación principal">
+      <button class="landing-menu-toggle" type="button" aria-controls="landing-links" aria-expanded="false" aria-label="Abrir menú de navegación">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <nav id="landing-links" aria-label="Navegación principal">
         <a href="#tu-semana">Así funciona</a
         ><a href="#por-que">Por qué StudyFlow</a>
       </nav>
-      <a class="nav-enter" href="/panel"
-        >Entrar <span aria-hidden="true">↗</span></a
+      <a class="nav-enter" href="/login"
+        >Ingresa <span aria-hidden="true">↗</span></a
       >
     </header>
     <main id="contenido">
       <section class="hero chapter" data-scene="0" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow">
-            <span class="tiny-star" aria-hidden="true">✦</span> Para estudiantes
+            <i class="bi bi-stars tiny-star" aria-hidden="true"></i> Para estudiantes
             universitarios
           </p>
           <h1 id="hero-title">
@@ -85,7 +88,7 @@
             <div>Tu próxima clase<small>Cálculo · 10:00 a. m.</small></div>
           </div>
           <div class="floating-note note-two">
-            <span class="note-icon cyan">✓</span>
+            <span class="note-icon cyan"><i class="bi bi-check" aria-hidden="true"></i></span>
             <div>
               Un pendiente menos<small>Entrega lista para revisión</small>
             </div>
@@ -127,7 +130,7 @@
         <div class="product-visual calendar-visual" data-depth="1">
           <div class="window-bar">
             <span class="window-dots">● ● ●</span
-            ><span>Tu espacio · StudyFlow</span><span>✦</span>
+            ><span>Tu espacio · StudyFlow</span><i class="bi bi-stars" aria-hidden="true"></i>
           </div>
           <div class="preview-body">
             <div class="preview-heading">
@@ -177,7 +180,7 @@
               </div>
             </div>
             <div class="preview-task">
-              <span class="task-check">✓</span
+              <span class="task-check"><i class="bi bi-check" aria-hidden="true"></i></span
               ><span>Preparar la entrega de Diseño</span
               ><span class="soft-tag">Hoy</span>
             </div>
@@ -231,7 +234,7 @@
             </div>
             <div class="phase-flow">
               <div class="phase-card done">
-                <span class="phase-status">✓ Terminada</span
+                <span class="phase-status"><i class="bi bi-check" aria-hidden="true"></i> Terminada</span
                 ><strong>Investigar</strong><small>El punto de partida</small>
               </div>
               <span class="phase-arrow">→</span>
@@ -246,7 +249,7 @@
               </div>
             </div>
             <div class="project-message">
-              <span class="note-icon">✦</span>
+              <span class="note-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
               <div>
                 <strong>Ponte al día con IA</strong>
                 <p>
@@ -302,7 +305,7 @@
                 alt=""
               /><strong>StudyFlow</strong><span>Tu recordatorio</span>
             </div>
-            <h3>Tu entrega se acerca ✦</h3>
+            <h3>Tu entrega se acerca</h3>
             <p>
               Revisar el prototipo de Diseño.<br />Un pequeño paso hoy, más
               tranquilidad mañana.
@@ -312,7 +315,7 @@
             </div>
           </div>
           <div class="reminder-note">
-            <span>✎</span>
+            <i class="bi bi-pencil" aria-hidden="true"></i>
             <div>
               <strong>Antes de que se te olvide</strong>
               <p>Guarda una idea, una tarea o un apunte después de clase.</p>
@@ -349,7 +352,7 @@
             </p>
           </article>
           <article>
-            <span class="benefit-icon">✦</span>
+            <i class="bi bi-stars benefit-icon" aria-hidden="true"></i>
             <h3>Un inicio más sencillo</h3>
             <p>
               Apóyate en la IA para dar forma a un proyecto o resumir los
@@ -404,7 +407,7 @@
               >
             </summary>
             <p>
-              Entra a la pantalla de acceso y elige explorar el ejemplo. También
+              Entra a la pantalla de acceso y elige el recorrido guiado. También
               puedes crear tu cuenta para empezar a organizar tu propio espacio.
             </p>
             <a class="text-link" href="/login"
@@ -430,9 +433,9 @@
           Tu próximo paso,<br /><em>un poco más claro.</em>
         </h2>
         <p>Sencillo, rápido y presente en las aplicaciones que ya usas.</p>
-        <a class="button button-primary" href="/registro"
+        <a class="button button-primary" href="/sandbox"
           >Encuentra tu flow <span aria-hidden="true">↗</span></a
-        ><a class="closing-login" href="/panel">Ya tengo mi espacio →</a>
+        ><a class="closing-login" href="/login?acceso=cuenta">Ya tengo mi cuenta →</a>
       </section>
     </main>
     <footer class="site-footer">
@@ -476,7 +479,7 @@
         <nav class="footer-column" aria-label="Tu espacio en StudyFlow">
           <h3>Tu próximo paso</h3>
           <a href="/registro">Crea tu cuenta ↗</a>
-          <a href="/panel">Entra a tu espacio ↗</a>
+          <a href="/login?acceso=cuenta">Entra a tu espacio ↗</a>
           <p>Para estudiantes<br />universitarios.</p>
         </nav>
       </div>

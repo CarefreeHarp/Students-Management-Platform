@@ -5,7 +5,8 @@
   "description": "Capa de estilos (Tailwind CSS) de StudyFlow. Compila src/main/frontend/tailwind.css hacia src/main/resources/static/css/app.css",
   "scripts": {
     "css": "tailwindcss -i ./src/main/frontend/tailwind.css -o ./src/main/resources/static/css/app.css --minify",
-    "css:watch": "tailwindcss -i ./src/main/frontend/tailwind.css -o ./src/main/resources/static/css/app.css --watch"
+    "css:watch": "tailwindcss -i ./src/main/frontend/tailwind.css -o ./src/main/resources/static/css/app.css --watch",
+    "test:ui": "node --test tests/*.test.cjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.14"

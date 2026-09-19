@@ -1,6 +1,7 @@
 package com.studyflow.platform.service;
 
 import com.studyflow.platform.model.dto.PeticionPreferenciaRecordatorio;
+import com.studyflow.platform.model.dto.PeticionRecordatorio;
 import com.studyflow.platform.model.dto.PreferenciaRecordatorioDTO;
 import com.studyflow.platform.model.dto.RecordatorioDTO;
 
@@ -14,6 +15,8 @@ public interface RecordatorioService {
     PreferenciaRecordatorioDTO guardarPreferencias(Long usuarioId, PeticionPreferenciaRecordatorio peticion);
 
     List<RecordatorioDTO> listar(Long usuarioId);
+
+    RecordatorioDTO crearPersonal(Long usuarioId, PeticionRecordatorio peticion);
 
     /**
      * Recalcula la agenda de avisos del usuario a partir de sus tareas pendientes,

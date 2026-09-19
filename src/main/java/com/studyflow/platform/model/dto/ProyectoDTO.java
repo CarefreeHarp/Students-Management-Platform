@@ -14,6 +14,9 @@ public record ProyectoDTO(
         String etapaActual,
         int progreso,
         List<IntegranteDTO> integrantes,
-        List<TareaDTO> tareas
+        List<TareaDTO> tareas,
+        /** Ordered phases available when creating or moving a task. */
+        List<String> etapas,
+        String modoReparto
 ) {
 }
