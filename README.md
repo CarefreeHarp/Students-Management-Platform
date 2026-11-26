@@ -4,11 +4,11 @@ El semestre de un estudiante, en una sola vista: horario de clases, tareas de to
 y entregas en el mismo calendario, y cada trabajo en grupo con su espacio propio —conversación por
 tema, reparto de tareas por dependencias y registro de entregables—.
 
-Aplicación **Spring Boot 3.3 + Thymeleaf + Tailwind CSS + MySQL 8**, organizada en capas **IMVC**.
+SPA en **Angular 21, TypeScript, RxJS y CSS** con una API **Spring Boot 4.1 y Java 17**. Los datos se guardan en H2.
 
 **Índice** · [Qué es](#1-qué-es-studyflow) · [Flujo de pantallas](#2-flujo-de-pantallas) ·
 [Las pantallas](#3-las-pantallas-una-a-una) · [Funcionalidades](#4-funcionalidades) ·
-[Arquitectura](#5-arquitectura-por-capas-imvc) · [Puesta en marcha](#6-puesta-en-marcha)
+[Arquitectura](#5-arquitectura) · [Puesta en marcha](#6-puesta-en-marcha)
 
 ---
 
@@ -62,102 +62,25 @@ libre elección, que es lo que evita la reunión de asignación.
 
 ### Estado del proyecto
 
-Prototipo funcional con **136 clases Java, 15 pantallas, 70 endpoints REST, 22 tablas
-y 38 pruebas automáticas**. Los dos servicios externos (WhatsApp de Meta y OpenAI)
-están escritos e integrados, pero **corren en simulación**: la lógica se ejecuta
-entera y el envío se escribe en el log. El apartado 4.10 detalla qué no está hecho.
-
----
+El organizador puede usar OpenAI para redactar el resumen de un plan. Canales usa Gemini para los resúmenes cuando se configura la clave, con un resumen local disponible como respaldo. WhatsApp y OpenAI tienen la conexión externa desactivada por defecto.
 
 ## 2. Flujo de pantallas
 
-### El recorrido
+La portada está en `/`. Desde `/login` se puede abrir el tour sin cuenta, crear una cuenta o entrar con correo y contraseña. El tour usa datos temporales en el navegador.
 
-```
-                        ┌─────────────┐
-                        │   /login    │  entrar con el nombre (un campo)
-                        │  /registro  │  o crear cuenta (tres datos)
-                        └──────┬──────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │         /           │   PANEL · el centro de todo
-                    │  calendario general │   clases + tareas + entregas
-                    └──┬───┬───┬───┬──────┘
-          ┌────────────┘   │   │   └────────────┐
-          │                │   │                │
-   ┌──────▼──────┐  ┌──────▼───▼─────┐  ┌───────▼────────┐
-   │  /horarios  │  │   /proyectos   │  │ /recordatorios │
-   │  materias   │  │  mis trabajos  │  │ avisos + apuntes│
-   └─────────────┘  └────────┬───────┘  └────────────────┘
-                             │
-                   ┌─────────▼──────────┐
-                   │ /proyectos/{codigo}│  ESPACIO DE TRABAJO
-                   │ calendario + tareas│
-                   └──┬───────┬───────┬─┘
-                      │       │       │
-        ┌─────────────▼─┐ ┌───▼────┐ ┌▼──────────────┐
-        │   /canales    │ │ /fases │ │ /entregables  │
-        │ conversación  │ │reparto │ │ documentos    │
-        └───────────────┘ └────────┘ └───────────────┘
-
-   Transversales, desde la barra superior:
-   /perfil → /perfil/editar        /chats (canales de todos los proyectos)
-   /paleta (guía de estilo, sin sesión)
-```
-
-### Las tres reglas de navegación
-
-1. **Todo empieza en el panel.** Al entrar se cae siempre en `/`, que es la vista
-   general del semestre. La barra superior lleva a las cuatro zonas: Inicio,
-   Proyectos, Horarios, Canales y Recordatorios.
-2. **Un proyecto es un espacio con tres pestañas.** Desde el espacio de trabajo se
-   entra a sus canales, a su diagrama de fases y a sus entregables. Las tres tienen
-   un enlace de vuelta al proyecto.
-3. **Sin sesión no se ve nada.** Cualquier ruta sin sesión redirige a `/login`. La
-   única excepción es `/paleta`, la guía de estilo, que no muestra datos de nadie.
-
-### Recorrido recomendado para una demostración
-
-| # | Pantalla | Qué enseñar |
-|---|---|---|
-| 1 | `/login` | Entrar con **un solo campo**, o el botón de datos de ejemplo |
-| 2 | `/` | El calendario con las tareas de los tres proyectos, cada uno con su color |
-| 3 | `/horarios` | Añadir una materia y verla aparecer en la semana |
-| 4 | `/proyectos` → `/proyectos/cognitiva` | Abrir un trabajo en grupo |
-| 5 | `/proyectos/cognitiva/fases` | **El momento fuerte**: tomar una tarea disponible y ver que otra sigue bloqueada |
-| 6 | `/proyectos/cognitiva/canales` | Escribir en `#general`, reaccionar con un emoji, pedir el resumen |
-| 7 | `/proyectos/cognitiva/entregables` | Registrar un enlace de Canva y ver que se reconoce el tipo |
-| 8 | `/recordatorios` | Apuntar algo «anunciado en clase» y ver que entra en la cola de avisos |
-| 9 | Barra superior | El interruptor de modo oscuro |
-
-Los datos de ejemplo ya traen tres proyectos, cuatro materias, una conversación con
-mensajes y dependencias entre tareas, así que **la demostración no necesita
-preparación**: basta con el botón «Explorar con datos de ejemplo» del acceso.
-
----
+Después de entrar, Angular abre `/panel` o recupera la ruta privada solicitada. Desde el panel se llega a Proyectos, Horarios, Recordatorios y Perfil. Cada proyecto tiene páginas para Canales, Fases y Entregables. `/paleta` muestra la guía de estilo y es pública.
 
 ## 3. Las pantallas, una a una
 
 ### 3.1 Acceso · `/login`
 
-Dos mitades: a la izquierda un panel con degradado de marca y tres ventajas del
-producto; a la derecha el formulario.
-
-- **Entrada de un solo campo**: el nombre basta. El correo es opcional y solo sirve
-  para recuperar la cuenta después.
-- Botón **«Explorar con datos de ejemplo»**, que entra con el usuario de demostración
-  y sus tres proyectos ya cargados.
-- Google, GitHub y Facebook aparecen, pero **avisan de que no están conectados** en
-  lugar de fingir una entrada.
-- Plegado abajo, el acceso con correo y contraseña para quien ya la tiene.
+El acceso ofrece un tour temporal, registro o ingreso con correo y contraseña. El tour se abre en `/sandbox` y elimina sus datos al salir o reiniciar.
 
 ### 3.2 Registro · `/registro`
 
-«Tres datos y listo»: nombre, correo y contraseña. Universidad, programa, semestre y
-edad quedan plegados como opcionales, para que el formulario no ahuyente. Se pueden
-completar después desde el perfil.
+Se solicita nombre, correo y contraseña. Universidad, programa, semestre y edad son opcionales. Las contraseñas nuevas requieren al menos 12 caracteres y un máximo de 72 bytes.
 
-### 3.3 Panel · `/`
+### 3.3 Panel · `/panel`
 
 La pantalla que más se usa. Saluda por el nombre y resume la semana en una frase
 («Siete tareas por avanzar esta semana. La más cercana vence el jueves»).
@@ -187,7 +110,7 @@ Formulario en tres pasos numerados, con vista previa a la derecha.
 3. **Primeras tareas**: nombre, responsable y fecha.
 
 - **Calendario de vista previa** que se va llenando según se añaden tareas.
-- **«Organizar con IA»**: se indica un número de tareas (1–20) y se reparten con
+- **«Usar plantilla»**: completa los campos vacíos con datos editables. El organizador disponible en la API reparte tareas con
   plazos calculados y responsables rotados entre el equipo.
 - Al crearlo, el proyecto **nace con su canal `#general`**.
 
@@ -275,11 +198,7 @@ estudiante, el «Enfoque de la semana» y los proyectos en los que participa.
 
 ### 3.14 Editar perfil · `/perfil/editar`
 
-Foto, datos personales y datos académicos, en dos grupos de campos.
-
-> **Aviso para la demostración:** los cambios del perfil **se guardan solo en el
-> navegador**, no en la base de datos. El endpoint existe pero la pantalla todavía no
-> lo llama (ver 4.10).
+El formulario guarda en el servidor los datos académicos y la foto de la cuenta autenticada.
 
 ### 3.15 Guía de estilo · `/paleta`
 
@@ -298,19 +217,9 @@ Sin elegir nada se sigue la preferencia del sistema.
 
 ### 4.1 Acceso y perfil
 
-| Funcionalidad | Estado |
-|---|---|
-| **Entrar solo con el nombre** — un campo y dentro | Completo |
-| Registro reducido: nombre, correo y contraseña | Completo |
-| Datos académicos opcionales, plegados en el formulario | Completo |
-| Sesión real (`HttpSession`): cada persona escribe y toma tareas como ella misma | Completo |
-| Acceso con correo y contraseña para quien ya la tiene | Completo |
-| Botones de Google, GitHub y Facebook | **No conectados** (avisan en lugar de fingir) |
-| Perfil con foto, descripción, datos académicos y proyectos | Completo |
+Spring Security protege la API. Angular adjunta un JWT de cinco minutos a las llamadas privadas. El navegador conserva una cookie de renovación HttpOnly y SameSite estricta. Cerrar sesión revoca ambos accesos en el servidor. La autorización comprueba el propietario o el integrante vinculado por ID, y solo el titular de la cuenta puede cambiar el perfil.
 
-El camino principal de entrada es de **un solo campo**. Si el correo se omite, se genera uno
-interno (`nombre@studyflow.local`) para no pedir más datos; si se indica y ya existe, se reutiliza
-la cuenta en lugar de duplicarla.
+Para vincular a un colaborador, guarda su ficha en **Modificar integrantes** y copia su enlace de invitación. El enlace vence en 48 horas y se puede usar una vez. Si la ficha tiene un correo, la cuenta que acepta debe usar ese correo.
 
 ### 4.2 Proyectos y tareas
 
@@ -400,15 +309,9 @@ Es el índice de dónde vive cada parte del trabajo, distinto de los archivos su
 Sin credenciales de Meta la pasarela funciona en **modo simulación**: toda la lógica se ejecuta
 igual y el mensaje se escribe en el log en lugar de enviarse.
 
-### 4.8 Organizador de proyectos con IA
+### 4.8 Organizador de proyectos
 
-| Funcionalidad | Estado |
-|---|---|
-| Reparto en el número de tareas que se indique (1–20) | Completo |
-| Plazo por tarea: inicio, fecha límite y días estimados | Completo |
-| Rotación de responsables entre los integrantes | Completo |
-| Reorganización de un proyecto conservando lo completado | Completo (vía API) |
-| Redacción de la explicación con ChatGPT | **Preparado, sin conectar** |
+Los endpoints del organizador proponen tareas y fechas con reglas locales. Con la integración OpenAI activada, el modelo redacta el resumen del plan. En la pantalla de creación, **Usar plantilla** solo completa campos editables. El resumen de Canales usa un prompt de sistema y hasta 60 mensajes recientes. Consulta la configuración de Gemini para activarlo.
 
 ### 4.9 Panel principal
 
@@ -416,246 +319,77 @@ Calendario general con las tareas de todos los proyectos (un color por proyecto)
 al pasar el ratón, clic para ir al proyecto, formulario para marcar tarea terminada y resumen de
 ritmo y próximas entregas.
 
-### 4.10 Qué **no** está implementado
+## 5. Arquitectura
 
-- **No hay autenticación real.** La sesión identifica a la persona pero no la verifica: no se usa
-  Spring Security y la contraseña se guarda codificada en Base64 como marcador provisional.
-- **Los botones de Google, GitHub y Facebook no hacen OAuth.**
-- **La API de OpenAI no está conectada.** `ClienteIaOpenAi` está escrito contra el contrato público
-  pero nunca se ha ejecutado contra el servicio real.
-- **El envío por WhatsApp no se ha probado contra Meta**, por no disponer de credenciales.
-- **Los mensajes no llegan solos**: no hay WebSocket, hay que recargar para ver lo nuevo.
-- **El perfil no se guarda en la base de datos.** La pantalla lee y escribe en el navegador; el
-  endpoint `PUT /api/usuarios/{id}` existe pero ninguna pantalla lo llama, así que los cambios se
-  pierden al cerrar sesión.
-- **Los horarios viven solo en el navegador**: las materias se guardan en `localStorage` y no
-  llegan a la base. El resto de pantallas —panel, proyectos, canales, fases, entregables,
-  recordatorios y acceso— ya usan la API REST.
+| Carpeta | Responsabilidad |
+|---|---|
+| `frontend/` | Componentes y plantillas Angular, Router, guards, interceptor HTTP y estilos CSS. |
+| `backend/` | API Spring Boot, Spring Security, reglas de negocio, JPA y base H2. |
 
----
-
-## 5. Arquitectura por capas (IMVC)
-
-| Capa | Ubicación | Responsabilidad |
-|------|-----------|-----------------|
-| **I** · Interfaz | `src/main/resources/static/` | Hoja Tailwind compilada, JavaScript de interacción e imágenes |
-| **V** · Vista | `src/main/resources/templates/` | Plantillas Thymeleaf; `fragments/layout.html` centraliza head, navegación y scripts |
-| **C** · Controlador | `controller/view/`, `controller/api/` | `PaginaController` resuelve la navegación; los `*ApiController` exponen la API REST |
-| **M** · Modelo | `model/entity/`, `model/dto/`, `model/enums/` | Entidades JPA, objetos de transferencia y enumeraciones |
-
-Capas de apoyo: `service/` (+`impl/`), `repository/`, `mapper/`, `config/`, `exception/`, `util/`.
-
-```
-src/main/java/com/studyflow/platform/        · 136 archivos
-├── StudyFlowApplication.java
-├── config/        ConfiguracionWeb · CargadorDatosIniciales
-│                  PropiedadesWhatsApp · PropiedadesIa
-├── controller/
-│   ├── view/      PaginaController
-│   └── api/       Usuario · Sesion · Proyecto · Tarea · Horario
-│                  Recordatorio · Canal · Archivo · Entregable · Fase · Organizador
-├── service/       UsuarioService · SesionService · ProyectoService · TareaService
-│                  HorarioService · RecordatorioService · ApunteClaseService
-│                  CanalService · ArchivoService · EntregableService · FaseService
-│                  OrganizadorProyectoService · AsistenteIaService
-│                  PasarelaMensajeria · ClienteIaConversacional  ← puntos de integración
-│   └── impl/      implementaciones + WhatsAppCloudApiGateway
-│                  ClienteIaSimulado · ClienteIaOpenAi · PlanificadorRecordatorios
-├── repository/    17 repositorios Spring Data
-├── model/
-│   ├── entity/    Universidad · Usuario · Proyecto · Integrante · Etapa · Tarea ·
-│   │              ArchivoTarea · RegistroAvance · Entregable · Materia · BloqueHorario ·
-│   │              Horario · Recordatorio · PreferenciaRecordatorio · ApunteClase ·
-│   │              Canal · MensajeChat · ReaccionMensaje · ArchivoAdjunto · ResumenChat
-│   ├── dto/       DTO de salida y peticiones de formulario
-│   └── enums/     EstadoTarea · DiaSemana · RolIntegrante · ProveedorAcceso ·
-│                  CanalRecordatorio · TipoRecordatorio · EstadoRecordatorio ·
-│                  TipoCanal · TipoEntregable · EstadoEntregable
-├── mapper/        UsuarioMapper · ProyectoMapper · HorarioMapper
-│                  RecordatorioMapper · CanalMapper
-├── exception/     RecursoNoEncontradoException · ManejadorGlobalErrores
-└── util/          TextoUtil
-```
-
-### Puntos de integración
-
-Las dos APIs externas están detrás de una interfaz, de modo que conectarlas no obliga a tocar
-servicios ni controladores:
-
-| Interfaz | Implementación activa | Implementación real |
-|---|---|---|
-| `PasarelaMensajeria` | `WhatsAppCloudApiGateway` en simulación | el mismo, con credenciales |
-| `ClienteIaConversacional` | `ClienteIaSimulado` | `ClienteIaOpenAi` con `studyflow.ia.enabled=true` |
-
----
+Angular sirve las pantallas y reenvía las llamadas REST de `/api` a Spring Boot mediante el proxy de desarrollo. El backend publica la API REST. El tour carga las mismas plantillas en un marco con la red bloqueada y usa un almacén en RAM.
 
 ## 6. Puesta en marcha
 
-### Requisitos
-- JDK 17+
-- MySQL 8 — opcional, ver el atajo del apartado 6.1
-- Node 18+ — solo si vas a recompilar los estilos
-
-### 6.1 Atajo: arrancar sin instalar MySQL
+Usa Java 17 o superior y Node.js 20.19+, 22.12+ o 24.
 
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+make install
+make run
 ```
 
-Base H2 en memoria, sin instalar nada. Abre <http://localhost:6767>. Los datos de ejemplo se
-crean en cada arranque y se pierden al parar.
+Abre el frontend en <http://localhost:4200>. La API REST está en <http://localhost:6767/api>. `make run` inicia ambos procesos y `make run-h2` es un alias. H2 arranca en memoria con datos de demostración. Al detener el backend se descartan los cambios de esa ejecución y el cargador vuelve a sembrar los datos al siguiente arranque. El perfil `dev` usa una base separada en memoria para las pruebas existentes.
 
-### 6.2 Instalar MySQL (Ubuntu / Debian)
+Para entrar a la demostración desde Angular, usa `valentina.rojas@universidad.edu.co` o `mateo@universidad.edu.co`. La contraseña de ambas cuentas es `StudyFlowDemo2026!`. Los dos comparten Cognitiva, un proyecto con cuatro tareas encadenadas y tres canales con conversaciones. Comparten Arquitectura de software y cada uno tiene otras dos materias. Valentina tiene un pendiente de esa clase. Usa `STUDYFLOW_DEMO_PASSWORD` para cambiar la contraseña del próximo arranque o `STUDYFLOW_DEMO_ENABLED=false` para iniciar con la base vacía.
+
+También puedes ejecutar `make backend` y `make frontend` en dos terminales. `make build` genera los archivos estáticos en `frontend/dist/studyflow/browser` y un JAR separado para la API.
+
+### Panel local de administración
+
+Con el backend iniciado mediante `make backend` o `make run`, usa `admin` / `admin` en la pantalla normal de ingreso o abre <http://localhost:4200/admin>. El panel muestra el motor, el esquema, las tablas y sus filas paginadas. El visor es de solo lectura y oculta las columnas de credenciales. Las credenciales de administrador y el panel están reservados a la ejecución local y el JAR por sí solo sirve la API de estudiantes.
+
+**Reiniciar backend** pide confirmación, reinicia el proceso de Java y vuelve a cargar la demostración en una H2 nueva cuando está en memoria. Si H2 usa un archivo, los datos se conservan. Después del reinicio se requiere iniciar sesión otra vez.
+
+En un despliegue HTTPS, sirve los archivos de Angular desde un servidor web con reenvío de `/api/` a Spring, y usa `index.html` como entrada para las rutas de Angular. Ejecuta el JAR desde `backend/` con `STUDYFLOW_SECURE_COOKIE=true`. Puedes definir `STUDYFLOW_JWT_KEY` como una clave aleatoria de 32 bytes codificada en Base64. Cuando falta, se genera una clave en memoria al arrancar. El directorio de archivos adjuntos se puede configurar con `STUDYFLOW_ARCHIVOS_RUTA`.
+
+#### Railway
+
+Conecta dos servicios al mismo repositorio y rama. Railway detecta los Dockerfiles desde los directorios raíz de cada servicio.
+
+| Servicio | Directorio raíz | Variables | Red |
+| --- | --- | --- | --- |
+| `backend` | `/backend` | `PORT=6767` | Privada |
+| `frontend` | `/frontend` | `PORT=8080`, `BACKEND_URL=http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:6767` | Dominio público al puerto 8080 |
+
+El contenedor de Angular sirve la SPA y reenvía `/api` al backend privado. Spring escucha en IPv6 para la red privada de Railway y arranca con H2 en memoria. Para cargar los datos de demostración, configura `STUDYFLOW_DEMO_ENABLED=true` y una contraseña propia en `STUDYFLOW_DEMO_PASSWORD`. El panel administrativo sigue deshabilitado. Configura `GEMINI_KEY` y `STUDYFLOW_JWT_KEY` como variables del backend. H2 en memoria se reinicia con cada arranque, y los adjuntos necesitan un volumen si deben conservarse entre despliegues.
+
+WhatsApp y OpenAI mantienen sus propiedades en `backend/src/main/resources/application.properties`. La conexión externa se habilita ahí con la propiedad `enabled` y sus credenciales correspondientes.
+
+### Gemini para Canales
+
+En el `.env` de la raíz, añade la clave a `gemini.key=` y reinicia el backend. La clave vive en el servidor. Al pulsar **Resumir**, se envía a Gemini el texto reciente del canal y un directorio con los nombres de los autores en el prompt de sistema. Gemini resume los acuerdos vigentes y atribuye los compromisos confirmados. El canal `#general` de Cognitiva trae una discusión de ejemplo con propuestas reemplazadas y un acuerdo final. Si falta la clave o el proveedor no responde, se muestra el resumen local.
+
+Los canales son compartidos por cuentas vinculadas al mismo proyecto. La conversación abierta se actualiza automáticamente sin recargar la página.
+
+### Datos de una instalación anterior
+
+H2 es la única base de datos de ejecución. Para copiar una instalación MySQL anterior, usa el migrador local `com.studyflow.platform.migration.MigrarMysql` desde un JAR compilado. Prepara un archivo H2 vacío iniciando y deteniendo la aplicación con `STUDYFLOW_H2_URL=jdbc:h2:file:./data/studyflow` desde `backend/`. Esa variable selecciona la base persistente para recuperación o migración. Define `STUDYFLOW_MYSQL_URL`, `STUDYFLOW_MYSQL_USER` y `STUDYFLOW_MYSQL_PASSWORD` en el entorno. Mantén apagada la aplicación durante la copia.
 
 ```bash
-sudo apt update
-sudo apt install mysql-server
-systemctl status mysql          # debe decir "active (running)"
+cd backend
+java -Dloader.main=com.studyflow.platform.migration.MigrarMysql \
+  -Dloader.path=/ruta/mysql-connector-j.jar \
+  -cp target/students-management-platform.jar \
+  org.springframework.boot.loader.launch.PropertiesLauncher
 ```
 
-> `mysql_secure_installation` es opcional y **no afecta a este proyecto**: la aplicación se conecta
-> como `studyflow`, no como `root`.
-
-### 6.3 Crear la base de datos — paso manual, una sola vez
-
-**Este paso no es automático.** La aplicación se conecta *a* la base `studyflow` con el usuario
-`studyflow`: ambos deben existir antes de que arranque, porque no puede crear la base a la que
-necesita conectarse.
+El migrador copia y verifica las filas, mantiene los IDs y transforma las contraseñas legadas a BCrypt. Las cuentas antiguas sin contraseña y las que usaban la clave pública de demostración conservan sus datos. Para recuperar su acceso, establece una contraseña localmente con el servidor detenido. El comando la solicita sin mostrarla en la terminal y revoca las sesiones anteriores.
 
 ```bash
-sudo mysql < src/main/resources/db/mysql/schema.sql
+cd backend
+java -Dloader.main=com.studyflow.platform.migration.RestablecerContrasena \
+  -cp target/students-management-platform.jar \
+  org.springframework.boot.loader.launch.PropertiesLauncher correo@ejemplo.edu
 ```
-
-Crea la base, las 22 tablas, la vista de avance, el usuario y sus permisos. **No se repite.**
-
-Los datos de ejemplo son opcionales:
-
-```bash
-sudo mysql studyflow < src/main/resources/db/mysql/data.sql
-```
-
-Si la base está vacía, la propia aplicación la siembra al arrancar (usuario, 3 proyectos con sus
-tareas encadenadas por dependencias, canales `#general`, materias, entregables y un apunte de
-clase). No hay riesgo de duplicados si ejecutas los dos.
-
-#### Qué es automático y qué no
-
-| | Quién lo hace |
-|---|---|
-| Base de datos y usuario de MySQL | **Tú**, con `schema.sql` (una vez) |
-| Tablas | Hibernate, con `ddl-auto=update` |
-| Datos de demostración | `CargadorDatosIniciales`, si la base está vacía |
-
-### 6.4 Arrancar
-
-```bash
-./mvnw spring-boot:run
-```
-
-La aplicación queda en <http://localhost:6767>.
-
-### 6.5 Detener la ejecución
-
-- **Lanzada desde una terminal:** `Ctrl+C`.
-- **Lanzada en segundo plano** (`&` o `nohup`), `Ctrl+C` no sirve:
-
-```bash
-pkill -f "com.studyflow.platform.StudyFlowApplication"
-```
-
-`spring-boot:run` arranca **dos** procesos (Maven y la JVM). El `pkill` de arriba apunta a la JVM,
-que es la que ocupa el puerto. Para ver quién lo tiene: `ss -ltnp | grep 6767`.
-
-### 6.6 Configuración
-
-Todo en `src/main/resources/application.properties`:
-
-| Qué | Propiedad |
-|---|---|
-| Puerto | `server.port=6767` |
-| Servidor y base de MySQL | `spring.datasource.url` |
-| Acceso desde otros equipos | añade `server.address=0.0.0.0` |
-| Carpeta de archivos subidos | `studyflow.archivos.ruta` (por defecto `archivos/`) |
-| Frecuencia de la cola de recordatorios | `studyflow.recordatorios.intervalo-ms` |
-
-Credenciales por entorno, sin editar el archivo:
-
-```bash
-DB_USER=miusuario DB_PASSWORD=miclave ./mvnw spring-boot:run
-```
-
-#### Activar el envío real por WhatsApp
-
-El token y el *Phone Number ID* salen del
-[panel de desarrolladores de Meta](https://developers.facebook.com/).
-
-```properties
-studyflow.whatsapp.enabled=true
-studyflow.whatsapp.token=${WHATSAPP_TOKEN:}
-studyflow.whatsapp.phone-number-id=${WHATSAPP_PHONE_ID:}
-```
-
-Dos avisos al conectarlo: Meta solo permite **texto libre dentro de las 24 h** posteriores a un
-mensaje del usuario (fuera de esa ventana hace falta una plantilla aprobada, que este cliente aún
-no envía), y el número va en **formato internacional sin signos**: `573001112233`.
-
-#### Activar la API de ChatGPT
-
-```properties
-studyflow.ia.enabled=true
-studyflow.ia.api-key=${OPENAI_API_KEY:}
-studyflow.ia.modelo=gpt-4o-mini
-```
-
-`ClienteIaOpenAi` sustituye automáticamente a `ClienteIaSimulado`. Ese cliente **no se ha probado
-contra el servicio real**: al conectarlo conviene verificar el modelo y la forma de la respuesta.
-
-### 6.7 Empaquetar
-
-```bash
-./mvnw clean package
-java -jar target/students-management-platform.jar
-```
-
-### 6.8 Estilos (Tailwind)
-
-```bash
-npm install
-npm run css        # compila una vez
-npm run css:watch  # recompila al guardar
-```
-
-Fuente: `src/main/frontend/tailwind.css` → salida: `src/main/resources/static/css/app.css`.
-El CSS compilado está versionado: **solo necesitas Node si vas a modificar los estilos**.
-
-**Modo claro y oscuro.** El interruptor está en la barra superior (y suelto en
-acceso, registro y la guía de estilo, que no llevan barra). La elección se
-guarda en el navegador; mientras no se elija nada se sigue la preferencia del
-sistema y la página cambia con ella.
-
-No hay dos hojas de estilo ni variantes `dark:` repetidas por componente: las
-superficies son **variables de rol** (`--tarjeta-gris`, `--campo`, `--titulo-a`,
-`--form-linea`…) declaradas dos veces en `tailwind.css`, una en `:root` y otra
-en `.dark`. Cada regla usa la variable, así que volcar ese bloque cambia toda la
-aplicación y no puede quedar media pantalla sin adaptar. Los colores de marca
-(primary, success, warning, danger, cyan) son fijos: valen en los dos modos.
-
-La clase `.dark` la pone un script síncrono en el `<head>`, antes de pintar; si
-se dejara a `main.js` (que va con `defer`) se vería un fogonazo blanco al cargar.
-
-**Paleta y guía de estilo:** con la aplicación en marcha, `http://localhost:6767/paleta`
-muestra los colores, las sombras, los redondeos y las tipografías. No hace falta
-sesión. Los valores no están escritos en esa página: cada muestra se pinta con la
-clase real y se lee su color ya calculado, así que la guía no puede quedar
-desfasada respecto a la hoja de estilos. Pulsa cualquier muestra para copiarla.
-
-Conviene mirarla antes de maquetar una pantalla nueva. Los colores con nombre
-(`primary`, `success`…) viven en `tailwind.config.js`, pero los grises azulados
-que separan una tarjeta del fondo o un campo de su panel están escritos como
-valor literal dentro de `tailwind.css` y no tienen nombre; la guía es el único
-sitio donde se ven todos juntos y con su función explicada.
-
----
 
 ## 7. Rutas
 
@@ -683,7 +417,7 @@ sitio donde se ven todos juntos y con su función explicada.
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `GET` | `/api/sesion/actual` | Quién está usando la aplicación |
-| `POST` | `/api/sesion/entrar` | Entrada en un paso (nombre) |
+| `POST` | `/api/sesion/entrar` | Alias del ingreso con correo y contraseña |
 | `POST` | `/api/sesion/acceder` · `/salir` | Correo y contraseña · cerrar sesión |
 | `GET`/`POST`/`PUT` | `/api/usuarios/**` | Perfil, registro y actualización |
 
@@ -738,70 +472,4 @@ sitio donde se ven todos juntos y con su función explicada.
 
 ## 8. Base de datos
 
-22 tablas en MySQL 8:
-
-| Área | Tablas |
-|---|---|
-| Cuentas | `universidad`, `usuario` |
-| Proyectos | `proyecto`, `integrante`, `etapa` |
-| Tareas | `tarea`, `tarea_dependencia`, `archivo_tarea`, `registro_avance` |
-| Entregables | `entregable` |
-| Canales | `canal`, `mensaje_chat`, `reaccion_mensaje`, `archivo_adjunto`, `resumen_chat` |
-| Horarios | `materia`, `bloque_horario`, `horario`, `horario_materia` |
-| Recordatorios | `apunte_clase`, `preferencia_recordatorio`, `recordatorio` |
-
-Más la vista `vista_avance_proyecto`, que precalcula el porcentaje de tareas terminadas.
-
-Esquema en `src/main/resources/db/mysql/schema.sql`, con claves foráneas, borrado en cascada,
-índices sobre fechas y estados, y restricciones de coherencia (edad válida, `hora_inicio < hora_fin`,
-una tarea no puede depender de sí misma, un emoji por persona y mensaje).
-
----
-
-## 9. Pruebas
-
-```bash
-./mvnw test
-```
-
-27 pruebas sobre el perfil `dev`: arranque, respuesta de las páginas, datos de demostración,
-antelación de recordatorios, modo simulación de WhatsApp, reparto de plazos del organizador,
-resúmenes de canal, reacciones con emoji, ciclos de dependencias, reparto de tareas, los cuatro
-estados, tipos de entregable deducidos del enlace y acceso rápido.
-
----
-
-## 10. Problemas frecuentes
-
-**El navegador dice «no se puede acceder a este sitio».**
-La aplicación no está arrancada o murió al arrancar. Si ves `Communications link failure` o
-`Unknown database 'studyflow'`, falta MySQL o el paso 3.3. Comprobación rápida:
-`./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` no necesita base de datos — si con `dev`
-sí abre, el problema está en MySQL y no en la aplicación.
-
-**`Port 6767 was already in use`.**
-Quedó una ejecución viva. `ss -ltnp | grep 6767` y el `pkill` del apartado 6.5.
-
-**`Unknown database 'studyflow'` o `Access denied`.**
-Falta el paso 3.3. Comprobar: `sudo mysql -e "SHOW DATABASES;" | grep studyflow`.
-
-**No me llega ningún WhatsApp.**
-Es lo esperado sin credenciales: la pasarela simula y escribe en el log (`[WhatsApp · SIMULADO]`).
-La página de recordatorios muestra un aviso amarillo cuando está en ese modo.
-
-**Los recordatorios no aparecen.**
-Solo se programan avisos para vencimientos **futuros**. Pulsa «Recalcular agenda» tras cambiar
-tareas o fechas.
-
-**No puedo tomar una tarea.**
-O ya tiene responsable, o alguna de sus dependencias no está terminada. El diagrama de fases marca
-las bloqueadas con un candado e indica de qué dependen.
-
-**No puedo eliminar un canal.**
-`#general` es el hilo principal del proyecto y no se puede borrar. Los demás sí.
-
-**Cambié el CSS y no se ve.**
-Hay que recompilar con `npm run css`. Y `Ctrl+Shift+R` en el navegador.
-
-**Cambié `server.port` y sigue en el puerto anterior.**
-Spring Boot lee ese valor solo al iniciar: hay que reiniciar.
+H2 guarda las entidades académicas, las relaciones y los IDs durante la ejecución. La tabla `sesion_autenticada` guarda el vencimiento y el hash de la credencial de renovación. Los resultados y adjuntos binarios se almacenan por separado en `archivos/`.

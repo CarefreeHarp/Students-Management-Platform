@@ -1,0 +1,15 @@
+*
+!package.json
+!package-lock.json
+!angular.json
+!tsconfig.app.json
+!tailwind.config.cjs
+!Caddyfile
+!public/
+!public/**
+!scripts/
+!scripts/**
+!src/
+!src/**
+!styles/
+!styles/**

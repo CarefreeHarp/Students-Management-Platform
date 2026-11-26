@@ -1,0 +1,101 @@
+<a class="skip-link" href="#contenido">Ir al contenido</a>
+<header id="main-nav" class="app-nav"></header>
+
+<main id="contenido" class="page-shell schedule-builder">
+  <section class="page-heading" aria-labelledby="schedule-page-title">
+    <div>
+      <p class="eyebrow">Planificador académico</p>
+      <h1 id="schedule-page-title">Tu próximo horario</h1>
+      <p class="schedule-muted">Añade tus materias, registra las opciones que ofrece tu universidad y compara tu semana.</p>
+    </div>
+    <a class="text-action" href="/panel"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al inicio</a>
+  </section>
+
+  <div class="schedule-builder__layout">
+    <aside class="panel schedule-subjects" aria-labelledby="subjects-title">
+      <div class="schedule-row">
+        <h2 id="subjects-title">Mis materias <span id="subject-count" class="schedule-muted">0</span></h2>
+        <button id="clear-subjects" type="button" class="btn btn-ghost btn-sm">Limpiar</button>
+      </div>
+      <p class="schedule-muted schedule-small">Elige una opción por materia para verla en tu semana.</p>
+
+      <details id="subject-editor" class="schedule-editor">
+        <summary id="subject-editor-title"><i class="bi bi-plus-lg" aria-hidden="true"></i> Añadir materia</summary>
+        <form id="subject-form" class="schedule-subject-form" novalidate>
+          <div class="form-field">
+            <label for="subject-name">Nombre de la materia</label>
+            <input id="subject-name" name="name" type="text" placeholder="Ej. Anatomía humana" maxlength="80" required>
+          </div>
+          <div class="form-field">
+            <label for="subject-credits">Créditos</label>
+            <input id="subject-credits" name="credits" type="number" min="1" max="30" value="3" required inputmode="numeric">
+          </div>
+          <p class="schedule-muted schedule-small">Una opción agrupa todas las clases de la misma sección. Por ejemplo: lunes y miércoles de 8:00 a 10:00. Añade otra opción si hay una sección diferente.</p>
+          <div id="subject-options" class="schedule-options-editor"></div>
+          <button id="add-subject-option" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus-lg" aria-hidden="true"></i> Añadir otra opción</button>
+          <p id="subject-form-error" class="schedule-error" role="alert" hidden></p>
+          <div class="schedule-actions">
+            <button id="save-subject" class="btn btn-primary" type="submit">Guardar materia</button>
+            <button id="cancel-subject-edit" class="btn btn-ghost" type="button">Cancelar</button>
+          </div>
+        </form>
+      </details>
+
+      <div id="subject-list" class="schedule-subject-list" aria-live="polite"></div>
+      <button id="load-subject-examples" class="text-action schedule-examples" type="button">Añadir ejemplos de otras carreras</button>
+      <button id="restore-schedule" class="text-action schedule-examples" type="button" disabled>Recuperar horario guardado</button>
+      <p id="schedule-storage-status" class="schedule-muted schedule-small" role="status">El borrador se guarda en este navegador. Los ejemplos son ilustrativos.</p>
+    </aside>
+
+    <div class="schedule-preview-column">
+      <section class="panel" aria-labelledby="draft-calendar-title">
+        <div class="section-head flex-wrap">
+          <div>
+            <h2 id="draft-calendar-title">Tu semana</h2>
+            <p id="draft-calendar-caption">Selecciona una opción de cada materia.</p>
+          </div>
+          <button id="save-schedule" class="btn btn-secondary" type="button" disabled><i class="bi bi-bookmark-check" aria-hidden="true"></i> Guardar horario</button>
+        </div>
+        <p id="schedule-conflicts" class="schedule-error" role="status" hidden></p>
+        <p id="schedule-scroll-help" class="schedule-scroll-hint">Desliza el calendario para ver todos los días y horas. También puedes usar las flechas del teclado al enfocarlo.</p>
+        <div class="schedule-calendar-wrap" tabindex="0" role="region" aria-label="Semana de materias, desplazable" aria-describedby="schedule-scroll-help">
+          <div id="draft-calendar" class="schedule-calendar" aria-label="Calendario semanal de materias"></div>
+        </div>
+        <div class="schedule-preview-footer">
+          <span>Vista previa de las opciones que elegiste.</span>
+          <span id="draft-credit-count">0 créditos</span>
+        </div>
+      </section>
+
+      <section class="panel schedule-preferences" aria-labelledby="schedule-preferences-title">
+        <div class="schedule-row">
+          <h2 id="schedule-preferences-title">Preferencias de horario</h2>
+        </div>
+        <p class="schedule-muted schedule-small" id="schedule-preferences-help">Guárdalas mientras eliges una opción por materia. Se incluyen cuando guardas tu horario.</p>
+        <div id="schedule-preferences" class="schedule-preference-fields">
+          <fieldset>
+            <legend>Jornada</legend>
+            <div class="schedule-preference-options">
+              <label><input type="radio" name="schedule-day-preference" value="any" checked> Sin preferencia</label>
+              <label><input type="radio" name="schedule-day-preference" value="early"> Empezar temprano</label>
+              <label><input type="radio" name="schedule-day-preference" value="late"> Terminar tarde</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Pausas entre clases</legend>
+            <div class="schedule-preference-options">
+              <label><input type="radio" name="schedule-break-preference" value="any" checked> Sin preferencia</label>
+              <label><input type="radio" name="schedule-break-preference" value="short"> Sin pausas largas</label>
+              <label><input type="radio" name="schedule-break-preference" value="long"> Con pausas largas</label>
+            </div>
+          </fieldset>
+          <label class="schedule-credit-preference"><input id="schedule-more-credits" type="checkbox"> Priorizar más créditos</label>
+        </div>
+        <div class="schedule-preference-actions">
+          <button id="save-schedule-preferences" class="btn btn-secondary" type="button" aria-describedby="schedule-preferences-help">Guardar preferencias</button>
+          <p id="schedule-preference-status" class="schedule-muted schedule-small" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,106 @@
+<a class="skip-link" href="#contenido">Ir al contenido</a>
+<header id="main-nav" class="app-nav"></header>
+
+<main id="contenido" class="page-shell">
+  <section class="page-heading" aria-labelledby="recordatorios-title">
+    <div>
+      <p class="eyebrow">A tu tiempo</p>
+      <h1 id="recordatorios-title">Recordatorios</h1>
+      <p class="mt-2 text-muted">Tus pendientes, con un aviso por WhatsApp cuando lo necesites.</p>
+    </div>
+    <div class="flex flex-wrap gap-2.5">
+      <button id="open-preferences" class="btn btn-secondary" type="button"><i class="bi bi-sliders" aria-hidden="true"></i> Configurar recordatorios</button>
+      <button id="open-reminder" class="btn btn-primary" type="button"><i class="bi bi-plus-lg" aria-hidden="true"></i> Añadir recordatorio</button>
+    </div>
+  </section>
+
+  <p id="gateway-status" class="mb-5 text-[13px] text-muted" role="status"></p>
+
+  <section class="panel" aria-labelledby="scheduled-title">
+    <div class="section-head flex-wrap">
+      <div><h2 id="scheduled-title">Tus avisos</h2><p id="scheduled-count">Cargando recordatorios…</p></div>
+      <button id="reprogram" class="btn btn-ghost" type="button"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Actualizar desde mis pendientes</button>
+    </div>
+    <div id="reminders-list" class="grid gap-2.5" aria-live="polite"></div>
+  </section>
+
+  <details id="reminder-history" class="panel mt-5" hidden>
+    <summary class="text-sm font-semibold">Historial de avisos</summary>
+    <div id="reminders-history-list" class="mt-4 grid gap-2.5"></div>
+  </details>
+  <details id="class-notes" class="panel mt-5" hidden>
+    <summary class="text-sm font-semibold">Pendientes de clase guardados</summary>
+    <p class="mt-2 mb-4 text-[13px] text-muted">Marca como resueltos los pendientes que ya terminaste.</p>
+    <div id="notes-list" class="grid gap-2.5" aria-live="polite"></div>
+  </details>
+</main>
+
+<dialog id="reminder-dialog" class="app-dialog" aria-labelledby="new-reminder-title">
+  <form id="reminder-form" class="dialog-form" novalidate>
+    <div class="dialog-header">
+      <div><p class="eyebrow">Aviso por WhatsApp</p><h2 id="new-reminder-title">Añadir recordatorio</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    </div>
+    <label class="form-field" for="reminder-title">¿Qué necesitas recordar?
+      <input id="reminder-title" name="titulo" type="text" maxlength="150" placeholder="Ej. Preparar la exposición de psicología" required autofocus>
+    </label>
+    <div class="form-grid-two">
+      <label class="form-field" for="reminder-date">Fecha del pendiente<input id="reminder-date" name="fecha" type="date" required></label>
+      <label class="form-field" for="reminder-time">Hora del pendiente<input id="reminder-time" name="hora" type="time" value="09:00" required></label>
+    </div>
+    <div class="form-grid-two">
+      <label class="form-field" for="reminder-advance">Avisarme con antelación<input id="reminder-advance" name="antelacion" type="number" min="0" max="43200" step="1" value="1" required></label>
+      <label class="form-field" for="reminder-unit">Unidad
+        <select id="reminder-unit" name="unidad"><option value="1">Minutos</option><option value="60" selected>Horas</option><option value="1440">Días</option></select>
+      </label>
+    </div>
+    <p id="reminder-preview" class="field-hint" aria-live="polite">Elige fecha y hora para ver cuándo recibirás el aviso.</p>
+    <label class="form-field" for="reminder-message">Detalle <span class="font-normal text-muted">(opcional)</span>
+      <textarea id="reminder-message" name="mensaje" rows="3" maxlength="400" placeholder="Lugar, materiales o algo que no quieras olvidar."></textarea>
+    </label>
+    <p id="reminder-destination" class="field-hint"></p>
+    <p id="reminder-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
+      <button class="btn btn-primary" type="submit">Guardar recordatorio</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="preferences-dialog" class="app-dialog" aria-labelledby="config-title">
+  <form id="preferences-form" class="dialog-form" novalidate>
+    <div class="dialog-header">
+      <div><p class="eyebrow">Tus valores por defecto</p><h2 id="config-title">Configurar recordatorios</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    </div>
+    <p class="dialog-intro">Esta antelación se aplica a tus tareas, entregas y pendientes de clase. Cada aviso personal conserva la que elegiste al crearlo.</p>
+    <label class="check-label" for="reminders-active"><input id="reminders-active" name="activo" type="checkbox" checked><span>Recibir recordatorios</span></label>
+    <label class="form-field" for="whatsapp-phone">Número de WhatsApp
+      <input id="whatsapp-phone" name="telefonoWhatsapp" type="tel" inputmode="numeric" pattern="[0-9]{8,15}" placeholder="573001112233" maxlength="15">
+      <span class="field-hint">Indicativo del país y número, sin espacios. Ejemplo: 573001112233.</span>
+    </label>
+    <label class="form-field" for="advance-task">Tareas · avisar con
+      <select id="advance-task" name="minutosAntesTarea">
+        <option value="60">1 hora antes</option><option value="180">3 horas antes</option><option value="720">12 horas antes</option>
+        <option value="1440" selected>1 día antes</option><option value="2880">2 días antes</option><option value="4320">3 días antes</option>
+      </select>
+    </label>
+    <label class="form-field" for="advance-delivery">Entregas de proyecto · avisar con
+      <select id="advance-delivery" name="minutosAntesEntrega">
+        <option value="1440">1 día antes</option><option value="2880">2 días antes</option><option value="4320" selected>3 días antes</option>
+        <option value="10080">1 semana antes</option><option value="20160">2 semanas antes</option>
+      </select>
+    </label>
+    <label class="form-field" for="advance-note">Pendientes de clase · avisar con
+      <select id="advance-note" name="minutosAntesApunte">
+        <option value="60">1 hora antes</option><option value="120" selected>2 horas antes</option><option value="720">12 horas antes</option><option value="1440">1 día antes</option>
+      </select>
+    </label>
+    <p id="preferences-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
+    <div class="dialog-actions flex-wrap">
+      <button id="test-message" class="btn btn-ghost" type="button">Enviar prueba</button>
+      <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
+      <button class="btn btn-primary" type="submit">Guardar configuración</button>
+    </div>
+  </form>
+</dialog>

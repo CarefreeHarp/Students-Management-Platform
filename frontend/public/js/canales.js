@@ -1,0 +1,545 @@
+/*
+ * Canales de un proyecto.
+ * Barra lateral de canales, conversación con reacciones y archivos adjuntos,
+ * más las secciones de imágenes y documentos del canal activo.
+ */
+export function mount(scope) {
+  const { document, listen, request, later, animate } = scope;
+
+  const app = scope.app || {};
+  const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
+  const proyecto = document.body.dataset.projectId;
+  const REACCIONES = { acuerdo: 'De acuerdo', hecho: 'Hecho', gracias: 'Gracias' };
+
+  const avataresCargados = new Map();
+  const cuentaDemo = proyecto === "cognitiva"
+    && ["valentina.rojas@universidad.edu.co", "mateo@universidad.edu.co"].includes(scope.user?.correo);
+  const fotosDemo = new Map([
+    ["Valentina Rojas", "/assets/img/avatares-demo/valentina.webp"],
+    ["Mateo Díaz", "/assets/img/avatares-demo/mateo.webp"]
+  ]);
+
+  const estado = { canales: [], activo: null, archivoPendiente: null, seleccionado: null, revision: 0, enviando: false };
+  const $ = (selector) => document.querySelector(selector);
+
+  async function pedir(url, opciones = {}) {
+    const esFormulario = opciones.body instanceof FormData;
+    const respuesta = await request(url, {
+      headers: esFormulario ? {} : { "Content-Type": "application/json" },
+      ...opciones
+    });
+    // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
+    if (respuesta.status === 401) {
+      app.navigate("/login");
+      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+    }
+    if (!respuesta.ok) {
+      const detalle = await respuesta.json().catch(() => ({}));
+      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
+    }
+    return respuesta.status === 204 ? null : respuesta.json();
+  }
+
+  const avisar = (mensaje, tipo = "info") => {
+    if (typeof app.showToast === "function") app.showToast(mensaje, tipo);
+  };
+
+  /* ------------------------------------------------------------ barra lateral */
+
+  function pintarCanales() {
+    $("#channel-list").innerHTML = estado.canales.map((canal) => `
+      <button class="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-[13px] font-semibold transition-colors
+                     ${canal.id === estado.activo?.id ? "bg-primary-soft text-[var(--estado-primary)]" : "text-muted hover:bg-primary-soft hover:text-[var(--estado-primary)]"}"
+              type="button" data-channel="${canal.id}">
+        <span class="text-muted-light">#</span>
+        <span class="min-w-0 flex-1 truncate">${esc(canal.slug)}</span>
+        ${canal.totalMensajes ? `<span class="text-[10px] text-muted-light">${canal.totalMensajes}</span>` : ""}
+      </button>`).join("");
+
+    $("#channel-list").querySelectorAll("[data-channel]").forEach((boton) => {
+      boton.addEventListener("click", () => abrirCanal(Number(boton.dataset.channel)));
+    });
+  }
+
+  /* ------------------------------------------------------------ mensajes */
+
+  function burbujaReacciones(mensaje) {
+    const existentes = mensaje.reacciones.filter(reaccion => REACCIONES[reaccion.emoji]).map((reaccion) => `
+      <button class="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11px] transition-colors
+                     ${reaccion.propia ? "border-primary bg-primary-soft text-[var(--estado-primary)]" : "border-line bg-[var(--superficie)] text-muted hover:border-primary"}"
+              type="button" data-react="${mensaje.id}" data-emoji="${esc(reaccion.emoji)}"
+              title="${esc(reaccion.personas.join(", "))}">
+        <span>${REACCIONES[reaccion.emoji]}</span><span>${reaccion.total}</span>
+      </button>`).join("");
+
+    return `<div class="mt-1.5 flex flex-wrap items-center gap-1">
+        ${existentes}
+        <button class="grid h-6 w-6 place-items-center rounded-full border border-line bg-[var(--superficie)] text-[11px] text-muted hover:border-primary hover:text-primary"
+                type="button" data-open-picker="${mensaje.id}" aria-label="Añadir reacción">
+          <i class="bi bi-plus" aria-hidden="true"></i>
+        </button>
+      </div>`;
+  }
+
+  function burbujaAdjuntos(mensaje) {
+    if (!mensaje.adjuntos.length) return "";
+    return `<div class="mt-2 grid gap-1.5">${mensaje.adjuntos.map((archivo) => archivo.esImagen
+      ? `<a href="${esc(archivo.url)}" target="_blank" rel="noopener">
+           <img ${scope.sandbox ? 'src' : 'data-adjunto'}="${esc(archivo.url)}" alt="${esc(archivo.nombre)}" class="max-h-52 rounded-sm border border-line object-cover">
+         </a>`
+      : `<a href="${esc(archivo.url)}" class="inline-flex items-center gap-2 rounded-sm border border-line bg-[var(--superficie)] px-2.5 py-1.5 text-xs hover:border-primary"
+            target="_blank" rel="noopener">
+           <i class="bi bi-file-earmark-arrow-down text-primary"></i>
+           <span class="min-w-0 flex-1 truncate">${esc(archivo.nombre)}</span>
+           <span class="text-muted-light">${esc(archivo.tamano)}</span>
+         </a>`).join("")}</div>`;
+  }
+
+  function burbuja(mensaje) {
+    if (mensaje.generadoPorIa) {
+      return `<div class="self-center w-full max-w-[85%] rounded-sm border border-primary/20 bg-primary-soft/60 p-3 text-xs text-[var(--estado-primary)]">
+          <strong class="mb-1 block"><i class="bi bi-stars"></i> Asistente</strong>${esc(mensaje.contenido)}
+        </div>`;
+    }
+    const urlAvatar = mensaje.autorAvatarUrl
+      || (mensaje.propio ? scope.user?.avatarUrl : null)
+      || (mensaje.autorAvatarUrl === undefined && cuentaDemo ? fotosDemo.get(mensaje.autorNombre) : null);
+    const avatar = urlAvatar
+      ? `<span>${esc(mensaje.iniciales)}</span>
+         <img data-avatar-autor="${esc(urlAvatar)}" class="hidden h-full w-full rounded-full object-cover"
+              alt="" referrerpolicy="no-referrer">`
+      : esc(mensaje.iniciales);
+    return `
+      <div class="flex max-w-[88%] items-start gap-2.5 ${mensaje.propio ? "flex-row-reverse self-end" : "self-start"}">
+        <span class="member-avatar ml-0 flex-none" style="--member-color:${esc(mensaje.autorColor)}"
+              title="${esc(mensaje.autorNombre)}">${avatar}</span>
+        <div class="min-w-0">
+          <div class="rounded-sm border border-line ${mensaje.propio ? "bg-primary-soft" : "bg-[var(--superficie)]"} px-3 py-2">
+            <p class="mb-0.5 text-[11px] font-extrabold ${mensaje.propio ? "text-primary" : "text-muted"}">
+              ${esc(mensaje.autorNombre)} · ${esc(mensaje.fechaEnvio)}
+            </p>
+            <p class="whitespace-pre-wrap break-words text-[13px]">${esc(mensaje.contenido)}</p>
+            ${burbujaAdjuntos(mensaje)}
+          </div>
+          ${burbujaReacciones(mensaje)}
+        </div>
+      </div>`;
+  }
+
+  async function cargarVistaPrevia(root) {
+    if (scope.sandbox) return;
+    for (const img of root.querySelectorAll('img[data-adjunto]')) {
+      try {
+        const res = await request(img.dataset.adjunto);
+        if (!res.ok) continue;
+        const blob = await res.blob();
+        if (img.isConnected && /^image\/(png|jpeg|webp|gif)$/.test(blob.type)) {
+          img.src = scope.objectUrl(blob);
+        }
+      } catch (_) { /* El archivo sigue disponible con su enlace de descarga. */ }
+    }
+  }
+
+  function descargarAvatar(url) {
+    if (!avataresCargados.has(url)) {
+      const descarga = request(url).then(async respuesta => {
+        if (!respuesta.ok || scope.signal.aborted) return null;
+        const imagen = await respuesta.blob();
+        return !scope.signal.aborted && /^image\/(png|jpeg|webp)$/.test(imagen.type)
+          ? scope.objectUrl(imagen) : null;
+      }).catch(() => null).then(resultado => {
+        if (!resultado) avataresCargados.delete(url);
+        return resultado;
+      });
+      avataresCargados.set(url, descarga);
+    }
+    return avataresCargados.get(url);
+  }
+
+  async function mostrarAvatar(imagen) {
+    const url = imagen.dataset.avatarAutor;
+    const fuente = /^\/api\/canales\/\d+\/avatares\/\d+\?v=[0-9a-f]+$/.test(url)
+      ? await descargarAvatar(url) : url;
+    if (!fuente || !imagen.isConnected) return;
+    imagen.addEventListener("load", () => {
+      imagen.previousElementSibling.hidden = true;
+      imagen.classList.remove("hidden");
+    }, { once: true });
+    imagen.src = fuente;
+  }
+
+  function pintarMensajes(mensajes, conservar = false) {
+    const caja = $("#messages");
+    const posicion = caja.scrollTop;
+    const alFinal = caja.scrollHeight - caja.clientHeight - posicion < 48;
+    caja.innerHTML = mensajes.length
+      ? mensajes.map(burbuja).join("")
+      : '<p class="m-auto text-center text-[13px] text-muted">Aún no hay mensajes en este canal.</p>';
+    caja.scrollTop = !conservar || alFinal ? caja.scrollHeight : posicion;
+    void cargarVistaPrevia(caja);
+    caja.querySelectorAll("img[data-avatar-autor]").forEach(imagen => void mostrarAvatar(imagen));
+
+    caja.querySelectorAll("[data-react]").forEach((boton) => {
+      boton.addEventListener("click", () => reaccionar(Number(boton.dataset.react), boton.dataset.emoji));
+    });
+    caja.querySelectorAll("[data-open-picker]").forEach((boton) => {
+      boton.addEventListener("click", (evento) => abrirSelector(evento, Number(boton.dataset.openPicker)));
+    });
+  }
+
+  /* ------------------------------------------------------------ reacciones */
+
+  function abrirSelector(evento, mensajeId) {
+    const selector = $("#emoji-picker");
+    selector.innerHTML = Object.entries(REACCIONES).map(([codigo, etiqueta]) =>
+      `<button class="reaction-label hover:bg-primary-soft" type="button" data-emoji="${codigo}">${etiqueta}</button>`
+    ).join("");
+    selector.classList.remove("hidden");
+    selector.classList.add("flex");
+
+    const rect = evento.currentTarget.getBoundingClientRect();
+    const viewport = window.visualViewport;
+    const left = viewport?.offsetLeft || 0;
+    const top = viewport?.offsetTop || 0;
+    const width = viewport?.width || window.innerWidth;
+    const height = viewport?.height || window.innerHeight;
+    const menu = selector.getBoundingClientRect();
+    const above = rect.top - menu.height - 8;
+    const preferredTop = above >= top + 8 ? above : rect.bottom + 8;
+    selector.style.left = `${Math.max(left + 8, Math.min(left + width - menu.width - 8, rect.left))}px`;
+    selector.style.top = `${Math.max(top + 8, Math.min(top + height - menu.height - 8, preferredTop))}px`;
+
+    selector.querySelectorAll("[data-emoji]").forEach((boton) => {
+      boton.addEventListener("click", () => {
+        cerrarSelector();
+        reaccionar(mensajeId, boton.dataset.emoji);
+      });
+    });
+  }
+
+  function cerrarSelector() {
+    const selector = $("#emoji-picker");
+    selector.classList.add("hidden");
+    selector.classList.remove("flex");
+  }
+
+  async function reaccionar(mensajeId, emoji) {
+    const canalId = estado.activo?.id;
+    if (!canalId) return;
+    try {
+      await pedir(`/api/mensajes/${mensajeId}/reacciones`, {
+        method: "POST",
+        body: JSON.stringify({ emoji })
+      });
+      if (estado.seleccionado === canalId) await abrirCanal(canalId);
+    } catch (error) {
+      avisar(error.message, "error");
+    }
+  }
+
+  /* ------------------------------------------------------------ archivos */
+
+  function pintarArchivos(archivos) {
+    const imagenes = archivos.filter((archivo) => archivo.esImagen);
+    const documentos = archivos.filter((archivo) => !archivo.esImagen);
+
+    $("#image-count").textContent = String(imagenes.length);
+    $("#doc-count").textContent = String(documentos.length);
+
+    $("#gallery").innerHTML = imagenes.length
+      ? imagenes.map((imagen) => `
+          <a href="${esc(imagen.url)}" target="_blank" rel="noopener" title="${esc(imagen.nombre)}">
+            <img ${scope.sandbox ? 'src' : 'data-adjunto'}="${esc(imagen.url)}" alt="${esc(imagen.nombre)}"
+                 class="aspect-square w-full rounded-md border border-line object-cover transition-transform hover:scale-105">
+          </a>`).join("")
+      : '<p class="col-span-3 text-[13px] text-muted">Sin imágenes todavía.</p>';
+
+    void cargarVistaPrevia($("#gallery"));
+    $("#documents").innerHTML = documentos.length
+      ? documentos.map((documento) => `
+          <a href="${esc(documento.url)}" target="_blank" rel="noopener"
+             class="flex items-center gap-2 rounded-sm border border-line bg-[var(--superficie)] p-2 text-xs hover:border-primary">
+            <i class="bi bi-file-earmark-text text-lg text-primary"></i>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-bold">${esc(documento.nombre)}</span>
+              <span class="text-muted-light">${esc(documento.tamano)} · ${esc(documento.subidoPor)}</span>
+            </span>
+          </a>`).join("")
+      : '<p class="text-[13px] text-muted">Sin documentos todavía.</p>';
+  }
+
+  /* ------------------------------------------------------------ resumen */
+
+  function pintarResumen(resumen) {
+    const caja = $("#summary-body");
+    if (!resumen) {
+      $("#summary-model").textContent = "Resumen";
+      $("#summary-model").removeAttribute("title");
+      caja.innerHTML = '<p class="text-[13px] text-muted">Pulsa «Resumir» cuando haya conversación.</p>';
+      return;
+    }
+    const etiqueta = $("#summary-model");
+    etiqueta.textContent = resumen.modelo?.startsWith("gemini-") ? "Gemini" : (resumen.modelo || "Local");
+    etiqueta.title = resumen.modelo || "Local";
+    const puntos = (resumen.puntosClave || []).length
+      ? `<ul class="mt-2.5 grid gap-1.5 text-xs text-muted">${resumen.puntosClave
+          .map((punto) => `<li class="flex gap-1.5"><i class="bi bi-dot text-primary"></i><span>${esc(punto)}</span></li>`)
+          .join("")}</ul>`
+      : "";
+    caja.innerHTML = `<p class="whitespace-pre-wrap text-[13px]">${esc(resumen.contenido)}</p>${puntos}
+      <p class="mt-2.5 text-[11px] text-muted-light">${resumen.mensajesResumidos} mensajes · ${esc(resumen.fechaGeneracion)}</p>`;
+  }
+
+  /* ------------------------------------------------------------ carga */
+
+  async function abrirCanal(canalId, enSegundoPlano = false) {
+    if (!enSegundoPlano) {
+      estado.seleccionado = canalId;
+      estado.revision++;
+    }
+    const revision = estado.revision;
+    const vigente = () => !scope.signal.aborted && estado.seleccionado === canalId && revision === estado.revision;
+    const canal = await pedir(`/api/canales/${canalId}`);
+    if (!vigente()) return;
+    const anterior = estado.activo?.id === canalId ? estado.activo : null;
+    estado.activo = canal;
+
+    $("#channel-title").textContent = `#${canal.slug}`;
+    $("#channel-description").textContent = canal.descripcion || "";
+    $("#message-input").placeholder = `Escribe en #${canal.slug}…`;
+    $("#delete-channel").hidden = !canal.borrable;
+    $("#summarize").disabled = $("#summarize").hasAttribute("aria-busy") || !canal.mensajes.length;
+
+    if (!enSegundoPlano || JSON.stringify(anterior?.mensajes) !== JSON.stringify(canal.mensajes)) {
+      pintarMensajes(canal.mensajes, enSegundoPlano);
+    }
+    if (!enSegundoPlano || anterior?.ultimoResumen?.id !== canal.ultimoResumen?.id) {
+      pintarResumen(canal.ultimoResumen);
+    }
+    if (!enSegundoPlano || anterior?.totalArchivos !== canal.totalArchivos) {
+      const adjuntos = await pedir(`/api/canales/${canalId}/archivos`);
+      if (vigente()) pintarArchivos(adjuntos);
+    }
+    if (!enSegundoPlano || anterior?.totalMensajes !== canal.totalMensajes
+        || anterior?.totalArchivos !== canal.totalArchivos) {
+      const canales = await pedir(`/api/proyectos/${proyecto}/canales`);
+      if (vigente()) {
+        estado.canales = canales;
+        pintarCanales();
+      }
+    }
+  }
+
+  async function actualizarConversacion() {
+    const canal = estado.activo;
+    if (canal && canal.id === estado.seleccionado && !estado.enviando) await abrirCanal(canal.id, true);
+  }
+
+  async function enviar(evento) {
+    evento.preventDefault();
+    const campo = $("#message-input");
+    const contenido = campo.value.trim();
+    const archivo = estado.archivoPendiente;
+    const canalId = estado.activo?.id;
+    if (estado.enviando || (!contenido && !archivo)) return;
+    if (!canalId || estado.seleccionado !== canalId) {
+      avisar("Abre un canal antes de escribir.", "error");
+      return;
+    }
+
+    estado.enviando = true;
+    const control = evento.currentTarget.querySelector('button[type="submit"]');
+    if (control) control.disabled = true;
+    try {
+      const mensaje = await pedir(`/api/canales/${canalId}/mensajes`, {
+        method: "POST",
+        body: JSON.stringify({ contenido: contenido || archivo.name })
+      });
+      if (campo.value.trim() === contenido) campo.value = "";
+
+      if (archivo) {
+        const formulario = new FormData();
+        formulario.append("archivo", archivo);
+        await pedir(`/api/canales/${canalId}/archivos?mensajeId=${mensaje.id}`, {
+          method: "POST",
+          body: formulario
+        });
+        if (estado.archivoPendiente === archivo) limpiarArchivo();
+      }
+
+      if (estado.seleccionado === canalId) await abrirCanal(canalId);
+    } catch (error) {
+      avisar(error.message, "error");
+    } finally {
+      estado.enviando = false;
+      if (control) control.disabled = false;
+    }
+  }
+
+  function limpiarArchivo() {
+    estado.archivoPendiente = null;
+    $("#file-input").value = "";
+    const caja = $("#pending-file");
+    caja.classList.add("hidden");
+    caja.classList.remove("flex");
+  }
+
+  async function crearCanal(evento) {
+    evento.preventDefault();
+    const feedback = $("#channel-feedback");
+    try {
+      const canal = await pedir(`/api/proyectos/${proyecto}/canales`, {
+        method: "POST",
+        body: JSON.stringify({
+          nombre: $("#channel-name").value.trim(),
+          descripcion: $("#channel-description-input").value.trim(),
+          tareaId: $("#channel-task").value ? Number($("#channel-task").value) : null
+        })
+      });
+      $("#channel-dialog").close();
+      $("#channel-form").reset();
+      feedback.classList.remove("is-visible");
+      await abrirCanal(canal.id);
+      avisar(`Canal #${canal.slug} creado.`, "success");
+    } catch (error) {
+      feedback.textContent = error.message;
+      feedback.classList.add("is-visible");
+    }
+  }
+
+  /* Enlaza todos los controles. Se hace antes de pedir datos: si el proyecto
+     todavía no tiene canales, los botones deben seguir funcionando —
+     especialmente el de crear el primero. */
+  function enlazarControles() {
+    if (typeof app.renderNavigation === "function") app.renderNavigation();
+    $("#back-to-project").href = `/proyectos/${proyecto}`;
+
+    $("#message-form").addEventListener("submit", enviar);
+    $("#message-input").addEventListener("keydown", (evento) => {
+      if (evento.key === "Enter" && !evento.shiftKey) {
+        evento.preventDefault();
+        $("#message-form").requestSubmit();
+      }
+    });
+
+    $("#file-input").addEventListener("change", (evento) => {
+      const [archivo] = evento.target.files || [];
+      if (!archivo) return;
+      estado.archivoPendiente = archivo;
+      const caja = $("#pending-file");
+      caja.classList.remove("hidden");
+      caja.classList.add("flex");
+      caja.innerHTML = `<i class="bi bi-paperclip"></i><span class="flex-1 truncate">${esc(archivo.name)}</span>
+        <button class="icon-button h-6 w-6" type="button" id="clear-file" aria-label="Quitar archivo"><i class="bi bi-x"></i></button>`;
+      $("#clear-file").addEventListener("click", limpiarArchivo);
+    });
+
+    $("#summarize").addEventListener("click", async () => {
+      const canal = estado.activo;
+      if (!canal) return;
+      const boton = $("#summarize");
+      boton.disabled = true;
+      boton.setAttribute("aria-busy", "true");
+      try {
+        const resumen = await pedir(`/api/canales/${canal.id}/resumen`, { method: "POST" });
+        if (estado.activo?.id === canal.id) pintarResumen(resumen);
+        avisar(resumen.modelo?.startsWith("gemini-") ? "Resumen generado con Gemini." : "Resumen local generado.", "success");
+      } catch (error) {
+        avisar(error.message, "error");
+      } finally {
+        boton.removeAttribute("aria-busy");
+        boton.disabled = !estado.activo || !estado.activo.mensajes.length;
+      }
+    });
+
+    $("#delete-channel").addEventListener("click", async () => {
+      if (!estado.activo) return;
+      if (!window.confirm(`¿Eliminar el canal #${estado.activo.slug} y sus mensajes?`)) return;
+      await pedir(`/api/canales/${estado.activo.id}`, { method: "DELETE" });
+      estado.canales = await pedir(`/api/proyectos/${proyecto}/canales`);
+      if (estado.canales.length) await abrirCanal(estado.canales[0].id);
+      else mostrarSinCanales();
+    });
+
+    const dialogo = $("#channel-dialog");
+    $("#new-channel").addEventListener("click", () => dialogo.showModal());
+    dialogo.querySelectorAll("[data-close-dialog]").forEach((boton) =>
+      boton.addEventListener("click", () => dialogo.close()));
+    $("#channel-form").addEventListener("submit", crearCanal);
+    $("#channel-name").addEventListener("input", (evento) => {
+      $("#slug-preview").textContent = `#${aSlug(evento.target.value) || "canal"}`;
+    });
+
+    // Cerrar el selector de reacciones al pulsar fuera.
+    document.addEventListener("click", (evento) => {
+      if (!evento.target.closest("#emoji-picker") && !evento.target.closest("[data-open-picker]")) {
+        cerrarSelector();
+      }
+    });
+    document.addEventListener("keydown", (evento) => {
+      if (evento.key === "Escape") cerrarSelector();
+    });
+    listen(window, "resize", cerrarSelector, { passive: true });
+    document.addEventListener("scroll", (evento) => {
+      if (!evento.target.closest?.("#emoji-picker")) cerrarSelector();
+    }, { capture: true, passive: true });
+  }
+
+  /** Mismo criterio que TextoUtil.aSlug en el servidor. */
+  function aSlug(texto) {
+    return String(texto || "").trim().toLowerCase()
+      .normalize("NFD").replace(/\p{Diacritic}/gu, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function mostrarSinCanales() {
+    estado.activo = null;
+    $("#channel-title").textContent = "Sin canales";
+    $("#channel-description").textContent = "";
+    $("#delete-channel").hidden = true;
+    $("#summarize").disabled = true;
+    $("#channel-list").innerHTML =
+      '<p class="px-2 py-1.5 text-xs text-muted">Ninguno todavía.</p>';
+    $("#messages").innerHTML = `<div class="m-auto grid max-w-[36ch] gap-3 text-center">
+        <i class="bi bi-chat-square-dots text-3xl text-primary"></i>
+        <p class="text-[13px] text-muted">Este proyecto aún no tiene canales. Crea el primero para empezar a conversar.</p>
+        <button class="btn btn-primary mx-auto" type="button" id="first-channel">
+          <i class="bi bi-plus-lg"></i> Crear el primer canal
+        </button>
+      </div>`;
+    $("#first-channel").addEventListener("click", () => $("#channel-dialog").showModal());
+    pintarArchivos([]);
+    pintarResumen(null);
+  }
+
+  async function init() {
+    enlazarControles();
+
+    try {
+      estado.canales = await pedir(`/api/proyectos/${proyecto}/canales`);
+
+      const detalle = await pedir(`/api/proyectos/${proyecto}`);
+      $("#project-label").textContent = detalle.nombre;
+      $("#channel-task").innerHTML = '<option value="">Sin tarea</option>'
+        + detalle.tareas.map((tarea) => `<option value="${tarea.id}">${esc(tarea.titulo)}</option>`).join("");
+
+      if (!estado.canales.length) {
+        mostrarSinCanales();
+        return;
+      }
+
+      // Abre el canal indicado en la URL (?canal=slug) o el primero de la lista.
+      const solicitado = new URLSearchParams(window.location.search).get("canal");
+      const inicial = estado.canales.find((canal) => canal.slug === solicitado) || estado.canales[0];
+      await abrirCanal(inicial.id);
+      scope.poll(actualizarConversacion, 2500);
+    } catch (error) {
+      avisar("No se pudieron cargar los canales: " + error.message, "error");
+      $("#messages").innerHTML =
+        `<p class="m-auto text-center text-[13px] text-danger">No se pudieron cargar los canales.<br>${esc(error.message)}</p>`;
+    }
+  }
+
+  init();
+}
