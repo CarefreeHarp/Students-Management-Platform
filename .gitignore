@@ -16,3 +16,16 @@ node_modules/
 # Sistema
 *.log
 .DS_Store
+
+# Salidas de Angular y persistencia local
+.angular/
+dist/
+backend/data/
+backend/archivos/
+archivos/
+*.mv.db
+*.trace.db
+frontend/.sandbox-generated/
+
+# Secretos del entorno local
+/.env
