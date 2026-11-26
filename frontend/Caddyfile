@@ -12,6 +12,9 @@ http://:{$PORT:8080} {
 
 	handle {
 		root * /srv
+		header /js/* Cache-Control "no-cache"
+		header /css/* Cache-Control "no-cache"
+		header /index.html Cache-Control "no-cache"
 		try_files {path} /index.html
 		file_server
 	}

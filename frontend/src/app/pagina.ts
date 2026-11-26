@@ -18,7 +18,7 @@ interface PageData { page: string; script: string; bodyClass?: string; view?: st
 type Behavior = { mount(scope: PageScope): void };
 
 function moduleAt<T>(file: string): Promise<T> {
-  return import(/* @vite-ignore */ '/js/' + file + '.js');
+  return import(/* @vite-ignore */ '/js/' + file + '.js?v=flow-horarios-20261126');
 }
 const scopeModule: Promise<{ createPageScope(root: HTMLElement, options: ScopeOptions): PageScope }> =
   moduleAt('page-scope');
