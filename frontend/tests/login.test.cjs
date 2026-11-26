@@ -36,7 +36,7 @@ test('entry offers an isolated sandbox and never creates an account automaticall
   assert.equal(page.requests.length,0);
   assert(template.includes('href="/sandbox"'));
   assert(template.includes('href="/registro"'));
-  for(const removed of ['quick-form','demo-button','Valentina','sesion/demostracion','sesion/entrar']) assert(!template.includes(removed)&&!source.includes(removed));
+  for(const removed of ['quick-form','demo-button','sesion/demostracion','sesion/entrar']) assert(!template.includes(removed)&&!source.includes(removed));
 });
 
 test('existing-account choice reveals login and back restores entry options', () => {

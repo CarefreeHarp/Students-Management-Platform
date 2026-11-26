@@ -71,6 +71,23 @@ export function mount(scope) {
     document.querySelector("#show-signin").addEventListener("click", () => showSignIn(true));
     document.querySelector("#hide-signin").addEventListener("click", () => showSignIn(false));
     document.querySelector("#password-form").addEventListener("submit", signIn);
+    const demoContainer = document.querySelector("#cuentas-demo");
+    if (demoContainer) {
+      request("/api/sesion/cuentas-demo").then(response => response.ok ? response.json() : []).then(cuentas => {
+        if (!Array.isArray(cuentas) || cuentas.length !== 2) return;
+        demoContainer.querySelectorAll("[data-demo]").forEach(button => {
+          button.addEventListener("click", () => {
+            const cuenta = cuentas[Number(button.dataset.demo)];
+            if (!cuenta) return;
+            document.querySelector("#login-email").value = cuenta.correo;
+            document.querySelector("#login-password").value = cuenta.contrasena;
+            feedback("");
+            document.querySelector("#signin-submit").focus();
+          });
+        });
+        demoContainer.hidden = false;
+      }).catch(() => {});
+    }
     document.querySelectorAll("[data-password-toggle]").forEach((button) => {
       button.addEventListener("click", () => {
         const field = document.getElementById(button.dataset.passwordToggle);
