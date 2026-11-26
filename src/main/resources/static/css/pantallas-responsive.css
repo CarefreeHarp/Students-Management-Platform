@@ -13,6 +13,14 @@ body[data-page="dashboard"] .calendar-toolbar { flex-wrap: wrap; }
 body[data-page="dashboard"] .calendar-toolbar h2 { flex: 1 1 180px; }
 body[data-page="dashboard"] .calendar-actions { flex: none; }
 body[data-page="dashboard"] .week-calendar { max-width: 100%; overscroll-behavior-inline: contain; }
+.agenda-unificada-grid.calendar-grid { min-width: 790px; grid-template-columns: 62px repeat(7, minmax(104px, 1fr)); }
+.agenda-unificada-grid .calendar-day-head.today strong { display: grid; margin-inline: auto; }
+.agenda-unificada-grid :is(.calendar-slot, .calendar-hour) { height: auto; min-height: 48px; }
+.agenda-unificada-grid .calendar-slot { display: grid; gap: 4px; align-content: start; padding: 4px; }
+.agenda-unificada-grid .calendar-event { position: relative; inset: auto; overflow-wrap: anywhere; }
+.agenda-unificada-grid .calendar-event small { white-space: normal; }
+.calendar-toolbar h3 { font-weight: 700; font-size: 14px; }
+#dashboard-agenda-status:not(:empty) { margin-bottom: 8px; }
 body[data-page="dashboard"] :is(.legend-item, .overview-pending-tasks a) { min-width: 0; overflow-wrap: anywhere; }
 body[data-page="dashboard"] .calendar-popover { max-width: calc(100vw - 24px); overflow-wrap: anywhere; }
 body[data-page="dashboard"] .calendar-popover p { align-items: flex-start; }

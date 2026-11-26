@@ -164,9 +164,9 @@ La pantalla que más se usa. Saluda por el nombre y resume la semana en una fras
 
 - **Tres tarjetas de resumen**: avance del semestre, próxima entrega y avisos
   programados.
-- **Calendario semanal** con las tareas de *todos* los proyectos, cada uno con su
-  color, y navegación entre semanas. Al pasar el ratón sobre una tarea sale una
-  ventana con su detalle; al pulsarla se abre su proyecto.
+- **Agenda académica** con las clases del horario guardado, las tareas, los
+  entregables con vencimiento y las fechas finales de proyecto. Abre en la semana
+  actual y permite navegar a otras semanas. En el móvil se lee como una lista por días.
 - **«Próximamente»**: las siguientes entregas en una lista.
 - **«Tus proyectos»**: avance de cada uno en porcentaje.
 - **«¿Terminaste algo?»**: marcar una tarea como terminada sin salir del panel, lo
@@ -211,8 +211,9 @@ La conversación del equipo, dividida por temas al estilo de un servidor de mens
 - **Reacciones con emoji**: ocho disponibles; volver a pulsar retira la reacción y se
   ve quién reaccionó.
 - **Adjuntos hasta 10 MB**: las imágenes se muestran en línea y el resto se descarga.
-- Columna derecha con **galería de imágenes**, **lista de documentos** y **resumen de
-  la conversación** (marcado como simulado mientras la IA no esté conectada).
+- Columna derecha con **galería de imágenes**, **lista de documentos** y **resumen
+  de la conversación**. **Resumir con IA** envía a Gemini hasta los últimos 100 mensajes
+  del canal y guarda la síntesis y sus puntos clave.
 
 ### 3.8 Fases y dependencias · `/proyectos/{codigo}/fases`
 
@@ -242,11 +243,13 @@ canal—.
 
 Planificador de la semana de clases.
 
-- **Alta de materias** con día, hora de inicio y fin, profesor y créditos.
+- **Alta de materias** con créditos y secciones. Cada sección puede reunir clases de varios días.
 - **Calendario semanal** con cada materia en un color, y aviso si dos se solapan.
-- **«Generar horarios con IA»**: propone alternativas seleccionando subconjuntos de
-  las materias registradas —sin inventarse horas que no existen— para comparar y
-  elegir.
+- **Generar horarios con IA** envía a Gemini los créditos, las franjas disponibles y las preferencias
+  de jornada y pausas. StudyFlow verifica cada combinación y muestra hasta tres alternativas en
+  **Tu semana**. Si hay un cruce inevitable en una alternativa, indica qué materia quedó fuera.
+- Puedes comparar los resultados y pulsar **Guardar horario** para conservar la alternativa en tu cuenta.
+  El borrador manual y sus preferencias se guardan en el navegador.
 
 ### 3.11 Recordatorios · `/recordatorios`
 
@@ -338,7 +341,7 @@ la cuenta en lugar de duplicarla.
 | **Sección de imágenes** del canal (galería) | Completo |
 | **Sección de documentos** del canal | Completo |
 | Subida real de archivos (hasta 10 MB) al enviar un mensaje | Completo |
-| Resumen de la conversación con IA | Simulado · preparado para la API |
+| Resumen de la conversación con IA | Gemini, con historial por canal |
 
 Los archivos se guardan en disco (carpeta configurable) y en la base queda solo la ficha. Las
 imágenes se muestran en línea y el resto se descarga.
@@ -379,9 +382,9 @@ Es el índice de dónde vive cada parte del trabajo, distinto de los archivos su
 
 | Funcionalidad | Estado |
 |---|---|
-| Registro de materias con día, horas, profesor y créditos | Completo |
+| Registro de materias con créditos y secciones de una o más franjas | Completo |
 | Vista previa semanal | Completo |
-| Generación de alternativas de horario **con IA** | Simulado (algoritmo propio) |
+| Generación de alternativas de horario **con IA** | Integrada con la API de Gemini |
 | Comparación y selección de alternativas | Completo |
 | Detección de choques de horas | Completo |
 
@@ -412,9 +415,21 @@ igual y el mensaje se escribe en el log en lugar de enviarse.
 
 ### 4.9 Panel principal
 
-Calendario general con las tareas de todos los proyectos (un color por proyecto), ventana flotante
-al pasar el ratón, clic para ir al proyecto, formulario para marcar tarea terminada y resumen de
-ritmo y próximas entregas.
+La agenda reúne el horario seleccionado, los vencimientos de las tareas y las
+entregas. Un documento con fecha límite propia aparece ese día. Si tiene una
+tarea vinculada y carece de fecha propia, usa el vencimiento de esa tarea.
+
+Flow aparece en Inicio. Cada estudiante puede elegir entre violeta, turquesa y
+coral. Desde la incorporación de Flow, cerrar una tarea con evidencia dentro de
+su plazo suma 10 puntos al responsable con cuenta. Si la tarea está sin asignar,
+los gana el integrante que la cierra. Los plazos se comparan en hora de Bogotá.
+Cada tarea da puntos una sola vez, incluso si se reabre o cambia de responsable.
+
+La tarjeta de Flow también muestra los días consecutivos con al menos una tarea
+terminada con evidencia, incluso si estaba vencida o no tenía plazo. La racha
+permanece activa hasta que pasa un día completo sin actividad, según la hora de
+Bogotá. Cada tarea cuenta una vez desde que se activó la racha. En el recorrido
+de prueba, la personalización y el progreso duran hasta que termina la visita.
 
 ### 4.10 Qué **no** está implementado
 
@@ -428,9 +443,8 @@ ritmo y próximas entregas.
 - **El perfil no se guarda en la base de datos.** La pantalla lee y escribe en el navegador; el
   endpoint `PUT /api/usuarios/{id}` existe pero ninguna pantalla lo llama, así que los cambios se
   pierden al cerrar sesión.
-- **Los horarios viven solo en el navegador**: las materias se guardan en `localStorage` y no
-  llegan a la base. El resto de pantallas —panel, proyectos, canales, fases, entregables,
-  recordatorios y acceso— ya usan la API REST.
+- **El borrador manual de horarios** se guarda en el navegador. Las alternativas de Gemini y el
+  horario elegido entre ellas se guardan por estudiante en la base de datos.
 
 ---
 
@@ -583,6 +597,20 @@ Credenciales por entorno, sin editar el archivo:
 ```bash
 DB_USER=miusuario DB_PASSWORD=miclave ./mvnw spring-boot:run
 ```
+
+#### Gemini para horarios y resúmenes de canales
+
+Define `GEMINI_API_KEY` en el entorno del proceso de Spring Boot. Para ejecutar desde un IDE
+también puedes guardar la propiedad `GEMINI_API_KEY` en
+`~/.config/studyflow/gemini.properties`, con permisos de lectura y escritura solo para tu usuario.
+El modelo predeterminado es `gemini-3.5-flash-lite` y se puede cambiar con `GEMINI_MODEL`.
+
+Con una sesión iniciada, abre **Horarios**, incluye las materias que quieres cursar, ajusta tus
+preferencias y pulsa **Generar horarios con IA**. La primera alternativa aparece en **Tu semana**.
+El botón **Guardar horario** la selecciona para tu cuenta. La prueba pública permite usar el editor manual.
+El horario guardado desde el editor manual también se sincroniza con la agenda de tu cuenta.
+En **Canales**, pulsa **Resumir con IA** dentro de una conversación. Un fallo de Gemini
+mantiene accesible el último resumen guardado.
 
 #### Activar el envío real por WhatsApp
 

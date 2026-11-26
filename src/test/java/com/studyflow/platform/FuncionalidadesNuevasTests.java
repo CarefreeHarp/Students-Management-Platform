@@ -151,32 +151,12 @@ class FuncionalidadesNuevasTests {
     // ------------------------------------------------------------ chats
 
     @Test
-    void seResumeLaConversacionDeUnCanal() {
-        Long usuario = usuarioId();
-        CanalDTO canal = canalService.crear("cognitiva", usuario,
-                new PeticionCanal("canal de prueba", "Para el test", null, null));
-
-        canalService.publicar(canal.id(), usuario, new PeticionMensajeChat(
-                "Quedamos en revisar el informe el martes.", null));
-        canalService.publicar(canal.id(), usuario, new PeticionMensajeChat(
-                "¿Alguien tiene la plantilla de la presentación?", null));
-
-        ResumenChatDTO resumen = canalService.resumir(canal.id());
-        assertThat(resumen.mensajesResumidos()).isEqualTo(2);
-        assertThat(resumen.contenido()).isNotBlank();
-        assertThat(resumen.modelo()).isEqualTo("Local");
-        assertThat(resumen.contenido()).contains("revisaron 2 mensajes");
-        // Los puntos clave recogen el acuerdo y la pregunta abierta.
-        assertThat(resumen.puntosClave()).hasSize(2);
-    }
-
-    @Test
     void noSePuedeResumirUnCanalVacio() {
         Long usuario = usuarioId();
         CanalDTO canal = canalService.crear("cognitiva", usuario,
                 new PeticionCanal("vacio", null, null, null));
 
-        assertThatThrownBy(() -> canalService.resumir(canal.id()))
+        assertThatThrownBy(() -> canalService.resumir(canal.id(), usuario))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("no tiene mensajes");
     }
@@ -404,7 +384,7 @@ class FuncionalidadesNuevasTests {
         assertThat(canales.get(0).slug()).isEqualTo("general");
         assertThat(canales.get(0).borrable()).isFalse();
 
-        assertThatThrownBy(() -> canalService.eliminar(canales.get(0).id()))
+        assertThatThrownBy(() -> canalService.eliminar(canales.get(0).id(), usuarioId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("no se puede eliminar");
     }

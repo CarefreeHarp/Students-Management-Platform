@@ -319,7 +319,6 @@
       responsable: $("#task-assignee-input").value || null,
       etapa: $("#task-stage-input").value,
       fechaLimite: $("#task-date-input").value || null,
-      horaLimite: "09:00",
       estado: quiereTerminar && !tareaPrevia?.tieneResultado
         ? tareaPrevia?.estado || "sin-empezar"
         : $("#task-status-input").value

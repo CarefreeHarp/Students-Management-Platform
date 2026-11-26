@@ -60,7 +60,7 @@ public class CanalApiController {
 
     @DeleteMapping("/canales/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        canalService.eliminar(id);
+        canalService.eliminar(id, sesionService.usuarioActualId());
         return ResponseEntity.noContent().build();
     }
 
@@ -82,12 +82,12 @@ public class CanalApiController {
 
     @PostMapping("/canales/{id}/resumen")
     public ResumenChatDTO resumir(@PathVariable Long id) {
-        return canalService.resumir(id);
+        return canalService.resumir(id, sesionService.usuarioActualId());
     }
 
     @GetMapping("/canales/{id}/resumenes")
     public List<ResumenChatDTO> historial(@PathVariable Long id) {
-        return canalService.historialResumenes(id);
+        return canalService.historialResumenes(id, sesionService.usuarioActualId());
     }
 
     // ------------------------------------------------------------ archivos

@@ -42,10 +42,11 @@ test('task validation errors stay in the dialog as a red alert instead of repeat
   assert.match(refinements, /\.task-form-error\{[^}]*var\(--estado-danger\)/);
 });
 
-test('schedule preferences persist through a real save action without claiming AI generation', () => {
+test('schedule preferences have their own save action and Gemini uses the authenticated planner', () => {
   assert.match(scheduleTemplate, /id="save-schedule-preferences"/);
   assert.match(scheduleTemplate, /Guardar preferencias<\/button>/);
-  assert.doesNotMatch(scheduleTemplate, /Generar horarios con IA|Próximamente|generate-schedules/);
+  assert.match(scheduleTemplate, /<section th:unless="\$\{sandbox\}"[^>]*>[\s\S]*?id="generate-schedules"/);
+  assert.match(scheduleScript, /addEventListener\("click", generateSchedules\)/);
   assert.match(scheduleScript, /function savePreferences\(/);
   assert.match(scheduleScript, /writeStorage\(PREFERENCES_KEY, readPreferences\(\)\)/);
   assert.match(scheduleScript, /getById\("save-schedule-preferences"\)\.addEventListener\("click", \(\) => savePreferences\(\{ announce: true \}\)\)/);

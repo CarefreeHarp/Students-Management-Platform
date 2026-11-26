@@ -23,24 +23,29 @@
           <div class="section-head flex-wrap">
             <div>
               <h2>Tu agenda académica</h2>
-              <p>Una vista de los compromisos de todos tus proyectos.</p>
+              <p>Clases, tareas y entregas en una misma semana.</p>
             </div>
             <div class="project-legend" id="project-legend" aria-label="Proyectos en el calendario"></div>
           </div>
-          <div id="dashboard-calendar" aria-label="Calendario semanal de tareas"></div>
+          <p id="dashboard-agenda-status" class="text-xs text-muted" role="status"></p>
+          <div id="dashboard-calendar" aria-label="Calendario semanal de clases, tareas y entregas"></div>
         </div>
 
-        <aside class="panel project-overview" aria-labelledby="projects-snapshot-title">
-          <div class="section-head">
-            <div><h2 id="projects-snapshot-title">Estado general</h2><p id="pending-count">Cargando tus pendientes…</p></div>
-            <a class="text-action" th:href="@{/proyectos}" href="/proyectos" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
-          </div>
-          <div id="project-snapshot-list" class="overview-projects" aria-live="polite"></div>
-        </aside>
+        <div class="dashboard-side">
+          <section th:replace="~{fragments/flow :: mascota}"></section>
+          <aside class="panel project-overview" aria-labelledby="projects-snapshot-title">
+            <div class="section-head">
+              <div><h2 id="projects-snapshot-title">Estado general</h2><p id="pending-count">Cargando tus pendientes…</p></div>
+              <a class="text-action" th:href="@{/proyectos}" href="/proyectos" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+            </div>
+            <div id="project-snapshot-list" class="overview-projects" aria-live="polite"></div>
+          </aside>
+        </div>
       </section>
     </main>
 
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <script th:src="@{/js/flow.js}" src="/js/flow.js" defer></script>
     <script th:src="@{/js/dashboard.js}" src="/js/dashboard.js" defer></script>
   </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,6 +22,11 @@ import java.util.stream.Collectors;
  */
 @RestControllerAdvice(basePackages = "com.studyflow.platform.controller.api")
 public class ManejadorGlobalErrores {
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ProblemDetail problemaDeServicio(ResponseStatusException error) {
+        return error.getBody();
+    }
 
     /** Nombres de campo tal como aparecen en los formularios. */
     private static String enCastellano(String campo) {

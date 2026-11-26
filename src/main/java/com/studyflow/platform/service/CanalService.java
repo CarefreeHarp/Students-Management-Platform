@@ -19,7 +19,7 @@ public interface CanalService {
 
     CanalDTO crear(String codigoProyecto, Long usuarioId, PeticionCanal peticion);
 
-    void eliminar(Long canalId);
+    void eliminar(Long canalId, Long usuarioId);
 
     MensajeChatDTO publicar(Long canalId, Long usuarioId, PeticionMensajeChat peticion);
 
@@ -29,7 +29,7 @@ public interface CanalService {
      */
     MensajeChatDTO alternarReaccion(Long mensajeId, Long usuarioId, String emoji);
 
-    ResumenChatDTO resumir(Long canalId);
+    ResumenChatDTO resumir(Long canalId, Long usuarioId);
 
-    List<ResumenChatDTO> historialResumenes(Long canalId);
+    List<ResumenChatDTO> historialResumenes(Long canalId, Long usuarioId);
 }

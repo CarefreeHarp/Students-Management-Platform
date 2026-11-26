@@ -15,6 +15,7 @@ import com.studyflow.platform.model.enums.RolIntegrante;
 import com.studyflow.platform.repository.IntegranteRepository;
 import com.studyflow.platform.repository.TareaRepository;
 import com.studyflow.platform.service.FaseService;
+import com.studyflow.platform.service.FlowService;
 import com.studyflow.platform.service.ProyectoService;
 import com.studyflow.platform.service.UsuarioService;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,6 +40,7 @@ import java.util.Set;
 @Transactional
 public class FaseServiceImpl implements FaseService {
 
+    private final FlowService flow;
     private final TareaRepository tareaRepository;
     private final IntegranteRepository integranteRepository;
     private final ProyectoService proyectoService;
@@ -50,7 +51,8 @@ public class FaseServiceImpl implements FaseService {
                            IntegranteRepository integranteRepository,
                            ProyectoService proyectoService,
                            UsuarioService usuarioService,
-                           ProyectoMapper proyectoMapper) {
+                           ProyectoMapper proyectoMapper, FlowService flow) {
+        this.flow = flow;
         this.tareaRepository = tareaRepository;
         this.integranteRepository = integranteRepository;
         this.proyectoService = proyectoService;
@@ -170,7 +172,7 @@ public class FaseServiceImpl implements FaseService {
         Usuario usuario = usuarioService.obtenerActual();
         exigirRepartoLibre(tarea.getProyecto());
         boolean propietario = tarea.getProyecto().getPropietario().getId().equals(usuario.getId());
-        if (!propietario && (tarea.getResponsable() == null || !correspondeA(tarea.getResponsable(), usuario))) {
+        if (!propietario && (tarea.getResponsable() == null || !tarea.getResponsable().correspondeA(usuario))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Solo el responsable o quien creó el proyecto puede liberar esta tarea.");
         }
@@ -182,13 +184,14 @@ public class FaseServiceImpl implements FaseService {
 
     @Override
     public TareaFaseDTO cambiarEstado(Long tareaId, String estado) {
-        Tarea tarea = obtener(tareaId);
+        Tarea tarea = obtenerParaReparto(tareaId);
         EstadoTarea nuevo = EstadoTarea.desdeClave(estado);
-        if (nuevo == EstadoTarea.TERMINADA && !tarea.tieneResultado()) {
-            throw new IllegalArgumentException("Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.");
+        if (nuevo == EstadoTarea.TERMINADA) {
+            flow.terminar(tarea);
+        } else {
+            tarea.setEstado(nuevo);
+            tarea.setFechaCompletada(null);
         }
-        tarea.setEstado(nuevo);
-        tarea.setFechaCompletada(nuevo == EstadoTarea.TERMINADA ? LocalDateTime.now() : null);
         return proyectoMapper.aFaseDTO(tarea);
     }
 
@@ -243,7 +246,7 @@ public class FaseServiceImpl implements FaseService {
     /** Match a real membership, never a display name supplied by an outsider. */
     private Integrante integranteDe(Proyecto proyecto, Usuario usuario) {
         return proyecto.getIntegrantes().stream()
-                .filter(integrante -> correspondeA(integrante, usuario))
+                .filter(integrante -> integrante.correspondeA(usuario))
                 .findFirst()
                 .map(integrante -> {
                     // Contact-only invitations become linked when the member takes work.
@@ -267,11 +270,4 @@ public class FaseServiceImpl implements FaseService {
                 });
     }
 
-    private boolean correspondeA(Integrante integrante, Usuario usuario) {
-        if (integrante.getUsuario() != null) {
-            return integrante.getUsuario().getId().equals(usuario.getId());
-        }
-        return integrante.getContacto() != null && usuario.getCorreo() != null
-                && integrante.getContacto().trim().equalsIgnoreCase(usuario.getCorreo());
-    }
 }

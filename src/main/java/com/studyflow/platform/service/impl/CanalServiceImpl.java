@@ -10,26 +10,22 @@ import com.studyflow.platform.service.CanalService;
 import com.studyflow.platform.service.ProyectoService;
 import com.studyflow.platform.service.UsuarioService;
 import com.studyflow.platform.util.TextoUtil;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /** Implementacion de los canales de conversacion y sus resumenes. */
 @Service
 @Transactional
 public class CanalServiceImpl implements CanalService {
 
-    /** Identifica que el resumen se produjo aquí, sin proveedor ni red externa. */
-    private static final String MODELO_RESUMEN_LOCAL = "Local";
-
-    /** Marcas que identifican un mensaje relevante para la lista de puntos clave. */
-    private static final List<String> MARCAS = List.of(
-            "quedamos", "acordamos", "hagamos", "me encargo", "yo hago", "listo",
-            "entrega", "fecha", "pendiente", "falta", "necesito", "revisar", "?");
+    private static final int MAX_MENSAJES_RESUMEN = 100;
 
     /** Reacciones de texto admitidas, las mismas que ofrece la interfaz. */
     private static final List<String> REACCIONES = List.of("acuerdo", "hecho", "gracias");
@@ -41,6 +37,8 @@ public class CanalServiceImpl implements CanalService {
     private final UsuarioService usuarioService;
     private final ProyectoService proyectoService;
     private final CanalMapper mapper;
+    private final ResumidorCanalGemini resumidor;
+    private final TransactionTemplate transacciones;
 
     public CanalServiceImpl(CanalRepository canalRepository,
                             MensajeChatRepository mensajeRepository,
@@ -48,7 +46,8 @@ public class CanalServiceImpl implements CanalService {
                             ReaccionMensajeRepository reaccionRepository,
                             UsuarioService usuarioService,
                             ProyectoService proyectoService,
-                            CanalMapper mapper) {
+                            CanalMapper mapper, ResumidorCanalGemini resumidor,
+                            TransactionTemplate transacciones) {
         this.canalRepository = canalRepository;
         this.mensajeRepository = mensajeRepository;
         this.resumenRepository = resumenRepository;
@@ -56,6 +55,8 @@ public class CanalServiceImpl implements CanalService {
         this.usuarioService = usuarioService;
         this.proyectoService = proyectoService;
         this.mapper = mapper;
+        this.resumidor = resumidor;
+        this.transacciones = transacciones;
     }
 
     // ---------------------------------------------------------------- canales
@@ -71,6 +72,7 @@ public class CanalServiceImpl implements CanalService {
     @Override
     public List<CanalDTO> listarDeProyecto(String codigoProyecto, Long usuarioId) {
         Proyecto proyecto = proyectoService.obtenerEntidadPorCodigo(codigoProyecto);
+        verificarProyecto(proyecto, usuarioId);
         asegurarCanalGeneral(proyecto);
         return canalRepository.findByProyectoIdOrderByOrdenAscNombreAsc(proyecto.getId()).stream()
                 .map(canal -> mapper.aDTO(canal, usuarioId, false))
@@ -99,13 +101,14 @@ public class CanalServiceImpl implements CanalService {
     @Override
     @Transactional(readOnly = true)
     public CanalDTO obtener(Long canalId, Long usuarioId) {
-        return mapper.aDTO(obtenerEntidad(canalId), usuarioId, true);
+        return mapper.aDTO(obtenerVisible(canalId, usuarioId), usuarioId, true);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CanalDTO obtenerPorSlug(String codigoProyecto, String slug, Long usuarioId) {
         Proyecto proyecto = proyectoService.obtenerEntidadPorCodigo(codigoProyecto);
+        verificarProyecto(proyecto, usuarioId);
         Canal canal = canalRepository.findByProyectoIdAndSlug(proyecto.getId(), slug)
                 .orElseThrow(() -> new RecursoNoEncontradoException("canal", slug));
         return mapper.aDTO(canal, usuarioId, true);
@@ -114,6 +117,7 @@ public class CanalServiceImpl implements CanalService {
     @Override
     public CanalDTO crear(String codigoProyecto, Long usuarioId, PeticionCanal peticion) {
         Proyecto proyecto = proyectoService.obtenerEntidadPorCodigo(codigoProyecto);
+        verificarProyecto(proyecto, usuarioId);
         String slug = TextoUtil.aSlug(peticion.nombre());
 
         if (canalRepository.existsByProyectoIdAndSlug(proyecto.getId(), slug)) {
@@ -154,8 +158,8 @@ public class CanalServiceImpl implements CanalService {
     }
 
     @Override
-    public void eliminar(Long canalId) {
-        Canal canal = obtenerEntidad(canalId);
+    public void eliminar(Long canalId, Long usuarioId) {
+        Canal canal = obtenerVisible(canalId, usuarioId);
         if (!canal.esBorrable()) {
             throw new IllegalArgumentException("El canal #general no se puede eliminar.");
         }
@@ -166,7 +170,7 @@ public class CanalServiceImpl implements CanalService {
 
     @Override
     public MensajeChatDTO publicar(Long canalId, Long usuarioId, PeticionMensajeChat peticion) {
-        Canal canal = obtenerEntidad(canalId);
+        Canal canal = obtenerVisible(canalId, usuarioId);
         Usuario usuario = usuarioService.obtenerPorId(usuarioId);
 
         MensajeChat mensaje = new MensajeChat();
@@ -208,45 +212,53 @@ public class CanalServiceImpl implements CanalService {
     // ---------------------------------------------------------------- resumenes
 
     @Override
-    public ResumenChatDTO resumir(Long canalId) {
-        Canal canal = obtenerEntidad(canalId);
-        List<MensajeChat> mensajes = mensajeRepository.findByCanalIdOrderByFechaEnvioAsc(canalId);
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ResumenChatDTO resumir(Long canalId, Long usuarioId) {
+        List<MensajeParaResumen> mensajes = transacciones.execute(tx -> {
+            obtenerVisible(canalId, usuarioId);
+            return new ArrayList<>(mensajeRepository.ultimosParaResumen(canalId, PageRequest.of(0, MAX_MENSAJES_RESUMEN)));
+        });
         if (mensajes.isEmpty()) {
             throw new IllegalArgumentException("El canal aún no tiene mensajes que resumir.");
         }
+        Collections.reverse(mensajes);
+        var resultado = resumidor.resumir(mensajes);
 
-        List<MensajeChat> mensajesClave = seleccionarMensajesClave(mensajes);
-        List<String> puntosClave = mensajesClave.stream()
-                .limit(5)
-                .map(mensaje -> "%s: %s".formatted(mensaje.getAutorNombre(), recortar(mensaje.getContenido())))
-                .toList();
-
-        ResumenChat resumen = new ResumenChat();
-        resumen.setCanal(canal);
-        resumen.setContenido(resumirLocalmente(mensajes, mensajesClave));
-        resumen.setPuntosClave(String.join("\n", puntosClave));
-        resumen.setMensajesResumidos(mensajes.size());
-        resumen.setDesdeMensajeId(mensajes.get(0).getId());
-        resumen.setHastaMensajeId(mensajes.get(mensajes.size() - 1).getId());
-        resumen.setModelo(MODELO_RESUMEN_LOCAL);
-
-        ResumenChat guardado = resumenRepository.save(resumen);
-        canal.getResumenes().add(0, guardado);
-        return mapper.aDTO(guardado);
+        return transacciones.execute(tx -> {
+            Canal canal = obtenerVisible(canalId, usuarioId);
+            ResumenChat resumen = new ResumenChat();
+            resumen.setCanal(canal);
+            resumen.setContenido(resultado.contenido());
+            resumen.setPuntosClave(String.join("\n", resultado.puntosClave()));
+            resumen.setMensajesResumidos(mensajes.size());
+            resumen.setDesdeMensajeId(mensajes.get(0).id());
+            resumen.setHastaMensajeId(mensajes.get(mensajes.size() - 1).id());
+            resumen.setModelo(resultado.modelo());
+            return mapper.aDTO(resumenRepository.save(resumen));
+        });
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ResumenChatDTO> historialResumenes(Long canalId) {
-        return resumenRepository.findByCanalIdOrderByFechaGeneracionDesc(canalId)
+    public List<ResumenChatDTO> historialResumenes(Long canalId, Long usuarioId) {
+        obtenerVisible(canalId, usuarioId);
+        return resumenRepository.findByCanalIdOrderByFechaGeneracionDescIdDesc(canalId)
                 .stream().map(mapper::aDTO).toList();
     }
 
-    // ---------------------------------------------------------------- apoyo
-
-    private Canal obtenerEntidad(Long canalId) {
-        return canalRepository.findById(canalId)
+    private Canal obtenerVisible(Long canalId, Long usuarioId) {
+        Canal canal = canalRepository.findById(canalId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("canal", canalId));
+        if (canal.getProyecto() != null) {
+            verificarProyecto(canal.getProyecto(), usuarioId);
+        } else if (canal.getCreador() == null || !usuarioId.equals(canal.getCreador().getId())) {
+            throw new RecursoNoEncontradoException("canal", canalId);
+        }
+        return canal;
+    }
+
+    private void verificarProyecto(Proyecto proyecto, Long usuarioId) {
+        if (!proyecto.participa(usuarioId)) throw new RecursoNoEncontradoException("proyecto", proyecto.getCodigo());
     }
 
     /** Reutiliza el color del integrante para que coincida con el resto de la interfaz. */
@@ -259,44 +271,5 @@ public class CanalServiceImpl implements CanalService {
                 .map(Integrante::getColor)
                 .findFirst()
                 .orElse("#5b5ce2");
-    }
-
-    /**
-     * Prioriza acuerdos, plazos y preguntas. Si no hay marcadores, resume los
-     * mensajes existentes igualmente para que el control sea útil en cualquier
-     * conversación y no dependa de un servicio externo.
-     */
-    private List<MensajeChat> seleccionarMensajesClave(List<MensajeChat> mensajes) {
-        List<MensajeChat> relevantes = mensajes.stream()
-                .filter(mensaje -> {
-                    String texto = mensaje.getContenido().toLowerCase();
-                    return MARCAS.stream().anyMatch(texto::contains);
-                })
-                .toList();
-        return relevantes.isEmpty() ? mensajes : relevantes;
-    }
-
-    /** Resumen breve y determinista construido a partir de los mensajes reales. */
-    private String resumirLocalmente(List<MensajeChat> mensajes, List<MensajeChat> mensajesClave) {
-        Set<String> participantes = mensajes.stream()
-                .map(MensajeChat::getAutorNombre)
-                .filter(nombre -> nombre != null && !nombre.isBlank())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        String autores = participantes.isEmpty()
-                ? ""
-                : " entre " + String.join(", ", participantes.stream().limit(4).toList());
-        String cantidad = mensajes.size() == 1 ? "1 mensaje" : mensajes.size() + " mensajes";
-        String extractos = mensajesClave.stream()
-                .limit(3)
-                .map(mensaje -> recortar(mensaje.getContenido()))
-                .collect(Collectors.joining(" · "));
-
-        return "Se revisaron %s%s. Aspectos principales: %s"
-                .formatted(cantidad, autores, extractos);
-    }
-
-    private String recortar(String texto) {
-        String limpio = texto.replaceAll("\\s+", " ").trim();
-        return limpio.length() > 140 ? limpio.substring(0, 140) + "…" : limpio;
     }
 }

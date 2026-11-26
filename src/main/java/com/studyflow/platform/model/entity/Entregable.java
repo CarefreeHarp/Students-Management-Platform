@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -61,6 +62,9 @@ public class Entregable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tarea_id")
     private Tarea tarea;
+
+    @Column(name = "fecha_limite")
+    private LocalDate fechaLimite;
 
     @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro = LocalDateTime.now();

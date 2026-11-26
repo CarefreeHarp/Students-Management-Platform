@@ -72,7 +72,7 @@ public class Canal {
     private List<MensajeChat> mensajes = new ArrayList<>();
 
     @OneToMany(mappedBy = "canal", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("fechaGeneracion DESC")
+    @OrderBy("fechaGeneracion DESC, id DESC")
     private List<ResumenChat> resumenes = new ArrayList<>();
 
     @OneToMany(mappedBy = "canal", cascade = CascadeType.ALL, orphanRemoval = true)

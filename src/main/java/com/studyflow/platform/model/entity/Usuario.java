@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
  * perfil y edicion de perfil.
  */
 @Entity
+@org.hibernate.annotations.DynamicUpdate
 @Table(name = "usuario", uniqueConstraints = @UniqueConstraint(columnNames = "correo"))
 @Getter
 @Setter
@@ -67,6 +68,9 @@ public class Usuario {
     /** URL o data-URI de la foto de perfil. */
     @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
+
+    @Column(name = "color_flow", length = 16)
+    private String colorFlow;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)

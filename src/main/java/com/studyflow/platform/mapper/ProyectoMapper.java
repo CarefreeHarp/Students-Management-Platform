@@ -119,7 +119,8 @@ public class ProyectoMapper {
                 responsable != null ? responsable.getNombre() : null,
                 responsable != null ? responsable.getColor() : null,
                 entregable.getTarea() != null ? entregable.getTarea().getTitulo() : null,
-                entregable.getFechaRegistro().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                entregable.getFechaRegistro().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                entregable.getFechaLimite()
         );
     }
 

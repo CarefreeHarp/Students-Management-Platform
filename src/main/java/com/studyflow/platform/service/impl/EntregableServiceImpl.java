@@ -11,6 +11,7 @@ import com.studyflow.platform.model.enums.TipoEntregable;
 import com.studyflow.platform.repository.EntregableRepository;
 import com.studyflow.platform.service.EntregableService;
 import com.studyflow.platform.service.ProyectoService;
+import com.studyflow.platform.service.SesionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,19 +31,22 @@ public class EntregableServiceImpl implements EntregableService {
     private final EntregableRepository entregableRepository;
     private final ProyectoService proyectoService;
     private final ProyectoMapper proyectoMapper;
+    private final SesionService sesion;
 
     public EntregableServiceImpl(EntregableRepository entregableRepository,
                                  ProyectoService proyectoService,
-                                 ProyectoMapper proyectoMapper) {
+                                 ProyectoMapper proyectoMapper, SesionService sesion) {
         this.entregableRepository = entregableRepository;
         this.proyectoService = proyectoService;
         this.proyectoMapper = proyectoMapper;
+        this.sesion = sesion;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EntregableDTO> listar(String codigoProyecto) {
         Proyecto proyecto = proyectoService.obtenerEntidadPorCodigo(codigoProyecto);
+        verificarAcceso(proyecto);
         return entregableRepository.findByProyectoIdOrderByFechaRegistroDesc(proyecto.getId())
                 .stream().map(proyectoMapper::aDTO).toList();
     }
@@ -50,6 +54,7 @@ public class EntregableServiceImpl implements EntregableService {
     @Override
     public EntregableDTO registrar(String codigoProyecto, PeticionEntregable peticion) {
         Proyecto proyecto = proyectoService.obtenerEntidadPorCodigo(codigoProyecto);
+        verificarAcceso(proyecto);
         Entregable entregable = new Entregable();
         entregable.setProyecto(proyecto);
         aplicar(entregable, peticion, proyecto);
@@ -79,8 +84,16 @@ public class EntregableServiceImpl implements EntregableService {
     }
 
     private Entregable obtener(Long id) {
-        return entregableRepository.findById(id)
+        Entregable entregable = entregableRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("entregable", id));
+        verificarAcceso(entregable.getProyecto());
+        return entregable;
+    }
+
+    private void verificarAcceso(Proyecto proyecto) {
+        if (!proyecto.participa(sesion.usuarioActualId())) {
+            throw new RecursoNoEncontradoException("proyecto", proyecto.getCodigo());
+        }
     }
 
     private void aplicar(Entregable entregable, PeticionEntregable peticion, Proyecto proyecto) {
@@ -91,6 +104,7 @@ public class EntregableServiceImpl implements EntregableService {
                 ? TipoEntregable.valueOf(peticion.tipo().toUpperCase())
                 : TipoEntregable.desdeUrl(peticion.url()));
         entregable.setEstado(EstadoEntregable.desdeClave(peticion.estado()));
+        entregable.setFechaLimite(peticion.fechaLimite());
 
         if (peticion.responsable() != null && !peticion.responsable().isBlank()) {
             proyecto.getIntegrantes().stream()

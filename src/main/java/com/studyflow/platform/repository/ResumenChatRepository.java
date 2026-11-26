@@ -8,5 +8,5 @@ import java.util.List;
 /** Capa de persistencia de los resumenes de conversacion. */
 public interface ResumenChatRepository extends JpaRepository<ResumenChat, Long> {
 
-    List<ResumenChat> findByCanalIdOrderByFechaGeneracionDesc(Long canalId);
+    List<ResumenChat> findByCanalIdOrderByFechaGeneracionDescIdDesc(Long canalId);
 }

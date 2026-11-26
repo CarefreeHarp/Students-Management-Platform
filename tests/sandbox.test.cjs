@@ -410,3 +410,24 @@ test('attachments remain blobs and use file DTO fields needed by channel views',
   assert.deepEqual((await call(store, `/api/canales/${channel.id}/archivos`)).data, []);
   store.destroy();
 });
+
+test('Flow conserva el color, los puntos y la racha del visitante', async () => {
+  const store = createSandboxStore();
+  assert.deepEqual((await call(store, '/api/flow', 'PUT', {color: 'coral'})).data, {color: 'coral', puntos: 0, rachaDias: 0});
+  assert.equal((await call(store, '/api/flow', 'PUT', {color: 'inventado'})).status, 400);
+  const proyecto = await call(store, '/api/proyectos', 'POST', {
+    nombre: 'Proyecto Flow', descripcion: 'Prueba', fechaEntrega: '2099-06-30', modoReparto: 'libre',
+    tareas: [
+      {...task('Puntual'), fechaLimite: '2099-06-29', horaLimite: '10:00'},
+      {...task('Vencida'), fechaLimite: '2000-06-29'},
+      {...task('Otro responsable'), responsable: 'Leo', fechaLimite: '2099-06-29'},
+    ],
+  });
+  const tareas = proyecto.data.tareas;
+  for (const tarea of tareas) assert.equal((await complete(store, tarea.id, 'Trabajo terminado')).status, 200);
+  await call(store, `/api/tareas/${tareas[0].id}/estado`, 'PATCH', {estado: 'en-revision'});
+  await complete(store, tareas[0].id, 'Corregido');
+  assert.deepEqual((await call(store, '/api/flow')).data, {color: 'coral', puntos: 10, rachaDias: 1});
+  store.destroy();
+  assert.deepEqual((await call(store, '/api/flow')).data, {color: 'violeta', puntos: 0, rachaDias: 0});
+});

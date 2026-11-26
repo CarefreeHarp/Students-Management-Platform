@@ -14,6 +14,23 @@
       return {get length(){return values.size;},key:index=>[...values.keys()][index]??null,getItem:key=>values.get(String(key))??null,setItem:(key,value)=>values.set(String(key),String(value)),removeItem:key=>values.delete(String(key)),clear:()=>values.clear()};
     }
     const local = storage(), session = storage();
+    let colorFlow = 'violeta';
+    const premiosFlow = new Set();
+    const actividadesFlow = new Map();
+    function diaBogota(instante) {
+      return Math.floor((instante - 5 * 60 * 60 * 1000) / 86400000);
+    }
+    function rachaFlow() {
+      const dias = new Set(actividadesFlow.values());
+      const hoy = diaBogota(Date.now());
+      let dia = dias.has(hoy) ? hoy : hoy - 1;
+      let racha = 0;
+      while (dias.has(dia)) {
+        racha++;
+        dia--;
+      }
+      return racha;
+    }
     // Theme is copied from the entry screen, but remains isolated in RAM here.
     local.setItem('studyflow-tema', initialTheme==='claro' ? 'claro' : 'oscuro');
     local.setItem('studyflow_user',JSON.stringify({firstName:'Visitante',lastName:'',name:'Visitante',email:'',university:'',career:'',semester:'',description:'',avatar:''}));
@@ -71,7 +88,7 @@
         fail(`La fecha límite de la tarea no puede ser posterior a la fecha de entrega del proyecto (${entrega}).`);
       }
     }
-    function task(body, project) {if(!body.titulo?.trim()) fail('Escribe un título para la tarea');const etapa=body.etapa||project.etapaActual;if(!project.etapas.includes(etapa)) fail('La etapa elegida no pertenece a este proyecto');validarFechaContraEntrega(project,body.fechaLimite);const estado=normalizeState(body.estado);return {id:id(),codigo:'t-'+sequence,titulo:body.titulo.trim(),descripcion:body.descripcion||'',responsable:body.responsable==='Tú'?'Visitante':body.responsable||null,colorResponsable:'#8b75d7',etapa,fechaLimite:body.fechaLimite||null,horaLimite:body.horaLimite||null,estado,estadoEtiqueta:labels[estado],generadaPorIa:false,resultadoTexto:null,archivoResultadoNombre:null,archivoResultadoUrl:null,tieneResultado:false,dependencias:[]};}
+    function task(body, project) {if(!body.titulo?.trim()) fail('Escribe un título para la tarea');const etapa=body.etapa||project.etapaActual;if(!project.etapas.includes(etapa)) fail('La etapa elegida no pertenece a este proyecto');validarFechaContraEntrega(project,body.fechaLimite);const estado=normalizeState(body.estado);return {id:id(),codigo:'t-'+sequence,titulo:body.titulo.trim(),descripcion:body.descripcion||'',responsable:body.responsable==='Tú'?'Visitante':body.responsable||null,colorResponsable:'#8b75d7',etapa,fechaLimite:body.fechaLimite||null,horaLimite:body.horaLimite||'09:00',estado,estadoEtiqueta:labels[estado],generadaPorIa:false,resultadoTexto:null,archivoResultadoNombre:null,archivoResultadoUrl:null,tieneResultado:false,dependencias:[]};}
     function projectDTO(project) {project.progreso=project.tareas.length?Math.round(project.tareas.filter(done).length/project.tareas.length*100):0;return project;}
     function channel(project,body) {if(!body.nombre?.trim()) fail('Escribe un nombre para el canal');const general=body.tipo==='general';const c={id:id(),nombre:body.nombre.trim(),slug:general?'general':'canal-'+sequence,tipo:body.tipo||'tema',descripcion:body.descripcion||'',proyectoCodigo:project.codigo,proyectoNombre:project.nombre,color:project.color,totalMensajes:0,totalArchivos:0,ultimaActividad:null,borrable:!general,mensajes:[],archivos:[],resumenes:[],ultimoResumen:null};data.channels.push(c);return c;}
     const marcasResumen=['quedamos','acordamos','hagamos','me encargo','yo hago','listo','entrega','fecha','pendiente','falta','necesito','revisar','?'];
@@ -91,6 +108,7 @@
     function formatDeliverable(item) {item.estado=String(item.estado||'BORRADOR').toUpperCase().replace(/-/g,'_');if(!deliverableStates[item.estado])item.estado='BORRADOR';item.estadoEtiqueta=deliverableStates[item.estado];item.tipo=String(item.tipo||'OTRO').toUpperCase();if(!deliverableTypes[item.tipo])item.tipo='OTRO';[item.tipoEtiqueta,item.icono]=deliverableTypes[item.tipo];return item;}
     const allowedRoutes = [
       ['GET',/^\/api\/sesion\/actual$/], ['POST',/^\/api\/sesion\/salir$/],
+      ['GET',/^\/api\/agenda$/], ['GET|PUT',/^\/api\/flow$/],
       ['GET|PUT',/^\/api\/usuarios\/actual$/], ['GET',/^\/api\/materias$/],
       ['GET|POST',/^\/api\/apuntes$/], ['PATCH',/^\/api\/apuntes\/\d+\/resuelto$/], ['DELETE',/^\/api\/apuntes\/\d+$/],
       ['GET',/^\/api\/organizador\/estado$/], ['POST',/^\/api\/organizador\/plan$/],
@@ -121,7 +139,21 @@
         if(url.pathname==='/api/sesion/actual') result={iniciada:true,usuario:copy(user),cuentaDemostracion:''};
         else if(url.pathname==='/api/sesion/salir') result={mensaje:'Prueba terminada'};
         else if(url.pathname==='/api/usuarios/actual') {if(method!=='GET') Object.assign(user,body);result=user;}
+        else if (url.pathname === '/api/flow') {
+          if (method === 'PUT') {
+            if (!['violeta', 'turquesa', 'coral'].includes(body.color)) fail('Elige un color disponible para Flow.');
+            colorFlow = body.color;
+          }
+          result = {color: colorFlow, puntos: 10 * premiosFlow.size, rachaDias: rachaFlow()};
+        }
         else if(url.pathname==='/api/materias') result=[];
+        else if(url.pathname==='/api/agenda') {
+          const entregables = data.deliverables.filter(d => d.fechaLimite).map(d => ({
+            id: d.id, titulo: d.nombre, proyectoCodigo: d.proyectoCodigo,
+            fecha: d.fechaLimite, hora: null, estado: d.estadoEtiqueta,
+          }));
+          result = { horario: null, entregables };
+        }
         else if(parts[1]==='apuntes') {
           if(parts.length===2&&method==='GET') result=data.notes;
           else if(parts.length===2&&method==='POST') {if(!body.titulo?.trim()) fail('Escribe un título');result={...body,id:id(),resuelto:false,fechaCreacion:now()};data.notes.push(result);}
@@ -160,6 +192,7 @@
           }
         } else if(parts[1]==='tareas') {
           const t=findTask(parts[2]), project=projectOf(t);
+          const estabaTerminada = done(t);
           if(parts[3]==='dependencias') {
             if(method==='DELETE') t.dependencias=t.dependencias.filter(d=>d!==Number(parts[4]));
             else {const dependency=findTask(body.dependeDe);if(projectOf(dependency)!==project) fail('La dependencia pertenece a otro proyecto');const fechaTarea=t.fechaLimite&&new Date(`${t.fechaLimite}T00:00:00`),fechaDependencia=dependency.fechaLimite&&new Date(`${dependency.fechaLimite}T00:00:00`);if(fechaTarea&&fechaDependencia&&fechaDependencia>fechaTarea) fail(`Verifica las fechas: «${dependency.titulo}» vence el ${dependency.fechaLimite}, después de «${t.titulo}» (${t.fechaLimite}). Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);const reaches=(node,target,seen=new Set())=>node.id===target||(!seen.has(node.id)&&(seen.add(node.id),node.dependencias.some(d=>reaches(findTask(d),target,seen))));if(reaches(dependency,t.id)) fail('Esta dependencia crearía un ciclo');if(!t.dependencias.includes(dependency.id)) t.dependencias.push(dependency.id);}
@@ -168,6 +201,15 @@
           else if(parts[3]==='completar') {const resultado=String(body.get?.('resultado')||'').trim(),archivo=body.get?.('archivo');if(!resultado&&!archivo&&!t.tieneResultado) fail('Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.');if(resultado)t.resultadoTexto=resultado;if(archivo){t.archivoResultadoNombre=archivo.name;t.archivoResultadoUrl=URL.createObjectURL(archivo);data.urls.push(t.archivoResultadoUrl);}t.tieneResultado=true;t.estado='terminada';t.estadoEtiqueta=labels[t.estado];}
           else if(parts[3]==='estado') {const siguiente=normalizeState(body.estado);if(siguiente==='terminada'&&!t.tieneResultado) fail('Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.');t.estado=siguiente;t.estadoEtiqueta=labels[t.estado];}
           else if(method==='PUT') {if(!body.titulo?.trim()) fail('Escribe un título para la tarea');if('etapa'in body&&!project.etapas.includes(body.etapa)) fail('La etapa elegida no pertenece a este proyecto');if(body.responsable&&!project.integrantes.some(i=>i.nombre===body.responsable)) fail('El responsable elegido no pertenece al proyecto.');const fechaNueva=body.fechaLimite??t.fechaLimite;validarFechaContraEntrega(project,fechaNueva);const fechaNuevaDate=fechaNueva&&new Date(`${fechaNueva}T00:00:00`),dependenciaTardia=t.dependencias.map(findTask).find(d=>fechaNuevaDate&&d.fechaLimite&&new Date(`${d.fechaLimite}T00:00:00`)>fechaNuevaDate),tareaQueEspera=project.tareas.find(otra=>otra.dependencias.includes(t.id)&&fechaNuevaDate&&otra.fechaLimite&&fechaNuevaDate>new Date(`${otra.fechaLimite}T00:00:00`));if(dependenciaTardia) fail(`Verifica las fechas: «${dependenciaTardia.titulo}» vence después de esta tarea. Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);if(tareaQueEspera) fail(`Verifica las fechas: «${tareaQueEspera.titulo}» espera a esta tarea y vence antes. Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);['titulo','descripcion','responsable','etapa','fechaLimite','horaLimite'].forEach(key=>{if(key in body)t[key]=body[key];});const siguiente=normalizeState(body.estado||t.estado);if(siguiente==='terminada'&&!t.tieneResultado) fail('Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.');t.estado=siguiente;t.estadoEtiqueta=labels[t.estado];}
+          if (!estabaTerminada && done(t) && (!t.responsable || t.responsable === 'Visitante')) {
+            const cierre = Date.now();
+            if (!actividadesFlow.has(t.id)) actividadesFlow.set(t.id, diaBogota(cierre));
+            if (t.fechaLimite) {
+              const hora = t.horaLimite || '23:59:59.999';
+              const limite = Date.parse(`${t.fechaLimite}T${hora}-05:00`);
+              if (cierre <= limite) premiosFlow.add(t.id);
+            }
+          }
           result=t;
         } else if(parts[1]==='canales') {
           const c=data.channels.find(c=>c.id===Number(parts[2]))||fail('Canal no encontrado',404);
@@ -317,7 +359,7 @@
       persistProjects();
       return copy(projectDTO(project));
     }
-    return {storage:local,sessionStorage:session,request,projectCode:()=>data.projects[0]?.codigo||null,isTourDiagramPrepared:code=>Boolean(findProject(code || data.projects[0]?.codigo).tourDiagramReady),prepareTourDiagram,setTheme:theme=>local.setItem('studyflow-tema',theme==='claro'?'claro':'oscuro'),destroy(){data.urls.forEach(url=>URL.revokeObjectURL(url));data.urls.length=0;data.projects.length=0;data.channels.length=0;data.deliverables.length=0;data.reminders.length=0;data.notes.length=0;data.preferences.telefonoWhatsapp='';data.preferences.activo=false;local.clear();session.clear();}};
+    return {storage:local,sessionStorage:session,request,projectCode:()=>data.projects[0]?.codigo||null,isTourDiagramPrepared:code=>Boolean(findProject(code || data.projects[0]?.codigo).tourDiagramReady),prepareTourDiagram,setTheme:theme=>local.setItem('studyflow-tema',theme==='claro'?'claro':'oscuro'),destroy(){actividadesFlow.clear();premiosFlow.clear();colorFlow='violeta';data.urls.forEach(url=>URL.revokeObjectURL(url));data.urls.length=0;data.projects.length=0;data.channels.length=0;data.deliverables.length=0;data.reminders.length=0;data.notes.length=0;data.preferences.telefonoWhatsapp='';data.preferences.activo=false;local.clear();session.clear();}};
   }
   root.createSandboxStore=createSandboxStore;
   if(typeof module!=='undefined') module.exports={createSandboxStore};

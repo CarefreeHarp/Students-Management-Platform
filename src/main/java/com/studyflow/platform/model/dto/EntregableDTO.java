@@ -1,5 +1,7 @@
 package com.studyflow.platform.model.dto;
 
+import java.time.LocalDate;
+
 /** Documento o entregable registrado en el proyecto. */
 public record EntregableDTO(
         Long id,
@@ -14,6 +16,7 @@ public record EntregableDTO(
         String responsable,
         String colorResponsable,
         String tarea,
-        String fechaRegistro
+        String fechaRegistro,
+        LocalDate fechaLimite
 ) {
 }

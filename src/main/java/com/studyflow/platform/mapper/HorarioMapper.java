@@ -25,7 +25,8 @@ public class HorarioMapper {
                 materia.getProfesor(),
                 materia.getCreditos(),
                 materia.getIndiceColor(),
-                materia.getBloques().stream().map(this::aDTO).toList()
+                materia.getBloques().stream().map(this::aDTO).toList(),
+                null
         );
     }
 
@@ -40,6 +41,7 @@ public class HorarioMapper {
     }
 
     public HorarioDTO aDTO(Horario horario) {
+        var detalle = horario.getDetalleSecciones();
         return new HorarioDTO(
                 horario.getId(),
                 horario.getNombre(),
@@ -49,7 +51,8 @@ public class HorarioMapper {
                 horario.getTotalCreditos(),
                 horario.isGeneradoPorIa(),
                 horario.isSeleccionado(),
-                horario.getMaterias().stream().map(this::aDTO).toList()
+                detalle == null ? horario.getMaterias().stream().map(this::aDTO).toList() : detalle.materias(),
+                detalle == null ? List.of() : detalle.omitidas()
         );
     }
 

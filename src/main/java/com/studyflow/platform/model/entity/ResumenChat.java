@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Resumen de una conversación generado localmente a partir de sus mensajes.
+ * Resumen guardado de una conversación.
  * Guarda el rango de mensajes que cubre para poder repetirlo o auditarlo.
  */
 @Entity
@@ -42,7 +42,7 @@ public class ResumenChat {
     @Column(name = "hasta_mensaje_id")
     private Long hastaMensajeId;
 
-    /** Origen del resumen: "Local" cuando se genera sin proveedor externo. */
+    /** Modelo de Gemini o "Local" para resúmenes anteriores a la integración. */
     @Column(length = 60)
     private String modelo = "Local";
 

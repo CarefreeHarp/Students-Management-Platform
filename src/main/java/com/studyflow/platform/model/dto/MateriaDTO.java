@@ -10,6 +10,7 @@ public record MateriaDTO(
         String profesor,
         Integer creditos,
         Integer indiceColor,
-        List<BloqueHorarioDTO> bloques
+        List<BloqueHorarioDTO> bloques,
+        Integer opcion
 ) {
 }

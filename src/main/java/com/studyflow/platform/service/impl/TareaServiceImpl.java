@@ -13,6 +13,7 @@ import com.studyflow.platform.model.entity.Tarea;
 import com.studyflow.platform.model.enums.EstadoTarea;
 import com.studyflow.platform.repository.RegistroAvanceRepository;
 import com.studyflow.platform.repository.TareaRepository;
+import com.studyflow.platform.service.FlowService;
 import com.studyflow.platform.service.ProyectoService;
 import com.studyflow.platform.service.TareaService;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,6 +41,7 @@ public class TareaServiceImpl implements TareaService {
 
     private static final DateTimeFormatter FECHA_CORTA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private final FlowService flow;
     private final TareaRepository tareaRepository;
     private final RegistroAvanceRepository registroRepository;
     private final ProyectoService proyectoService;
@@ -50,8 +51,9 @@ public class TareaServiceImpl implements TareaService {
     public TareaServiceImpl(TareaRepository tareaRepository,
                             RegistroAvanceRepository registroRepository,
                             ProyectoService proyectoService,
-                            ProyectoMapper proyectoMapper,
+                            ProyectoMapper proyectoMapper, FlowService flow,
                             @Value("${studyflow.archivos.ruta:archivos}") String rutaArchivos) {
+        this.flow = flow;
         this.tareaRepository = tareaRepository;
         this.registroRepository = registroRepository;
         this.proyectoService = proyectoService;
@@ -80,14 +82,14 @@ public class TareaServiceImpl implements TareaService {
 
     @Override
     public TareaDTO actualizar(Long tareaId, PeticionTarea peticion) {
-        Tarea tarea = obtener(tareaId);
+        Tarea tarea = obtenerParaActualizar(tareaId);
         aplicar(tarea, peticion, tarea.getProyecto());
         return proyectoMapper.aDTO(tarea);
     }
 
     @Override
     public TareaDTO marcarCompletada(Long tareaId, String resultado, MultipartFile archivo) {
-        Tarea tarea = obtener(tareaId);
+        Tarea tarea = obtenerParaActualizar(tareaId);
         String texto = resultado == null ? "" : resultado.trim();
         if (texto.isBlank() && (archivo == null || archivo.isEmpty()) && !tarea.tieneResultado()) {
             throw new IllegalArgumentException("Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.");
@@ -100,8 +102,7 @@ public class TareaServiceImpl implements TareaService {
         if (archivo != null && !archivo.isEmpty()) {
             tarea.getArchivos().add(guardarArchivo(tarea, archivo));
         }
-        tarea.setEstado(EstadoTarea.TERMINADA);
-        tarea.setFechaCompletada(LocalDateTime.now());
+        flow.terminar(tarea);
         return proyectoMapper.aDTO(tarea);
     }
 
@@ -138,6 +139,11 @@ public class TareaServiceImpl implements TareaService {
                 .stream().map(proyectoMapper::aDTO).toList();
     }
 
+    private Tarea obtenerParaActualizar(Long id) {
+        return tareaRepository.findParaRepartoById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("tarea", id));
+    }
+
     private Tarea obtener(Long id) {
         return tareaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("tarea", id));
@@ -150,17 +156,12 @@ public class TareaServiceImpl implements TareaService {
         tarea.setTitulo(peticion.titulo().trim());
         tarea.setDescripcion(peticion.descripcion());
         tarea.setFechaLimite(peticion.fechaLimite());
-        tarea.setHoraLimite(peticion.horaLimite() != null && !peticion.horaLimite().isBlank()
-                ? LocalTime.parse(peticion.horaLimite())
-                : LocalTime.of(9, 0));
+        if (peticion.horaLimite() != null && !peticion.horaLimite().isBlank()) {
+            tarea.setHoraLimite(LocalTime.parse(peticion.horaLimite()));
+        } else if (tarea.getId() == null) {
+            tarea.setHoraLimite(LocalTime.of(9, 0));
+        }
         EstadoTarea estadoPropuesto = EstadoTarea.desdeClave(peticion.estado());
-        if (estadoPropuesto == EstadoTarea.TERMINADA && !tarea.tieneResultado()) {
-            throw new IllegalArgumentException("Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.");
-        }
-        tarea.setEstado(estadoPropuesto);
-        if (tarea.getEstado() == EstadoTarea.TERMINADA && tarea.getFechaCompletada() == null) {
-            tarea.setFechaCompletada(LocalDateTime.now());
-        }
         if (peticion.responsable() == null || peticion.responsable().isBlank()) {
             tarea.setResponsable(null);
         } else {
@@ -177,6 +178,12 @@ public class TareaServiceImpl implements TareaService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("La etapa elegida no pertenece a este proyecto."));
         tarea.setEtapa(etapa);
+        if (estadoPropuesto == EstadoTarea.TERMINADA) {
+            flow.terminar(tarea);
+        } else {
+            tarea.setEstado(estadoPropuesto);
+            tarea.setFechaCompletada(null);
+        }
     }
 
     /** Una tarea no puede extender el plan más allá de la entrega final del proyecto. */

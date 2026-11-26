@@ -33,7 +33,9 @@
               <p id="channel-description" class="text-xs text-muted"></p>
             </div>
             <div class="flex gap-1.5">
-              <button id="summarize" class="btn btn-sm btn-soft" type="button"><i class="bi bi-stars"></i> Resumir</button>
+              <button id="summarize" class="btn btn-sm btn-soft" type="button" disabled aria-describedby="summary-help">
+                <i class="bi bi-stars" aria-hidden="true"></i> <span th:text="${sandbox} ? 'Resumir' : 'Resumir con IA'">Resumir con IA</span>
+              </button>
               <button id="delete-channel" class="btn btn-sm btn-ghost" type="button" hidden aria-label="Eliminar canal"><i class="bi bi-trash3"></i></button>
             </div>
           </div>
@@ -77,8 +79,10 @@
           <section class="panel" aria-labelledby="summary-title">
             <div class="section-head">
               <h2 id="summary-title" class="text-base">Resumen</h2>
-              <span id="summary-model" class="tag bg-primary-soft text-[var(--estado-primary)]">Local</span>
+              <span id="summary-model" class="tag bg-primary-soft text-[var(--estado-primary)]" hidden></span>
             </div>
+            <p id="summary-help" class="mb-2 text-xs text-muted" th:text="${sandbox} ? 'La prueba resume los mensajes en este navegador.' : 'Al resumir con IA, se envían a Gemini hasta 100 mensajes recientes del canal.'">Al resumir con IA, se envían a Gemini hasta 100 mensajes recientes del canal.</p>
+            <p id="summary-status" class="text-xs text-muted" role="status" aria-live="polite"></p>
             <div id="summary-body"></div>
           </section>
         </aside>

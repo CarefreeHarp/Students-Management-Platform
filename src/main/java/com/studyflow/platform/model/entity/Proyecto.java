@@ -89,6 +89,11 @@ public class Proyecto {
     @OrderBy("fechaRegistro DESC")
     private List<Entregable> entregables = new ArrayList<>();
 
+    public boolean participa(Long usuarioId) {
+        return usuarioId.equals(propietario.getId()) || integrantes.stream()
+                .anyMatch(i -> i.getUsuario() != null && usuarioId.equals(i.getUsuario().getId()));
+    }
+
     public void agregarCanal(Canal canal) {
         canal.setProyecto(this);
         canales.add(canal);

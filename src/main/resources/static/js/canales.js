@@ -12,6 +12,8 @@
   const REACCIONES = { acuerdo: 'De acuerdo', hecho: 'Hecho', gracias: 'Gracias' };
 
   const estado = { canales: [], activo: null, archivoPendiente: null };
+  const resumiendo = new Set();
+  let cargaCanal = 0;
   const $ = (selector) => document.querySelector(selector);
 
   async function pedir(url, opciones = {}) {
@@ -207,36 +209,48 @@
 
   function pintarResumen(resumen) {
     const caja = $("#summary-body");
+    const modelo = $("#summary-model");
+    modelo.hidden = !resumen;
     if (!resumen) {
-      $("#summary-model").textContent = "Local";
-      caja.innerHTML = '<p class="text-[13px] text-muted">Pulsa «Resumir» cuando haya conversación.</p>';
+      caja.innerHTML = '<p class="text-[13px] text-muted">El resumen aparecerá aquí.</p>';
       return;
     }
-    $("#summary-model").textContent = resumen.modelo || "Local";
+    modelo.textContent = resumen.modelo || "Local";
     const puntos = (resumen.puntosClave || []).length
       ? `<ul class="mt-2.5 grid gap-1.5 text-xs text-muted">${resumen.puntosClave
           .map((punto) => `<li class="flex gap-1.5"><i class="bi bi-dot text-primary"></i><span>${esc(punto)}</span></li>`)
           .join("")}</ul>`
       : "";
     caja.innerHTML = `<p class="whitespace-pre-wrap text-[13px]">${esc(resumen.contenido)}</p>${puntos}
-      <p class="mt-2.5 text-[11px] text-muted-light">${resumen.mensajesResumidos} mensajes · ${esc(resumen.fechaGeneracion)}</p>`;
+      <p class="mt-2.5 text-[11px] text-muted-light">${resumen.mensajesResumidos} ${resumen.mensajesResumidos === 1 ? "mensaje resumido" : "mensajes resumidos"} · ${esc(resumen.fechaGeneracion)}</p>`;
   }
 
+  function estadoResumen() {
+    const esperando = resumiendo.has(estado.activo?.id);
+    const boton = $("#summarize");
+    boton.disabled = esperando || !estado.activo?.mensajes.length;
+    boton.setAttribute("aria-busy", String(esperando));
+    $("#summary-status").textContent = esperando ? "Generando el resumen…" : "";
+  }
   /* ------------------------------------------------------------ carga */
 
   async function abrirCanal(canalId) {
+    const carga = ++cargaCanal;
     const canal = await pedir(`/api/canales/${canalId}`);
+    if (carga !== cargaCanal) return;
     estado.activo = canal;
 
     $("#channel-title").textContent = `#${canal.slug}`;
     $("#channel-description").textContent = canal.descripcion || "";
     $("#message-input").placeholder = `Escribe en #${canal.slug}…`;
     $("#delete-channel").hidden = !canal.borrable;
-    $("#summarize").disabled = !canal.mensajes.length;
+    estadoResumen();
 
     pintarMensajes(canal.mensajes);
     pintarResumen(canal.ultimoResumen);
-    pintarArchivos(await pedir(`/api/canales/${canalId}/archivos`));
+    const archivos = await pedir(`/api/canales/${canalId}/archivos`);
+    if (carga !== cargaCanal) return;
+    pintarArchivos(archivos);
 
     // Refresca los contadores de la barra lateral.
     estado.canales = await pedir(`/api/proyectos/${proyecto}/canales`);
@@ -337,19 +351,25 @@
 
     $("#summarize").addEventListener("click", async () => {
       const canal = estado.activo;
-      if (!canal) return;
-      const boton = $("#summarize");
-      boton.disabled = true;
-      boton.setAttribute("aria-busy", "true");
+      if (!canal?.mensajes.length || resumiendo.has(canal.id)) return;
+      resumiendo.add(canal.id);
+      estadoResumen();
+      let mensaje;
       try {
         const resumen = await pedir(`/api/canales/${canal.id}/resumen`, { method: "POST" });
-        if (estado.activo?.id === canal.id) pintarResumen(resumen);
-        avisar("Resumen local generado.", "success");
+        if (estado.activo?.id === canal.id) {
+          estado.activo.ultimoResumen = resumen;
+          pintarResumen(resumen);
+        }
+        mensaje = "Resumen guardado.";
       } catch (error) {
-        avisar(error.message, "error");
+        mensaje = error.message;
       } finally {
-        boton.removeAttribute("aria-busy");
-        boton.disabled = !estado.activo || !estado.activo.mensajes.length;
+        resumiendo.delete(canal.id);
+        if (estado.activo?.id === canal.id) {
+          estadoResumen();
+          $("#summary-status").textContent = mensaje;
+        }
       }
     });
 

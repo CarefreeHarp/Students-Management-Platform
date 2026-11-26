@@ -49,7 +49,7 @@
 
     const color = entregable.colorResponsable || "#5b5ce2";
     return `
-      <article class="deliverable-card tarjeta-lista tarjeta-borde-color flex items-start gap-3" style="--borde:${esc(color)}">
+      <article class="deliverable-card tarjeta-lista tarjeta-borde-color flex items-start gap-3" id="entregable-${entregable.id}" style="--borde:${esc(color)}">
         <span class="grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-[var(--estado-primary)]">
           <i class="bi ${esc(entregable.icono)}"></i>
         </span>
@@ -67,6 +67,7 @@
             ${responsable}
             ${entregable.tarea ? `<span><i class="bi bi-list-check"></i> ${esc(entregable.tarea)}</span>` : ""}
             <span><i class="bi bi-calendar3"></i> ${esc(entregable.fechaRegistro)}</span>
+            ${entregable.fechaLimite ? `<span>Vence el ${esc(app.formatDate(entregable.fechaLimite, { day: "numeric", month: "short", year: "numeric" }))}</span>` : ""}
           </div>
         </div>
         <div class="deliverable-actions flex flex-none gap-1">
@@ -126,6 +127,7 @@
     $("#deliverable-description").value = entregable ? entregable.descripcion || "" : "";
     $("#deliverable-type").value = entregable ? entregable.tipo : "DOCUMENTO";
     $("#deliverable-state").value = entregable ? entregable.estado : "BORRADOR";
+    $("#deliverable-due").value = entregable?.fechaLimite || "";
     $("#deliverable-feedback").classList.remove("is-visible");
     $("#deliverable-dialog").showModal();
   }
@@ -139,7 +141,8 @@
       descripcion: $("#deliverable-description").value.trim(),
       url: $("#deliverable-url").value.trim(),
       tipo: $("#deliverable-type").value,
-      estado: $("#deliverable-state").value
+      estado: $("#deliverable-state").value,
+      fechaLimite: $("#deliverable-due").value || null
     };
 
     if (!cuerpo.nombre || !cuerpo.url) {
@@ -191,6 +194,9 @@
     });
 
     await cargar();
+    if (/^#entregable-\d+$/.test(window.location.hash)) {
+      document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ block: "center" });
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

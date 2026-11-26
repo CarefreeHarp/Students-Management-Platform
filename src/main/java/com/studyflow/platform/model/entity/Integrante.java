@@ -68,4 +68,12 @@ public class Integrante {
         }
         return iniciales.toString();
     }
+
+    public boolean correspondeA(Usuario cuenta) {
+        if (usuario != null) {
+            return usuario.getId().equals(cuenta.getId());
+        }
+        return contacto != null && cuenta.getCorreo() != null
+                && contacto.trim().equalsIgnoreCase(cuenta.getCorreo());
+    }
 }

@@ -12,6 +12,7 @@ public record HorarioDTO(
         Integer totalCreditos,
         boolean generadoPorIa,
         boolean seleccionado,
-        List<MateriaDTO> materias
+        List<MateriaDTO> materias,
+        List<String> omitidas
 ) {
 }

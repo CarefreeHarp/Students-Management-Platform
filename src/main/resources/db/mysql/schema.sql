@@ -39,12 +39,30 @@ CREATE TABLE usuario (
     semestre        INT,
     descripcion     VARCHAR(300),
     avatar_url      VARCHAR(500),
+    color_flow      VARCHAR(16),
     proveedor       VARCHAR(20)  NOT NULL DEFAULT 'CORREO',
     fecha_registro  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_usuario_correo UNIQUE (correo),
     CONSTRAINT fk_usuario_universidad FOREIGN KEY (universidad_id) REFERENCES universidad (id)
         ON DELETE SET NULL,
     CONSTRAINT ck_usuario_edad CHECK (edad IS NULL OR edad BETWEEN 15 AND 99)
+) ENGINE = InnoDB;
+
+-- Se conserva el premio aunque se elimine la tarea original.
+CREATE TABLE premio_flow (
+    tarea_id   BIGINT PRIMARY KEY,
+    usuario_id BIGINT NOT NULL,
+    INDEX idx_premio_flow_usuario (usuario_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario (id) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+-- Cada tarea cuenta una sola vez para la racha del estudiante.
+CREATE TABLE actividad_flow (
+    tarea_id   BIGINT PRIMARY KEY,
+    usuario_id BIGINT NOT NULL,
+    fecha      DATE NOT NULL,
+    INDEX idx_actividad_flow_usuario_fecha (usuario_id, fecha),
+    FOREIGN KEY (usuario_id) REFERENCES usuario (id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 -- ---------------------------------------------------------------------------
@@ -197,6 +215,7 @@ CREATE TABLE horario (
     puntaje         INT,
     total_creditos  INT,
     generado_por_ia TINYINT(1)   NOT NULL DEFAULT 0,
+    detalle_secciones JSON,
     seleccionado    TINYINT(1)   NOT NULL DEFAULT 0,
     fecha_creacion  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_horario_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id)
@@ -357,6 +376,7 @@ CREATE TABLE entregable (
     tarea_id            BIGINT,
     fecha_registro      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion DATETIME,
+    fecha_limite        DATE,
     CONSTRAINT fk_entregable_proyecto FOREIGN KEY (proyecto_id) REFERENCES proyecto (id) ON DELETE CASCADE,
     CONSTRAINT fk_entregable_responsable FOREIGN KEY (responsable_id) REFERENCES integrante (id) ON DELETE SET NULL,
     CONSTRAINT fk_entregable_tarea FOREIGN KEY (tarea_id) REFERENCES tarea (id) ON DELETE SET NULL

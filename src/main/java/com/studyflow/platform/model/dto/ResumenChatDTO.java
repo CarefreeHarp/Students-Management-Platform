@@ -2,7 +2,7 @@ package com.studyflow.platform.model.dto;
 
 import java.util.List;
 
-/** Resumen de conversación generado localmente a partir de los mensajes del canal. */
+/** Resumen guardado de los mensajes de un canal. */
 public record ResumenChatDTO(
         Long id,
         String contenido,
