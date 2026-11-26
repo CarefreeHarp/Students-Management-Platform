@@ -74,4 +74,8 @@ public class Integrante {
         }
         return iniciales.toString();
     }
+
+    public boolean correspondeA(Usuario cuenta) {
+        return usuario != null && cuenta != null && usuario.getId().equals(cuenta.getId());
+    }
 }

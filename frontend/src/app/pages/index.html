@@ -23,9 +23,37 @@
         </div>
         <div class="project-legend" id="project-legend" aria-label="Proyectos en el calendario"></div>
       </div>
+      <p id="dashboard-agenda-status" class="text-xs text-muted" role="status"></p>
       <div id="dashboard-calendar" aria-label="Calendario semanal de tareas"></div>
     </div>
 
+    <div class="dashboard-side">
+  <section class="panel flow-card" aria-labelledby="flow-title" data-flow>
+    <div class="section-head"><h2 id="flow-title">Mi mascota Flow</h2></div>
+    <div class="flow-scene" data-flow-color="violeta">
+      <div class="flow-portrait" role="img" aria-label="Flow, una chispa sonriente de color violeta">
+        <span class="flow-foot" aria-hidden="true"></span>
+        <span class="flow-body" aria-hidden="true">
+          <span class="flow-bolt"></span>
+          <span class="flow-eyes"></span>
+          <span class="flow-smile"></span>
+        </span>
+      </div>
+      <p class="flow-score"><strong data-flow-puntos>…</strong>Mis puntos</p>
+    </div>
+    <p class="flow-rule">Racha de tareas <strong data-flow-racha>…</strong></p>
+    <p class="flow-rule">Ganas 10 puntos por cada tarea que termines a tiempo.</p>
+    <div class="flow-controls">
+      <label for="flow-color">Color de Flow</label>
+      <select id="flow-color" data-flow-selector disabled>
+        <option value="violeta">Violeta</option>
+        <option value="turquesa">Turquesa</option>
+        <option value="coral">Coral</option>
+      </select>
+    </div>
+    <p role="status" data-flow-estado>Cargando tu mascota…</p>
+    <button type="button" class="text-action" data-flow-reintento hidden>Volver a cargar</button>
+  </section>
     <aside class="panel project-overview" aria-labelledby="projects-snapshot-title">
       <div class="section-head">
         <div><h2 id="projects-snapshot-title">Estado general</h2><p id="pending-count">Cargando tus pendientes…</p></div>
@@ -33,5 +61,6 @@
       </div>
       <div id="project-snapshot-list" class="overview-projects" aria-live="polite"></div>
     </aside>
+    </div>
   </section>
 </main>

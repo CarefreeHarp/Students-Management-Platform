@@ -48,6 +48,10 @@ export function mount(scope) {
   let choices = {};
   let editingId = null;
   let editorOptions = [];
+  let alternatives = [];
+  let preview = null;
+  let busy = false;
+  let draftRevision = 0;
   const getById = (id) => document.getElementById(id);
   const createId = () => scope.app?.uid?.() || `subject-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const dayLabel = (id) => DAYS.find((day) => day.id === id)?.label || id;
@@ -197,31 +201,49 @@ export function mount(scope) {
   }
 
   function renderCalendar() {
-    const sessions = selectedSessions();
-    const included = selectedSubjects();
+    const included = preview ? preview.materias : selectedSubjects();
+    const sessions = preview ? included.flatMap((materia) => materia.bloques.map((bloque) => ({
+      name: materia.nombre, day: bloque.dia, start: bloque.horaInicio, end: bloque.horaFin,
+      color: materia.indiceColor, section: materia.opcion,
+    }))) : selectedSessions();
     const conflicts = getConflicts(sessions);
-    const hours = Array.from({ length: 17 }, (_, index) => index + 6);
-    getById("draft-calendar").innerHTML = `<div class="schedule-calendar__header-time">Hora</div>
-      ${DAYS.map((day) => `<div class="schedule-calendar__day-name"><span>${day.short}</span>${day.label}</div>`).join("")}
-      <div class="schedule-calendar__time-axis">${hours.map((hour) => `<span class="schedule-time-label${hour === 22 ? " schedule-time-label--last" : ""}" style="top:${(hour - 6) / 16 * 100}%">${String(hour).padStart(2, "0")}:00</span>`).join("")}</div>
-      ${DAYS.map((day) => `<div class="schedule-calendar__day" data-day="${day.id}">${sessions.filter((session) => session.day === day.id).map((session) => {
-        const top = (timeToMinutes(session.start) - CALENDAR_START) / (CALENDAR_END - CALENDAR_START) * 100;
-        const height = (timeToMinutes(session.end) - timeToMinutes(session.start)) / (CALENDAR_END - CALENDAR_START) * 100;
-        const color = subjects.findIndex((subject) => subject.id === session.subjectId) % 6;
-        const label = `${session.name}, ${day.label}, ${session.start} a ${session.end}`;
-        return `<article class="schedule-event schedule-color-${color}" style="top:${top}%;height:calc(${height}% - 3px)" title="${escapeHTML(label)}" aria-label="${escapeHTML(label)}"><span class="schedule-event__name">${escapeHTML(session.name)}</span><span class="schedule-event__time">${session.start}–${session.end}</span></article>`;
+    const days = sessions.some((s) => s.day === "domingo") ? [...DAYS, {id: "domingo", label: "Domingo", short: "Dom"}] : DAYS;
+    const firstHour = Math.floor(Math.min(CALENDAR_START, ...sessions.map((s) => timeToMinutes(s.start))) / 60);
+    const lastHour = Math.ceil(Math.max(CALENDAR_END, ...sessions.map((s) => timeToMinutes(s.end))) / 60);
+    const span = lastHour - firstHour;
+    const hours = Array.from({ length: span + 1 }, (_, index) => index + firstHour);
+    const calendar = getById("draft-calendar");
+    calendar.style.setProperty("--dias", days.length);
+    calendar.style.setProperty("--hora", `${100 / span}%`);
+    calendar.innerHTML = `<div class="schedule-calendar__header-time">Hora</div>
+      ${days.map((day) => `<div class="schedule-calendar__day-name"><span>${day.short}</span>${day.label}</div>`).join("")}
+      <div class="schedule-calendar__time-axis">${hours.map((hour) => `<span class="schedule-time-label${hour === lastHour ? " schedule-time-label--last" : ""}" style="top:${(hour - firstHour) / span * 100}%">${String(hour).padStart(2, "0")}:00</span>`).join("")}</div>
+      ${days.map((day) => `<div class="schedule-calendar__day" data-day="${day.id}">${sessions.filter((session) => session.day === day.id).map((session) => {
+        const top = (timeToMinutes(session.start) / 60 - firstHour) / span * 100;
+        const height = (timeToMinutes(session.end) - timeToMinutes(session.start)) / (span * 60) * 100;
+        const color = session.color ?? subjects.findIndex((subject) => subject.id === session.subjectId) % 6;
+        const label = `${session.name}${session.section ? ", opción " + session.section : ""}, ${day.label}, ${session.start} a ${session.end}`;
+        return `<article class="schedule-event schedule-color-${color}" style="top:${top}%;height:calc(${height}% - 3px)" title="${escapeHTML(label)}" aria-label="${escapeHTML(label)}"><span class="schedule-event__name">${escapeHTML(session.name)}</span><span class="schedule-event__time">${session.start}–${session.end}${session.section ? " · Op. " + session.section : ""}</span></article>`;
       }).join("")}</div>`).join("")}`;
-    getById("draft-calendar-caption").textContent = included.length ? `${included.length} ${included.length === 1 ? "materia seleccionada" : "materias seleccionadas"} · ${sessions.length} clases por semana` : "Selecciona una opción de cada materia para verla aquí.";
-    const credits = included.reduce((total, subject) => total + subject.credits, 0);
+    const caption = `${included.length} ${included.length === 1 ? "materia" : "materias"} · ${sessions.length} ${sessions.length === 1 ? "clase" : "clases"} por semana`;
+    getById("draft-calendar-caption").textContent = included.length ? (preview ? `${preview.nombre} · ${caption}` : caption) : "Selecciona una opción de cada materia para verla aquí.";
+    const credits = preview ? preview.totalCreditos : included.reduce((total, subject) => total + subject.credits, 0);
     getById("draft-credit-count").textContent = `${credits} ${credits === 1 ? "crédito" : "créditos"}`;
     getById("schedule-conflicts").hidden = !conflicts.length;
     getById("schedule-conflicts").textContent = `Hay cruces de horario: ${conflicts.join("; ")}. Elige otra opción o excluye una materia para guardar.`;
-    getById("save-schedule").disabled = !included.length || Boolean(conflicts.length);
+    getById("schedule-preview-source").textContent = preview?.tipo === "gemini" ? `Gemini · ${preview.nombre}`
+      : preview ? "Horario manual de tu cuenta." : "Vista previa de las opciones que elegiste.";
+    getById("return-to-draft").hidden = !preview;
+    getById("save-schedule").textContent = preview?.seleccionado ? "Guardado en tu cuenta" : "Guardar horario";
+    getById("save-schedule").disabled = busy || !included.length || Boolean(conflicts.length) || Boolean(preview?.seleccionado);
   }
 
   function renderDraft() {
+    draftRevision++;
+    preview = null;
     ensureChoices();
     renderSubjectList();
+    renderAlternatives();
     renderCalendar();
   }
 
@@ -347,13 +369,135 @@ export function mount(scope) {
     return saved;
   }
 
-  function saveSelectedSchedule() {
+  function renderAlternatives() {
+    const button = getById("generate-schedules");
+    if (!button) return;
+    button.disabled = busy || !selectedSubjects().length;
+    getById("schedule-alternatives").innerHTML = alternatives.map((a) => `
+      <button type="button" class="schedule-alternative" data-preview-schedule="${a.id}" aria-pressed="${a.id === preview?.id}">
+        <strong>${escapeHTML(a.nombre)}</strong>
+        <span class="schedule-small">${escapeHTML(a.descripcion)}</span>
+        <span class="schedule-muted schedule-small">${a.materias.length} ${a.materias.length === 1 ? "materia" : "materias"} · ${a.totalCreditos} ${a.totalCreditos === 1 ? "crédito" : "créditos"}${a.seleccionado ? " · Guardado" : ""}</span>
+        ${a.omitidas.length ? `<span class="schedule-small">${a.omitidas.map(escapeHTML).join(", ")} ${a.omitidas.length === 1 ? "queda" : "quedan"} fuera por cruce.</span>` : ""}
+      </button>`).join("");
+  }
+
+  function aiStatus(message, error = false) {
+    const status = getById("schedule-ai-status");
+    status.textContent = message;
+    status.classList.toggle("schedule-error", error);
+  }
+
+  async function scheduleApi(path, options = {}) {
+    const response = await request("/api/horarios" + path, options);
+    if (response.status === 401) throw new Error("Tu sesión terminó. Vuelve a iniciar sesión para consultar tus horarios.");
+    if (!response.ok) {
+      const problem = await response.json().catch(() => ({}));
+      throw new Error(problem.detail || problem.message || "No se pudo completar la operación. Intenta de nuevo.");
+    }
+    return response.json();
+  }
+
+  function setBusy(value) {
+    busy = value;
+    renderAlternatives();
+    renderCalendar();
+  }
+
+  async function loadAlternatives() {
+    const revision = draftRevision;
+    setBusy(true);
+    try {
+      const saved = await scheduleApi("");
+      // Las versiones anteriores marcaban como IA sus propuestas simuladas.
+      alternatives = saved.filter((a) => a.tipo === "gemini");
+      if (revision === draftRevision) preview = saved.find((a) => a.seleccionado && ["gemini", "manual"].includes(a.tipo)) || alternatives[0] || null;
+    } catch (error) {
+      aiStatus(error.message, true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function generateSchedules() {
+    const included = selectedSubjects();
+    if (busy || !included.length) return;
+    const revision = draftRevision;
+    const preferences = readPreferences();
+    const request = {
+      materias: included.map((subject) => materiaParaApi(subject, subject.options)),
+      preferencias: { jornada: preferences.day, pausas: preferences.breaks, masCreditos: preferences.moreCredits },
+    };
+    setBusy(true);
+    aiStatus("Gemini está comparando tus secciones…");
+    try {
+      const generated = await scheduleApi("/generar", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request),
+      });
+      const saved = alternatives.find((a) => a.seleccionado && !generated.some((g) => g.id === a.id));
+      alternatives = saved ? [...generated, saved] : generated;
+      if (revision === draftRevision) preview = generated[0];
+      aiStatus(revision !== draftRevision ? "Ya están las alternativas para el borrador anterior."
+        : generated.length === 1 ? "Hay una alternativa. Ya puedes verla en Tu semana."
+        : `Hay ${generated.length} alternativas. Elige una para verla en Tu semana.`);
+    } catch (error) {
+      aiStatus(error.message, true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveGeneratedSchedule() {
+    if (busy || !preview || preview.seleccionado) return;
+    const id = preview.id;
+    setBusy(true);
+    try {
+      await scheduleApi(`/${id}/seleccionar`, { method: "PATCH" });
+      alternatives.forEach((a) => { a.seleccionado = a.id === id; });
+      aiStatus("Horario guardado en tu cuenta.");
+    } catch (error) {
+      aiStatus(error.message, true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function materiaParaApi(subject, options) {
+    return {
+      nombre: subject.name, creditos: subject.credits,
+      opciones: options.map((option) => option.sessions.map((s) => ({
+        dia: s.day, horaInicio: s.start, horaFin: s.end,
+      }))),
+    };
+  }
+
+  async function saveSelectedSchedule() {
+    if (preview) return saveGeneratedSchedule();
     const courses = selectedSessions();
-    if (!courses.length || getConflicts(courses).length) return;
+    if (busy || !courses.length || getConflicts(courses).length) return;
     const selected = { id: "manual", name: "Mi horario", courses, subjects: selectedSubjects(), choices, preferences: readPreferences(), savedAt: new Date().toISOString() };
+    if (getById("generate-schedules")) {
+      const revision = draftRevision;
+      const materias = selected.subjects.map((subject) => materiaParaApi(subject,
+        subject.options.filter((option) => option.id === selected.choices[subject.id])));
+      setBusy(true);
+      try {
+        const saved = await scheduleApi("/seleccionado", {
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ materias }),
+        });
+        alternatives.forEach((a) => { a.seleccionado = false; });
+        if (revision === draftRevision) preview = saved;
+        showToast("Horario guardado en tu cuenta y en la agenda.", "success");
+      } catch (error) {
+        showToast(error.message, "error");
+        return;
+      } finally {
+        setBusy(false);
+      }
+    }
     if (writeStorage(SELECTED_SCHEDULE_KEY, selected)) {
       getById("restore-schedule").disabled = false;
-      showToast("Horario guardado en este navegador.", "success");
+      if (!getById("generate-schedules")) showToast("Horario guardado en este navegador.", "success");
     } else showToast("No se pudo guardar el horario en este navegador.", "warning");
   }
 
@@ -427,11 +571,28 @@ export function mount(scope) {
       persistDraft();
       showToast("Ejemplos de salud, economía, derecho, diseño e investigación disponibles.", "success");
     });
-    getById("schedule-preferences").addEventListener("change", () => savePreferences());
+    getById("schedule-preferences").addEventListener("change", () => {
+      draftRevision++;
+      savePreferences();
+    });
     getById("save-schedule-preferences").addEventListener("click", () => savePreferences({ announce: true }));
     getById("save-schedule").addEventListener("click", saveSelectedSchedule);
+    getById("return-to-draft").addEventListener("click", renderDraft);
     getById("restore-schedule").disabled = !readSavedSchedule();
     getById("restore-schedule").addEventListener("click", restoreSavedSchedule);
+    if (getById("generate-schedules")) {
+      getById("generate-schedules").addEventListener("click", generateSchedules);
+      getById("schedule-alternatives").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-preview-schedule]");
+        if (!button) return;
+        draftRevision++;
+        preview = alternatives.find((a) => String(a.id) === button.dataset.previewSchedule);
+        renderCalendar();
+        renderAlternatives();
+        getById("schedule-alternatives").querySelector('[aria-pressed="true"]')?.focus();
+      });
+      loadAlternatives();
+    }
   }
 
   initialisePage();

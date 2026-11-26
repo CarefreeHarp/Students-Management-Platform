@@ -1,16 +1,15 @@
-/*
- * Panel principal. Consume la API REST: el calendario muestra las tareas reales
- * de todos los proyectos y al pulsarlas abre el proyecto correspondiente.
- */
 export function mount(scope) {
   const { document, listen, request, later, animate } = scope;
 
   const app = scope.app || {};
-  const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
-  const BANDAS = ["08:00", "10:00", "12:00", "14:00", "16:00"];
-  const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie"];
+  const esc = app.escapeHTML || ((valor) => String(valor ?? "").replace(/[&<>"']/g, caracter => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[caracter]));
+  const DIAS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
+  const DIAS_CORTOS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const CLASE = "#6956b8";
+  const TIPOS = { clase: "Clase", tarea: "Tarea", entregable: "Entregable", proyecto: "Entrega de proyecto" };
 
   let proyectos = [];
+  let agenda = { horario: null, entregables: [] };
   /* Semanas de desplazamiento respecto a la que toca por defecto. */
   let desplazamiento = 0;
   const $ = (selector) => document.querySelector(selector);
@@ -19,7 +18,7 @@ export function mount(scope) {
     const respuesta = await request(url, { headers: { "Content-Type": "application/json" }, ...opciones });
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
-      app.navigate("/login");
+      scope.navigate("/login");
       throw new Error("Tu sesión terminó. Vuelve a entrar.");
     }
     if (!respuesta.ok) {
@@ -29,142 +28,166 @@ export function mount(scope) {
     return respuesta.status === 204 ? null : respuesta.json();
   }
 
-  const iso = (fecha) => fecha.toISOString().slice(0, 10);
+  const iso = (fecha) => [fecha.getFullYear(), ...[fecha.getMonth() + 1, fecha.getDate()]
+    .map((valor) => String(valor).padStart(2, "0"))].join("-");
+  const fechaLarga = new Intl.DateTimeFormat("es-CO", { weekday: "long", day: "numeric", month: "short" });
+  const fechaSemana = new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", year: "numeric" });
+  const horaCorta = (hora) => hora ? hora.slice(0, 5) : "";
+  const urlProyecto = (proyecto) => `/proyectos/${encodeURIComponent(proyecto.codigo)}`;
 
-  function fechaCorta(valor) {
-    if (!valor) return "Sin fecha";
-    const fecha = new Date(`${valor}T12:00:00`);
-    return Number.isNaN(fecha.getTime())
-      ? valor
-      : new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(fecha).replace(".", "");
-  }
-
-  /** Todas las tareas, cada una con el proyecto al que pertenece. */
   function todasLasTareas() {
-    return proyectos.flatMap((proyecto) =>
-      proyecto.tareas.map((tarea) => ({ ...tarea, proyecto })));
+    return proyectos.flatMap((proyecto) => proyecto.tareas.map((tarea) => ({ ...tarea, proyecto })));
   }
 
-  /** Lunes de la semana con más carga; si no hay tareas, la de hoy. */
-  function inicioSemana(tareas) {
-    const pendientes = tareas.filter((tarea) => tarea.fechaLimite && tarea.estado !== "terminada")
-      .map((tarea) => tarea.fechaLimite).sort();
-    const referencia = pendientes.length ? new Date(`${pendientes[0]}T12:00:00`) : new Date();
-    referencia.setDate(referencia.getDate() - ((referencia.getDay() + 6) % 7) + desplazamiento * 7);
-    return referencia;
-  }
-
-  function pintarCalendario(tareas) {
-    const lunes = inicioSemana(tareas);
-    const dias = Array.from({ length: 5 }, (_, i) => {
+  function semanaActual() {
+    const lunes = new Date();
+    lunes.setHours(12, 0, 0, 0);
+    lunes.setDate(lunes.getDate() - ((lunes.getDay() + 6) % 7) + desplazamiento * 7);
+    return DIAS.map((_, indice) => {
       const fecha = new Date(lunes);
-      fecha.setDate(lunes.getDate() + i);
+      fecha.setDate(lunes.getDate() + indice);
       return fecha;
     });
+  }
+
+  function clasesGuardadas() {
+    if (window.SandboxBridge) {
+      try {
+        const guardado = JSON.parse(window.localStorage.getItem("atempo.selectedSchedule"));
+        return (guardado?.courses || []).map(c => ({ titulo: c.name, dia: c.day, hora: c.start, fin: c.end }));
+      } catch (_) {
+        return [];
+      }
+    }
+    return (agenda.horario?.materias || []).flatMap(materia => materia.bloques.map(bloque => ({
+      titulo: materia.nombre, dia: bloque.dia, hora: bloque.horaInicio, fin: bloque.horaFin, detalle: bloque.aula,
+    })));
+  }
+
+  function eventosDeSemana(dias) {
+    const fechas = dias.map(iso);
+    const porCodigo = new Map(proyectos.map(p => [p.codigo, p]));
+    const clases = clasesGuardadas().map(clase => ({
+      ...clase, tipo: "clase", fecha: fechas[DIAS.indexOf(clase.dia)], href: "/horarios", color: CLASE,
+    }));
+    const tareas = todasLasTareas().filter(t => t.fechaLimite).map(t => ({
+      tipo: "tarea", titulo: t.titulo, fecha: t.fechaLimite, hora: horaCorta(t.horaLimite),
+      href: urlProyecto(t.proyecto), proyecto: t.proyecto.nombre, color: t.proyecto.color,
+      detalle: t.responsable, estado: t.estadoEtiqueta, terminada: t.estado === "terminada",
+    }));
+    const entregas = agenda.entregables.filter(e => porCodigo.has(e.proyectoCodigo)).map(e => {
+      const proyecto = porCodigo.get(e.proyectoCodigo);
+      return {
+        tipo: "entregable", titulo: e.titulo, fecha: e.fecha, hora: horaCorta(e.hora),
+        href: `${urlProyecto(proyecto)}/entregables#entregable-${encodeURIComponent(e.id)}`,
+        proyecto: proyecto.nombre, color: proyecto.color, estado: e.estado,
+      };
+    });
+    const cierres = proyectos.filter(p => p.fechaEntrega).map(p => ({
+      tipo: "proyecto", titulo: p.nombre, fecha: p.fechaEntrega, href: urlProyecto(p), color: p.color,
+    }));
+    return [...clases, ...tareas, ...entregas, ...cierres].filter(e => fechas.includes(e.fecha));
+  }
+
+  function pintarEvento(evento, movil = false) {
+    const horario = evento.hora ? [evento.hora, evento.fin].filter(Boolean).join("–") : "Todo el día";
+    const descripcion = [TIPOS[evento.tipo], horario, evento.proyecto, evento.detalle, evento.estado].filter(Boolean).join(" · ");
+    const etiqueta = evento.tipo === "proyecto" ? TIPOS.proyecto : [TIPOS[evento.tipo], horario].join(" · ");
+    const color = /^#[a-f0-9]{6}$/i.test(evento.color || "") ? evento.color : "#5b5ce2";
+    const clase = movil ? "dashboard-agenda-task" : "calendar-event";
+    return `<a class="${clase}${evento.terminada ? " esta-terminada" : ""}" href="${esc(evento.href)}"
+      data-tipo="${evento.tipo}" data-detalle="${esc(descripcion)}" style="--event-color:${color}"
+      aria-label="${esc(evento.titulo + ' · ' + descripcion)}">
+      ${movil ? `<strong>${esc(evento.titulo)}</strong><span>${esc(descripcion)}</span>`
+        : `${esc(evento.titulo)}<small>${esc(etiqueta)}</small>`}
+    </a>`;
+  }
+
+  function enlazarDetalle(enlace) {
+    let detalle;
+    function ocultar() {
+      detalle?.remove();
+      detalle = null;
+    }
+    function mostrar() {
+      ocultar();
+      detalle = document.createElement("div");
+      detalle.className = "calendar-popover";
+      detalle.setAttribute("aria-hidden", "true");
+      detalle.textContent = enlace.dataset.detalle;
+      scope.root.append(detalle);
+      const marco = enlace.getBoundingClientRect();
+      detalle.style.left = `${Math.max(8, Math.min(marco.left, window.innerWidth - detalle.offsetWidth - 8))}px`;
+      detalle.style.top = `${Math.max(8, Math.min(marco.bottom + 8, window.innerHeight - detalle.offsetHeight - 8))}px`;
+    }
+    enlace.addEventListener("mouseenter", mostrar);
+    enlace.addEventListener("focus", mostrar);
+    enlace.addEventListener("mouseleave", ocultar);
+    enlace.addEventListener("blur", ocultar);
+  }
+
+  function pintarCalendario() {
+    const dias = semanaActual();
     const hoy = iso(new Date());
+    const porDia = new Map(dias.map(fecha => [iso(fecha), []]));
+    eventosDeSemana(dias).forEach(evento => porDia.get(evento.fecha).push(evento));
+    porDia.forEach(eventos => eventos.sort((a, b) => (a.hora || "").localeCompare(b.hora || "")
+      || a.titulo.localeCompare(b.titulo, "es")));
 
     const encabezado = `<div class="calendar-toolbar">
-        <h2>Semana del ${dias[0].getDate()} al ${dias[4].getDate()} de ${new Intl.DateTimeFormat("es-CO", { month: "long" }).format(dias[4])}</h2>
+        <h3>${fechaSemana.formatRange(dias[0], dias.at(-1))}</h3>
         <div class="calendar-actions">
-          <button class="calendar-button" type="button" data-semana="-1" aria-label="Semana anterior"><i class="bi bi-chevron-left"></i></button>
-          ${desplazamiento !== 0 ? '<button class="calendar-button w-auto px-2 text-[11px] font-bold" type="button" data-semana="0">Hoy</button>' : ""}
-          <button class="calendar-button" type="button" data-semana="1" aria-label="Semana siguiente"><i class="bi bi-chevron-right"></i></button>
+          <button class="calendar-button" type="button" data-semana="-1" aria-label="Semana anterior"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+          <button class="calendar-button w-auto px-2 text-[11px] font-bold" type="button" data-semana="0">Hoy</button>
+          <button class="calendar-button" type="button" data-semana="1" aria-label="Semana siguiente"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
         </div>
       </div>`;
 
-    let rejilla = '<div class="calendar-grid"><div class="calendar-corner"></div>';
+    let rejilla = '<div class="calendar-grid agenda-unificada-grid"><div class="calendar-corner"></div>';
     dias.forEach((fecha, i) => {
-      rejilla += `<div class="calendar-day-head${iso(fecha) === hoy ? " today" : ""}">${DIAS[i]}<strong>${fecha.getDate()}</strong></div>`;
+      rejilla += `<div class="calendar-day-head${iso(fecha) === hoy ? " today" : ""}">${DIAS_CORTOS[i]}<strong>${fecha.getDate()}</strong></div>`;
     });
-
-    BANDAS.forEach((banda, indice) => {
-      const siguiente = BANDAS[indice + 1] || "23:59";
-      rejilla += `<div class="calendar-hour">${banda}</div>`;
-      dias.forEach((fecha) => {
-        const dia = iso(fecha);
-        const enBanda = tareas.filter((tarea) => {
-          if (tarea.fechaLimite !== dia) return false;
-          const hora = tarea.horaLimite || "09:00";
-          return hora >= banda && hora < siguiente;
-        });
-        rejilla += `<div class="calendar-slot">${enBanda.map(evento).join("")}</div>`;
+    const horas = [...porDia.values()].flat().filter(e => e.hora)
+      .map(e => Number(e.hora.slice(0, 2)));
+    const primera = Math.min(8, ...horas);
+    const ultima = Math.max(16, ...horas);
+    const bandas = Array.from({ length: Math.floor((ultima - primera) / 2) + 1 },
+      (_, i) => `${String(primera + i * 2).padStart(2, "0")}:00`);
+    ["", ...bandas].forEach((banda, indice) => {
+      const siguiente = bandas[indice] || "24:00";
+      rejilla += `<div class="calendar-hour">${banda || "Todo el día"}</div>`;
+      porDia.forEach(eventos => {
+        const enBanda = eventos.filter(e => banda ? e.hora >= banda && e.hora < siguiente : !e.hora);
+        rejilla += `<div class="calendar-slot">${enBanda.map(e => pintarEvento(e)).join("")}</div>`;
       });
     });
     rejilla += "</div>";
 
-    const agenda = dias.map((fecha) => {
+    const lista = dias.map(fecha => {
       const dia = iso(fecha);
-      const pendientes = tareas.filter((tarea) => tarea.fechaLimite === dia)
-        .sort((a, b) => (a.horaLimite || "09:00").localeCompare(b.horaLimite || "09:00"));
-      const titulo = new Intl.DateTimeFormat("es-CO", { weekday: "long", day: "numeric", month: "short" }).format(fecha);
+      const eventos = porDia.get(dia);
+      const titulo = fechaLarga.format(fecha);
       return `<section class="dashboard-agenda-day${dia === hoy ? " is-today" : ""}" aria-label="${esc(titulo)}">
         <h3>${esc(titulo)}${dia === hoy ? " · Hoy" : ""}</h3>
-        ${pendientes.length ? `<ul>${pendientes.map((tarea) => `<li><a class="dashboard-agenda-task${tarea.estado === "terminada" ? " esta-terminada" : ""}" href="/proyectos/${encodeURIComponent(tarea.proyecto.codigo)}" style="--event-color:${esc(tarea.proyecto.color || "#5b5ce2")}">
-          <strong>${esc(tarea.titulo)}</strong>
-          <span>${esc(tarea.horaLimite || "09:00")} · ${esc(tarea.proyecto.nombre)}${tarea.estado === "terminada" ? " · Terminada" : ""}</span>
-        </a></li>`).join("")}</ul>` : '<p class="dashboard-agenda-empty">Sin pendientes para este día.</p>'}
+        ${eventos.length ? `<ul>${eventos.map(e => `<li>${pintarEvento(e, true)}</li>`).join("")}</ul>`
+          : '<p class="dashboard-agenda-empty">Sin eventos.</p>'}
       </section>`;
     }).join("");
 
-    $("#dashboard-calendar").innerHTML =
-      `<div class="calendar-shell">${encabezado}<div class="week-calendar" tabindex="0" role="region" aria-label="Calendario semanal, desplazable">${rejilla}</div><div class="dashboard-agenda" aria-label="Agenda de la semana">${agenda}</div></div>`;
-
-    $("#dashboard-calendar").querySelectorAll(".calendar-event").forEach(enlazarVentana);
-
-    // Navegación entre semanas: una tarea terminada deja de ser lo próximo,
-    // pero sigue en su fecha, así que hay que poder moverse por el calendario.
-    $("#dashboard-calendar").querySelectorAll("[data-semana]").forEach((boton) => {
+    const calendario = $("#dashboard-calendar");
+    document.querySelectorAll(".calendar-popover").forEach(detalle => detalle.remove());
+    calendario.innerHTML = `<div class="calendar-shell">${encabezado}
+      <div class="week-calendar" tabindex="0" role="region" aria-label="Calendario semanal desplazable">${rejilla}</div>
+      <div class="dashboard-agenda" aria-label="Agenda de la semana">${lista}</div></div>`;
+    calendario.querySelectorAll(".calendar-event").forEach(enlazarDetalle);
+    calendario.querySelectorAll("[data-semana]").forEach(boton => {
       boton.addEventListener("click", () => {
         const paso = Number(boton.dataset.semana);
         desplazamiento = paso === 0 ? 0 : desplazamiento + paso;
-        pintarCalendario(todasLasTareas());
+        pintarCalendario();
+        calendario.querySelector(`[data-semana="${paso}"]`).focus();
       });
     });
-  }
-
-  function evento(tarea) {
-    const datos = encodeURIComponent(JSON.stringify({
-      titulo: tarea.titulo,
-      proyecto: tarea.proyecto.nombre,
-      responsable: tarea.responsable,
-      fecha: tarea.fechaLimite,
-      estado: tarea.estadoEtiqueta
-    }));
-    const terminada = tarea.estado === "terminada" ? " esta-terminada" : "";
-    return `<a class="calendar-event${terminada}" href="/proyectos/${encodeURIComponent(tarea.proyecto.codigo)}"
-              data-task="${datos}" style="--event-color:${esc(tarea.proyecto.color || "#5b5ce2")}">
-        ${esc(tarea.titulo)}<small>${esc(tarea.proyecto.nombre)}</small>
-      </a>`;
-  }
-
-  /** Ventana flotante al pasar el ratón o al enfocar con el teclado. */
-  function enlazarVentana(elemento) {
-    let ventana;
-    const mostrar = () => {
-      ventana?.remove();
-      const tarea = JSON.parse(decodeURIComponent(elemento.dataset.task));
-      ventana = document.createElement("div");
-      ventana.className = "calendar-popover";
-      ventana.innerHTML = `<strong>${esc(tarea.titulo)}</strong>
-        <p><i class="bi bi-kanban"></i>${esc(tarea.proyecto)}</p>
-        <p><i class="bi bi-person"></i>${esc(tarea.responsable || "Sin responsable")}</p>
-        <p><i class="bi bi-calendar3"></i>${esc(fechaCorta(tarea.fecha))} · ${esc(tarea.estado)}</p>`;
-      scope.root.append(ventana);
-
-      const marco = elemento.getBoundingClientRect();
-      const izquierda = Math.max(12, Math.min(window.innerWidth - ventana.offsetWidth - 12, marco.left));
-      const arriba = marco.bottom + 8 > window.innerHeight - 120
-        ? marco.top - ventana.offsetHeight - 8
-        : marco.bottom + 8;
-      ventana.style.left = `${izquierda}px`;
-      ventana.style.top = `${Math.max(8, arriba)}px`;
-    };
-    const ocultar = () => { ventana?.remove(); ventana = null; };
-
-    elemento.addEventListener("mouseenter", mostrar);
-    elemento.addEventListener("mouseleave", ocultar);
-    elemento.addEventListener("focus", mostrar);
-    elemento.addEventListener("blur", ocultar);
   }
 
   function pintarResumen(tareas) {
@@ -198,10 +221,14 @@ export function mount(scope) {
   }
 
   async function cargar() {
-    proyectos = await pedir("/api/proyectos");
-    const tareas = todasLasTareas();
-    pintarResumen(tareas);
-    pintarCalendario(tareas);
+    const [proyectosCargados, agendaCargada] = await Promise.allSettled([pedir("/api/proyectos"), pedir("/api/agenda")]);
+    if (proyectosCargados.status === "rejected") throw proyectosCargados.reason;
+    proyectos = proyectosCargados.value;
+    if (agendaCargada.status === "fulfilled") agenda = agendaCargada.value;
+    const estado = $("#dashboard-agenda-status");
+    if (agendaCargada.status === "rejected") estado.textContent = "Por ahora se muestran las tareas y las fechas de proyecto.";
+    pintarResumen(todasLasTareas());
+    pintarCalendario();
   }
 
   async function init() {
@@ -222,7 +249,7 @@ export function mount(scope) {
     } catch (error) {
       $("#pending-count").textContent = "No se pudieron cargar los pendientes.";
       $("#dashboard-calendar").innerHTML =
-        `<p class="text-[13px] text-danger">No se pudo cargar la agenda: ${esc(error.message)}</p>`;
+        `<p class="text-[13px] text-danger">No se pudo cargar la agenda. ${esc(error.message)}</p>`;
     }
   }
 

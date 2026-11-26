@@ -41,31 +41,44 @@
         </form>
       </details>
 
-      <div id="subject-list" class="schedule-subject-list" aria-live="polite"></div>
-      <button id="load-subject-examples" class="text-action schedule-examples" type="button">Añadir ejemplos de otras carreras</button>
-      <button id="restore-schedule" class="text-action schedule-examples" type="button" disabled>Recuperar horario guardado</button>
-      <p id="schedule-storage-status" class="schedule-muted schedule-small" role="status">El borrador se guarda en este navegador. Los ejemplos son ilustrativos.</p>
-    </aside>
+          <div id="subject-list" class="schedule-subject-list" aria-live="polite"></div>
+          <button id="load-subject-examples" class="text-action schedule-examples" type="button">Añadir ejemplos de otras carreras</button>
+          <button id="restore-schedule" class="text-action schedule-examples" type="button" disabled>Recuperar horario manual</button>
+          <p id="schedule-storage-status" class="schedule-muted schedule-small" role="status">El borrador se guarda en este navegador. Los ejemplos son ilustrativos.</p>
+        </aside>
 
-    <div class="schedule-preview-column">
-      <section class="panel" aria-labelledby="draft-calendar-title">
-        <div class="section-head flex-wrap">
-          <div>
-            <h2 id="draft-calendar-title">Tu semana</h2>
-            <p id="draft-calendar-caption">Selecciona una opción de cada materia.</p>
-          </div>
-          <button id="save-schedule" class="btn btn-secondary" type="button" disabled><i class="bi bi-bookmark-check" aria-hidden="true"></i> Guardar horario</button>
-        </div>
-        <p id="schedule-conflicts" class="schedule-error" role="status" hidden></p>
-        <p id="schedule-scroll-help" class="schedule-scroll-hint">Desliza el calendario para ver todos los días y horas. También puedes usar las flechas del teclado al enfocarlo.</p>
-        <div class="schedule-calendar-wrap" tabindex="0" role="region" aria-label="Semana de materias, desplazable" aria-describedby="schedule-scroll-help">
-          <div id="draft-calendar" class="schedule-calendar" aria-label="Calendario semanal de materias"></div>
-        </div>
-        <div class="schedule-preview-footer">
-          <span>Vista previa de las opciones que elegiste.</span>
-          <span id="draft-credit-count">0 créditos</span>
-        </div>
-      </section>
+        <div class="schedule-preview-column">
+          <section class="panel schedule-ai" aria-labelledby="schedule-ai-title">
+            <div class="schedule-row">
+              <h2 id="schedule-ai-title">Alternativas de Gemini</h2>
+              <button id="generate-schedules" class="btn btn-primary" type="button">Generar horarios con IA</button>
+            </div>
+            <p class="schedule-muted schedule-small">Gemini compara todas las secciones de las materias incluidas según tus <a class="text-action" href="#schedule-preferences-title">preferencias de horario</a>.</p>
+            <p id="schedule-ai-status" class="schedule-small" role="status" aria-live="polite"></p>
+            <div id="schedule-alternatives" class="schedule-alternatives" aria-label="Alternativas generadas"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="draft-calendar-title">
+            <div class="section-head flex-wrap">
+              <div>
+                <h2 id="draft-calendar-title">Tu semana</h2>
+                <p id="draft-calendar-caption">Selecciona una opción de cada materia.</p>
+              </div>
+              <div class="schedule-actions">
+                <button id="return-to-draft" class="btn btn-ghost" type="button" hidden>Ver borrador manual</button>
+                <button id="save-schedule" class="btn btn-secondary" type="button" disabled>Guardar horario</button>
+              </div>
+            </div>
+            <p id="schedule-conflicts" class="schedule-error" role="status" hidden></p>
+            <p id="schedule-scroll-help" class="schedule-scroll-hint">Desliza el calendario para ver todos los días y horas. También puedes usar las flechas del teclado al enfocarlo.</p>
+            <div class="schedule-calendar-wrap" tabindex="0" role="region" aria-label="Semana de materias, desplazable" aria-describedby="schedule-scroll-help">
+              <div id="draft-calendar" class="schedule-calendar" aria-label="Calendario semanal de materias"></div>
+            </div>
+            <div class="schedule-preview-footer">
+              <span id="schedule-preview-source">Vista previa de las opciones que elegiste.</span>
+              <span id="draft-credit-count">0 créditos</span>
+            </div>
+          </section>
 
       <section class="panel schedule-preferences" aria-labelledby="schedule-preferences-title">
         <div class="schedule-row">

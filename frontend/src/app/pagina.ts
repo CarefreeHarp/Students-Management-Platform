@@ -75,6 +75,10 @@ export abstract class Pagina implements AfterViewInit, OnDestroy {
     });
     common?.mount(this.scope);
     specific.mount(this.scope);
+    if (page === 'dashboard' && this.auth.user) {
+      const flow = await moduleAt<Behavior>('flow');
+      if (!this.removed && this.scope) flow.mount(this.scope);
+    }
     tour?.mount(this.scope);
   }
 

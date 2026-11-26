@@ -4,6 +4,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.studyflow.platform.model.dto.HorarioDTO;
 import com.studyflow.platform.model.dto.MateriaDTO;
+import com.studyflow.platform.model.dto.PeticionGenerarHorario;
 import com.studyflow.platform.model.dto.PeticionMateria;
 import com.studyflow.platform.service.HorarioService;
 import com.studyflow.platform.service.UsuarioService;
@@ -41,7 +42,7 @@ public class HorarioApiController {
     @DeleteMapping("/materias/{id}")
     @PreAuthorize("@permisos.materia(#id)")
     public ResponseEntity<Void> eliminarMateria(@PathVariable Long id) {
-        horarioService.eliminarMateria(id);
+        horarioService.eliminarMateria(usuarioActual(), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -58,14 +59,19 @@ public class HorarioApiController {
 
     /** Respalda el boton "Generar horarios con IA". */
     @PostMapping("/horarios/generar")
-    public List<HorarioDTO> generar() {
-        return horarioService.generarAlternativas(usuarioActual());
+    public List<HorarioDTO> generar(@Valid @RequestBody(required = false) PeticionGenerarHorario borrador) {
+        return horarioService.generarAlternativas(usuarioActual(), borrador);
+    }
+
+    @PutMapping("/horarios/seleccionado")
+    public HorarioDTO guardarManual(@Valid @RequestBody PeticionGenerarHorario borrador) {
+        return horarioService.guardarManual(usuarioActual(), borrador);
     }
 
     @PatchMapping("/horarios/{id}/seleccionar")
     @PreAuthorize("@permisos.horario(#id)")
     public HorarioDTO seleccionar(@PathVariable Long id) {
-        return horarioService.seleccionar(id);
+        return horarioService.seleccionar(usuarioActual(), id);
     }
 
     private Long usuarioActual() {

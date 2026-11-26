@@ -2,50 +2,53 @@ package com.studyflow.platform.service.impl;
 
 import com.studyflow.platform.exception.RecursoNoEncontradoException;
 import com.studyflow.platform.mapper.HorarioMapper;
+import com.studyflow.platform.model.dto.DetalleHorario;
 import com.studyflow.platform.model.dto.HorarioDTO;
 import com.studyflow.platform.model.dto.MateriaDTO;
+import com.studyflow.platform.model.dto.PeticionGenerarHorario;
 import com.studyflow.platform.model.dto.PeticionMateria;
 import com.studyflow.platform.model.entity.BloqueHorario;
 import com.studyflow.platform.model.entity.Horario;
 import com.studyflow.platform.model.entity.Materia;
+import com.studyflow.platform.model.entity.Usuario;
 import com.studyflow.platform.model.enums.DiaSemana;
 import com.studyflow.platform.repository.HorarioRepository;
 import com.studyflow.platform.repository.MateriaRepository;
+import com.studyflow.platform.repository.UsuarioRepository;
 import com.studyflow.platform.service.HorarioService;
-import com.studyflow.platform.service.UsuarioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-/**
- * Implementacion del planificador de horarios.
- * La "generacion con IA" es una simulacion: ordena las materias segun tres
- * criterios (manana, tarde y jornada compacta) y descarta los choques de horas.
- */
+/** Planificador de secciones y persistencia de las alternativas de cada estudiante. */
 @Service
 @Transactional
 public class HorarioServiceImpl implements HorarioService {
 
-    private record Criterio(String nombre, String tipo, String descripcion, Comparator<Materia> orden) {
-    }
-
     private final MateriaRepository materiaRepository;
     private final HorarioRepository horarioRepository;
-    private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarios;
     private final HorarioMapper horarioMapper;
+    private final GeneradorHorariosGemini gemini;
+    private final TransactionTemplate transacciones;
 
     public HorarioServiceImpl(MateriaRepository materiaRepository,
                               HorarioRepository horarioRepository,
-                              UsuarioService usuarioService,
-                              HorarioMapper horarioMapper) {
+                              UsuarioRepository usuarios, HorarioMapper horarioMapper,
+                              GeneradorHorariosGemini gemini, TransactionTemplate transacciones) {
         this.materiaRepository = materiaRepository;
         this.horarioRepository = horarioRepository;
-        this.usuarioService = usuarioService;
+        this.usuarios = usuarios;
         this.horarioMapper = horarioMapper;
+        this.gemini = gemini;
+        this.transacciones = transacciones;
     }
 
     @Override
@@ -62,9 +65,10 @@ public class HorarioServiceImpl implements HorarioService {
             throw new IllegalArgumentException("La hora de finalización debe ser posterior a la de inicio.");
         }
 
+        Usuario usuario = bloquearUsuario(usuarioId);
         List<Materia> existentes = materiaRepository.findByUsuarioIdOrderByNombreAsc(usuarioId);
         Materia materia = new Materia();
-        materia.setUsuario(usuarioService.obtenerPorId(usuarioId));
+        materia.setUsuario(usuario);
         materia.setNombre(peticion.nombre().trim());
         materia.setCodigo(peticion.codigo());
         materia.setProfesor(peticion.profesor());
@@ -75,14 +79,20 @@ public class HorarioServiceImpl implements HorarioService {
     }
 
     @Override
-    public void eliminarMateria(Long materiaId) {
-        Materia materia = materiaRepository.findById(materiaId)
+    public void eliminarMateria(Long usuarioId, Long materiaId) {
+        bloquearUsuario(usuarioId);
+        Materia materia = materiaRepository.findByIdAndUsuarioId(materiaId, usuarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("materia", materiaId));
+        horarioRepository.findByUsuarioIdOrderByPuntajeDesc(usuarioId)
+                .forEach(horario -> horario.getMaterias().remove(materia));
         materiaRepository.delete(materia);
     }
 
     @Override
     public void limpiarMaterias(Long usuarioId) {
+        bloquearUsuario(usuarioId);
+        horarioRepository.findByUsuarioIdOrderByPuntajeDesc(usuarioId)
+                .forEach(horario -> horario.getMaterias().clear());
         materiaRepository.deleteByUsuarioId(usuarioId);
     }
 
@@ -94,75 +104,106 @@ public class HorarioServiceImpl implements HorarioService {
     }
 
     @Override
-    public List<HorarioDTO> generarAlternativas(Long usuarioId) {
-        List<Materia> materias = materiaRepository.findByUsuarioIdOrderByNombreAsc(usuarioId);
-        if (materias.isEmpty()) {
-            throw new IllegalArgumentException("Registra al menos una materia antes de generar alternativas.");
-        }
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public List<HorarioDTO> generarAlternativas(Long usuarioId, PeticionGenerarHorario borrador) {
+        // El cliente anterior enviaba la petición sin cuerpo y usaba sus materias de la base.
+        List<MateriaDTO> registradas = borrador == null
+                ? transacciones.execute(tx -> listarMaterias(usuarioId)) : List.of();
+        var oferta = borrador == null ? PeticionGenerarHorario.desdeRegistradas(registradas) : borrador;
+        var propuestas = gemini.generar(oferta);
 
-        List<Criterio> criterios = List.of(
-                new Criterio("Mañanas libres", "equilibrado",
-                        "Concentra las clases después del mediodía para dejar la mañana disponible.",
-                        Comparator.comparing(m -> primeraHora(m), Comparator.reverseOrder())),
-                new Criterio("Jornada temprana", "madrugador",
-                        "Agrupa las materias al inicio del día y libera las tardes.",
-                        Comparator.comparing(HorarioServiceImpl::primeraHora)),
-                new Criterio("Carga compacta", "compacto",
-                        "Prioriza las materias con más créditos para avanzar el semestre.",
-                        Comparator.comparing((Materia m) -> m.getCreditos() == null ? 0 : m.getCreditos()).reversed())
-        );
-
-        horarioRepository.deleteAll(horarioRepository.findByUsuarioIdOrderByPuntajeDesc(usuarioId));
-
-        List<Horario> generados = new ArrayList<>();
-        for (Criterio criterio : criterios) {
-            List<Materia> ordenadas = new ArrayList<>(materias);
-            ordenadas.sort(criterio.orden());
-
-            Horario horario = new Horario();
-            horario.setUsuario(usuarioService.obtenerPorId(usuarioId));
-            horario.setNombre(criterio.nombre());
-            horario.setTipo(criterio.tipo());
-            horario.setDescripcion(criterio.descripcion());
-            horario.setGeneradoPorIa(true);
-
-            int creditos = 0;
-            for (Materia candidata : ordenadas) {
-                if (chocaCon(horario, candidata)) {
-                    continue;
-                }
-                horario.getMaterias().add(candidata);
-                creditos += candidata.getCreditos() == null ? 0 : candidata.getCreditos();
+        // La espera de red ocurre fuera de la transacción que reemplaza las alternativas.
+        return transacciones.execute(tx -> {
+            Usuario usuario = bloquearUsuario(usuarioId);
+            if (borrador == null && !registradas.equals(listarMaterias(usuarioId))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Tus materias cambiaron durante la generación. Vuelve a generar el horario.");
             }
-            horario.setTotalCreditos(creditos);
-            // Puntaje simple: cobertura de materias sin choques sobre el total disponible.
-            horario.setPuntaje((int) Math.round(horario.getMaterias().size() * 100.0 / materias.size()));
-            generados.add(horarioRepository.save(horario));
+            var anteriores = horarioRepository.findByUsuarioIdOrderByPuntajeDesc(usuarioId);
+            var guardado = anteriores.stream().filter(Horario::isSeleccionado).findFirst();
+            horarioRepository.deleteAll(anteriores.stream().filter(h -> !h.isSeleccionado()).toList());
+            List<HorarioDTO> generados = new ArrayList<>();
+            for (var propuesta : propuestas) {
+                var detalle = armarDetalle(oferta, propuesta.opciones(), registradas);
+                var horario = guardado.filter(h -> detalle.equals(h.getDetalleSecciones())).orElseGet(Horario::new);
+                horario.setUsuario(usuario);
+                horario.setNombre(propuesta.nombre());
+                horario.setDescripcion(propuesta.descripcion());
+                horario.setTipo("gemini");
+                horario.setGeneradoPorIa(true);
+                horario.setDetalleSecciones(detalle);
+                horario.setTotalCreditos(detalle.materias().stream().mapToInt(MateriaDTO::creditos).sum());
+                horario.setPuntaje((int) Math.round(100.0 * detalle.materias().size() / oferta.materias().size()));
+                if (borrador == null) {
+                    detalle.materias().forEach(m -> horario.getMaterias().add(materiaRepository.getReferenceById(m.id())));
+                }
+                generados.add(horarioMapper.aDTO(horarioRepository.save(horario)));
+            }
+            return generados;
+        });
+    }
+
+    private DetalleHorario armarDetalle(PeticionGenerarHorario oferta, List<Integer> opciones,
+                                         List<MateriaDTO> registradas) {
+        List<MateriaDTO> incluidas = new ArrayList<>();
+        List<String> omitidas = new ArrayList<>();
+        for (int i = 0; i < oferta.materias().size(); i++) {
+            var materia = oferta.materias().get(i);
+            int opcion = opciones.get(i);
+            if (opcion == 0) {
+                omitidas.add(materia.nombre());
+            } else if (registradas.isEmpty()) {
+                var bloques = materia.opciones().get(opcion - 1).stream().map(PeticionGenerarHorario.Franja::aBloque).toList();
+                incluidas.add(new MateriaDTO(null, materia.nombre(), null, null, materia.creditos(), i % 6, bloques, opcion));
+            } else {
+                var original = registradas.get(i);
+                incluidas.add(new MateriaDTO(original.id(), original.nombre(), original.codigo(), original.profesor(),
+                        materia.creditos(), original.indiceColor(), original.bloques(), opcion));
+            }
         }
-        return generados.stream().map(horarioMapper::aDTO).toList();
+        return new DetalleHorario(incluidas, omitidas);
     }
 
     @Override
-    public HorarioDTO seleccionar(Long horarioId) {
-        Horario horario = horarioRepository.findById(horarioId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("horario", horarioId));
-        horarioRepository.findByUsuarioIdOrderByPuntajeDesc(horario.getUsuario().getId())
-                .forEach(otro -> otro.setSeleccionado(false));
+    public HorarioDTO guardarManual(Long usuarioId, PeticionGenerarHorario borrador) {
+        borrador.validarFranjas();
+        var franjas = new ArrayList<PeticionGenerarHorario.Franja>();
+        for (var materia : borrador.materias()) {
+            if (materia.opciones().size() != 1) {
+                throw new IllegalArgumentException("Elige una sección por materia para guardar tu horario.");
+            }
+            var seccion = materia.opciones().get(0);
+            if (seccion.stream().anyMatch(f -> franjas.stream().anyMatch(f::chocaCon))) {
+                throw new IllegalArgumentException("Corrige los cruces antes de guardar tu horario.");
+            }
+            franjas.addAll(seccion);
+        }
+        Usuario usuario = bloquearUsuario(usuarioId);
+        var anteriores = horarioRepository.findByUsuarioIdOrderByPuntajeDesc(usuarioId);
+        var horario = anteriores.stream().filter(h -> "manual".equals(h.getTipo())).findFirst().orElseGet(Horario::new);
+        anteriores.forEach(h -> h.setSeleccionado(false));
+        var detalle = armarDetalle(borrador, java.util.Collections.nCopies(borrador.materias().size(), 1), List.of());
+        horario.setUsuario(usuario);
+        horario.setNombre("Mi horario");
+        horario.setTipo("manual");
         horario.setSeleccionado(true);
-        return horarioMapper.aDTO(horario);
+        horario.setDetalleSecciones(detalle);
+        horario.setTotalCreditos(detalle.materias().stream().mapToInt(MateriaDTO::creditos).sum());
+        horario.setPuntaje(100);
+        return horarioMapper.aDTO(horarioRepository.save(horario));
     }
 
-    /** Comprueba si la materia candidata se cruza con algo ya incluido en el horario. */
-    private boolean chocaCon(Horario horario, Materia candidata) {
-        return horario.getMaterias().stream()
-                .flatMap(materia -> materia.getBloques().stream())
-                .anyMatch(bloque -> candidata.getBloques().stream().anyMatch(bloque::chocaCon));
+    @Override
+    public HorarioDTO seleccionar(Long usuarioId, Long horarioId) {
+        bloquearUsuario(usuarioId);
+        var alternativas = horarioRepository.findByUsuarioIdOrderByPuntajeDesc(usuarioId);
+        var elegido = alternativas.stream().filter(h -> h.getId().equals(horarioId)).findFirst()
+                .orElseThrow(() -> new RecursoNoEncontradoException("horario", horarioId));
+        alternativas.forEach(h -> h.setSeleccionado(h == elegido));
+        return horarioMapper.aDTO(elegido);
     }
 
-    private static LocalTime primeraHora(Materia materia) {
-        return materia.getBloques().stream()
-                .map(BloqueHorario::getHoraInicio)
-                .min(Comparator.naturalOrder())
-                .orElse(LocalTime.of(7, 0));
+    private Usuario bloquearUsuario(Long usuarioId) {
+        return usuarios.bloquearPorId(usuarioId).orElseThrow(() -> new RecursoNoEncontradoException("usuario", usuarioId));
     }
 }

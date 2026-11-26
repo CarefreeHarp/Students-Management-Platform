@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
  * perfil y edicion de perfil.
  */
 @Entity
+@org.hibernate.annotations.DynamicUpdate
 @Table(name = "usuario", uniqueConstraints = @UniqueConstraint(columnNames = "correo"))
 @Getter
 @Setter
@@ -68,6 +69,9 @@ public class Usuario {
     @Lob
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Column(name = "color_flow", length = 16)
+    private String colorFlow;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)

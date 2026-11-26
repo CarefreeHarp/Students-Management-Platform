@@ -2,6 +2,7 @@ package com.studyflow.platform.service;
 
 import com.studyflow.platform.model.dto.HorarioDTO;
 import com.studyflow.platform.model.dto.MateriaDTO;
+import com.studyflow.platform.model.dto.PeticionGenerarHorario;
 import com.studyflow.platform.model.dto.PeticionMateria;
 
 import java.util.List;
@@ -13,14 +14,16 @@ public interface HorarioService {
 
     MateriaDTO agregarMateria(Long usuarioId, PeticionMateria peticion);
 
-    void eliminarMateria(Long materiaId);
+    void eliminarMateria(Long usuarioId, Long materiaId);
 
     void limpiarMaterias(Long usuarioId);
 
     List<HorarioDTO> listarAlternativas(Long usuarioId);
 
     /** Genera y guarda alternativas de horario a partir de las materias registradas. */
-    List<HorarioDTO> generarAlternativas(Long usuarioId);
+    List<HorarioDTO> generarAlternativas(Long usuarioId, PeticionGenerarHorario borrador);
 
-    HorarioDTO seleccionar(Long horarioId);
+    HorarioDTO guardarManual(Long usuarioId, PeticionGenerarHorario borrador);
+
+    HorarioDTO seleccionar(Long usuarioId, Long horarioId);
 }

@@ -1,9 +1,12 @@
 package com.studyflow.platform.model.entity;
 
+import com.studyflow.platform.model.dto.DetalleHorario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -51,6 +54,10 @@ public class Horario {
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "detalle_secciones")
+    private DetalleHorario detalleSecciones;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "horario_materia",
