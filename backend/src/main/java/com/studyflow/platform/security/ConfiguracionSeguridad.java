@@ -60,6 +60,7 @@ public class ConfiguracionSeguridad {
                 .authorizeHttpRequests(authorization -> authorization
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sesion/cuentas-demo").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/pagos/wompi/eventos").permitAll()
                         .requestMatchers("/api/admin", "/api/admin/**").denyAll()
                         .requestMatchers(HttpMethod.POST, "/api/sesion/acceder", "/api/sesion/entrar",
                                 "/api/sesion/renovar", "/api/sesion/salir",

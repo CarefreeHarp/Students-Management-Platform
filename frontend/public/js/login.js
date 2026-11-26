@@ -68,6 +68,10 @@ export function mount(scope) {
   }
 
   function init() {
+    const volverPlan = new URLSearchParams(location.search).get("volver") || "";
+    if (/^\/planes\/confirmar\/(mensual|semestral|vitalicio)$/.test(volverPlan)) {
+      document.querySelector('a[href="/registro"]')?.setAttribute("href", "/registro?volver=" + encodeURIComponent(volverPlan));
+    }
     document.querySelector("#show-signin").addEventListener("click", () => showSignIn(true));
     document.querySelector("#hide-signin").addEventListener("click", () => showSignIn(false));
     document.querySelector("#password-form").addEventListener("submit", signIn);

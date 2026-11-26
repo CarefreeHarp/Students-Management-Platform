@@ -211,6 +211,8 @@ export function mount(scope) {
             <div class="profile-dropdown">
               <a href="/perfil"><i class="bi bi-person-circle"></i> Ver mi perfil</a>
               <a href="/perfil/editar"><i class="bi bi-sliders"></i> Editar perfil</a>
+              <a href="/planes"><i class="bi bi-stars"></i> Planes y precios</a>
+              <a href="/mi-plan"><i class="bi bi-card-checklist"></i> Mi plan</a>
               <a href="/panel?recorrido=1"><i class="bi bi-question-circle"></i> Recorrido guiado</a>
               <a href="/login" data-action="sign-out"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
             </div>

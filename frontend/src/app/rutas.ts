@@ -19,6 +19,10 @@ const proyecto = { project: true };
 
 export const rutas: Routes = [
   pagina('', Paginas.Landing, 'landing', 'landing', 'StudyFlow', { view: 'landing' }),
+  { path: 'planes', title: 'Planes · StudyFlow', loadComponent: () => import('./pages/planes').then(m => m.Planes) },
+  { path: 'planes/confirmar/:plan', title: 'Revisar plan · StudyFlow', canActivate: [authGuard], loadComponent: () => import('./pages/planes').then(m => m.ConfirmarPlan) },
+  { path: 'planes/resultado', title: 'Resultado del pago · StudyFlow', canActivate: [authGuard], loadComponent: () => import('./pages/planes').then(m => m.ResultadoPago) },
+  { path: 'mi-plan', title: 'Mi plan · StudyFlow', canActivate: [authGuard], loadComponent: () => import('./pages/planes').then(m => m.MiPlan) },
   pagina('login', Paginas.Login, 'login', 'login', 'Ingresa', { bodyClass: 'entry-page' }),
   { path: 'admin', title: 'Administración · StudyFlow', loadComponent: () => import('./pages/admin').then(m => m.Admin) },
   pagina('registro', Paginas.Registro, 'registro', 'registro', 'Crea tu cuenta'),

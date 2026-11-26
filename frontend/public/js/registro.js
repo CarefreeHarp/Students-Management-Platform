@@ -58,9 +58,11 @@ export function mount(scope) {
       }
       const usuario = await respuesta.json();
 
-      const desdeInvitacion = new URLSearchParams(location.search).get("volver") === "/invitacion";
-      const destino = desdeInvitacion ? "/invitacion" + location.hash : "/panel";
-      const linkAcceso = desdeInvitacion ? "/login?acceso=cuenta&volver=%2Finvitacion" + location.hash : "/login?acceso=cuenta";
+      const volver = new URLSearchParams(location.search).get("volver") || "";
+      const desdeInvitacion = volver === "/invitacion";
+      const planElegido = /^\/planes\/confirmar\/(mensual|semestral|vitalicio)$/.test(volver);
+      const destino = desdeInvitacion ? "/invitacion" + location.hash : planElegido ? volver : "/panel";
+      const linkAcceso = desdeInvitacion ? "/login?acceso=cuenta&volver=%2Finvitacion" + location.hash : planElegido ? "/login?acceso=cuenta&volver=" + encodeURIComponent(volver) : "/login?acceso=cuenta";
       const inicio = await request("/api/sesion/acceder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,6 +83,10 @@ export function mount(scope) {
 
   function init() {
     document.querySelector("#register-form").addEventListener("submit", registrar);
+    const volver = new URLSearchParams(location.search).get("volver") || "";
+    if (/^\/planes\/confirmar\/(mensual|semestral|vitalicio)$/.test(volver)) {
+      document.querySelector('a[href="/login?acceso=cuenta"]')?.setAttribute("href", "/login?acceso=cuenta&volver=" + encodeURIComponent(volver));
+    }
 
     document.querySelectorAll("[data-password-toggle]").forEach((boton) => {
       boton.addEventListener("click", () => {
