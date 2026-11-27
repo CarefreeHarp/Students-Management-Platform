@@ -14,7 +14,8 @@ http://:{$PORT:8080} {
 		root * /srv
 		header /js/* Cache-Control "no-cache"
 		header /css/* Cache-Control "no-cache"
-		header /index.html Cache-Control "no-cache"
+		@pages path_regexp ^(.*/)?[^/.]*$|^/index[.]html$
+		header @pages Cache-Control "no-cache"
 		try_files {path} /index.html
 		file_server
 	}

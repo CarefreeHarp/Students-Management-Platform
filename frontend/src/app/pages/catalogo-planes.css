@@ -1,6 +1,12 @@
 .plans-page {
   overflow: hidden;
-  background: radial-gradient(ellipse at 82% 16%, #44457488, transparent 42%),
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 12% 29%, #d9d5ff73 1px, transparent 1.6px) 0 0 / 217px 167px,
+    radial-gradient(circle at 72% 62%, #a6ddeb73 .9px, transparent 1.5px) 0 0 / 283px 203px,
+    radial-gradient(circle at 43% 84%, #e3ddff73 .7px, transparent 1.4px) 0 0 / 143px 191px,
+    radial-gradient(ellipse at 82% 16%, #44457488, transparent 42%),
     radial-gradient(ellipse at 9% 84%, #28475a80, transparent 48%), #1c2538;
 }
 .topbar, .content { max-width: 1440px; padding-inline: clamp(20px, 6vw, 88px); }
@@ -73,16 +79,14 @@ nav a { font-size: 13px; }
   .description { min-height: 0; }
 }
 
-/* Two layers of starlight sit behind the catalog and never intercept a click. */
-.plans-page { position: relative; isolation: isolate; }
-.plans-page::before, .plans-page::after {
+.plans-page::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background-image: radial-gradient(circle at 12% 29%, #d9d5ff 1px, transparent 1.6px),
     radial-gradient(circle at 72% 62%, #a6ddeb .9px, transparent 1.5px),
     radial-gradient(circle at 43% 84%, #e3ddff .7px, transparent 1.4px);
-  background-size: 217px 167px, 283px 203px, 143px 191px; opacity: .45;
+  background-size: 217px 167px, 283px 203px, 143px 191px;
+  background-position: 71px 43px, 52px 18px, 84px 19px; opacity: .22;
 }
-.plans-page::after { background-position: 71px 43px, 52px 18px, 84px 19px; opacity: .22; }
 @media (prefers-reduced-motion: no-preference) {
   .plans-page::after { animation: starlight 5s ease-in-out infinite alternate; }
   .plan { animation: plan-drift 5s ease-in-out infinite alternate; transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease; }
