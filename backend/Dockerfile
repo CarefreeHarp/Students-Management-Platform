@@ -11,7 +11,8 @@ COPY --from=build /app/target/students-management-platform.jar /app/studyflow.ja
 RUN mkdir /app/archivos && chown 10001:10001 /app/archivos
 USER 10001:10001
 ENV SERVER_ADDRESS=:: \
-    STUDYFLOW_ADMIN_ENABLED=false \
+    STUDYFLOW_ADMIN_CATALOGO=true \
+    SERVER_SERVLET_SESSION_COOKIE_SECURE=true \
     STUDYFLOW_DEMO_ENABLED=false \
     STUDYFLOW_SECURE_COOKIE=true \
     STUDYFLOW_ARCHIVOS_RUTA=/app/archivos

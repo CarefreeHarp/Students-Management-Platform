@@ -4,7 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -27,26 +27,29 @@ import java.util.Locale;
 import java.util.Set;
 
 @Configuration
-@ConditionalOnProperty(name = "studyflow.admin.enabled", havingValue = "true")
+@PanelAdminHabilitado
 public class ConfiguracionAdmin {
     private static final String ADMIN = "/api/admin";
     private static final Set<String> HOSTS_LOCALES = Set.of("localhost", "127.0.0.1", "[::1]", "::1");
 
     @Bean
     @Order(1)
-    SecurityFilterChain seguridadAdmin(HttpSecurity http, PasswordEncoder encoder) throws Exception {
-        var usuario = User.withUsername("admin").password(encoder.encode("admin")).roles("ADMIN").build();
+    SecurityFilterChain seguridadAdmin(HttpSecurity http, PasswordEncoder encoder,
+            @Value("${studyflow.admin.catalogo:false}") boolean catalogo) throws Exception {
+        var usuario = User.withUsername("admin").password(encoder.encode("admin")).roles(catalogo ? "CATALOGO" : "ADMIN").build();
         var proveedor = new DaoAuthenticationProvider(new InMemoryUserDetailsManager(usuario));
         proveedor.setPasswordEncoder(encoder);
 
         return http.securityMatcher(ADMIN, ADMIN + "/**")
                 .authenticationManager(new ProviderManager(proveedor))
-                .addFilterBefore(new AccesoLocal(), CsrfFilter.class)
+                .addFilterBefore(new AccesoPanel(catalogo), CsrfFilter.class)
                 .requestCache(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, ADMIN + "/estado").permitAll()
                         .requestMatchers(HttpMethod.POST, ADMIN + "/acceder").anonymous()
+                        .requestMatchers(HttpMethod.GET, ADMIN + "/base-de-datos", ADMIN + "/tablas/*")
+                                .hasAnyRole("CATALOGO", "ADMIN")
                         .anyRequest().hasRole("ADMIN"))
                 .exceptionHandling(errors -> errors.authenticationEntryPoint(
                         (request, response, error) -> response.setStatus(401)))
@@ -61,17 +64,23 @@ public class ConfiguracionAdmin {
                 .build();
     }
 
-    private static final class AccesoLocal extends OncePerRequestFilter {
+    private static final class AccesoPanel extends OncePerRequestFilter {
         private final SolicitudesAutenticacion intentos = new SolicitudesAutenticacion();
+
+        private final boolean catalogo;
+
+        private AccesoPanel(boolean catalogo) {
+            this.catalogo = catalogo;
+        }
 
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                 throws ServletException, IOException {
             String servidor = request.getServerName().toLowerCase(Locale.ROOT);
             String origen = request.getHeader("Sec-Fetch-Site");
-            if (!HOSTS_LOCALES.contains(servidor)
+            if ((!catalogo && (!HOSTS_LOCALES.contains(servidor)
                     || !InetAddress.getByName(request.getLocalAddr()).isLoopbackAddress()
-                    || !InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()
+                    || !InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()))
                     || "cross-site".equals(origen) || "same-site".equals(origen)) {
                 response.setStatus(404);
                 return;

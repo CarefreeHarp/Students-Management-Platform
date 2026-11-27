@@ -1,7 +1,7 @@
 package com.studyflow.platform.controller.api;
 
 import com.studyflow.platform.service.VisorBaseDatos;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.studyflow.platform.security.PanelAdminHabilitado;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,11 +18,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/api/admin")
-@ConditionalOnProperty(name = "studyflow.admin.enabled", havingValue = "true")
+@PanelAdminHabilitado
 public class AdminApiController {
     private static final int CODIGO_REINICIO = 75;
 
-    public record Estado(boolean autenticado, String csrf, UUID instancia) {}
+    public record Estado(boolean autenticado, String csrf, UUID instancia, boolean soloEsquema) {}
 
     private final VisorBaseDatos visor;
     private final ConfigurableApplicationContext contexto;
@@ -36,7 +36,7 @@ public class AdminApiController {
 
     @GetMapping("/estado")
     public Estado estado(Authentication autenticacion, CsrfToken csrf) {
-        return new Estado(autenticacion != null, csrf.getToken(), instancia);
+        return new Estado(autenticacion != null, csrf.getToken(), instancia, visor.soloEsquema());
     }
 
     @GetMapping("/base-de-datos")

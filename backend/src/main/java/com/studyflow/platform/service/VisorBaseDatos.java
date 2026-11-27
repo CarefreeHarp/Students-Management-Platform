@@ -1,6 +1,7 @@
 package com.studyflow.platform.service;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.studyflow.platform.security.PanelAdminHabilitado;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +19,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
-@ConditionalOnProperty(name = "studyflow.admin.enabled", havingValue = "true")
+@PanelAdminHabilitado
 public class VisorBaseDatos {
     private static final int FILAS_POR_PAGINA = 25;
     private static final int LIMITE_CELDA = 500;
@@ -30,8 +31,15 @@ public class VisorBaseDatos {
 
     private final JdbcTemplate jdbc;
 
-    public VisorBaseDatos(JdbcTemplate jdbc) {
+    private final boolean soloEsquema;
+
+    public VisorBaseDatos(JdbcTemplate jdbc, @Value("${studyflow.admin.catalogo:false}") boolean soloEsquema) {
         this.jdbc = jdbc;
+        this.soloEsquema = soloEsquema;
+    }
+
+    public boolean soloEsquema() {
+        return soloEsquema;
     }
 
     public Base base() {
@@ -61,6 +69,8 @@ public class VisorBaseDatos {
                     total = conteo.getLong(1);
                 }
             }
+
+            if (soloEsquema) return new Tabla(nombre, columnas, List.of(), total, 1, FILAS_POR_PAGINA);
 
             var filas = new ArrayList<List<String>>();
             if (!columnas.isEmpty() && (pagina - 1) * FILAS_POR_PAGINA < total) {

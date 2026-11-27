@@ -12,7 +12,7 @@
   @if (vista() === 'acceso') {
     <section class="tarjeta acceso" aria-labelledby="titulo-acceso">
       <h1 id="titulo-acceso">Administración</h1>
-      <p>Inicia sesión para consultar H2 y reiniciar el backend local.</p>
+      <p>Inicia sesión para consultar la base de datos de StudyFlow.</p>
       @if (aviso()) { <p class="aviso" role="status">{{ aviso() }}</p> }
       @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
       <form (submit)="entrar($event, usuario, contrasena)">
@@ -29,9 +29,9 @@
       <section class="introduccion" aria-labelledby="titulo-panel">
         <div>
           <h1 id="titulo-panel">Administración</h1>
-          <p>Backend local y base de datos de StudyFlow.</p>
+          <p>{{ estado?.soloEsquema ? 'Catálogo de tablas y columnas de StudyFlow.' : 'Backend local y base de datos de StudyFlow.' }}</p>
         </div>
-        @if (!confirmando()) {
+        @if (!estado?.soloEsquema && !confirmando()) {
           <button class="peligro" type="button" (click)="confirmando.set(true)" [disabled]="ocupado()">
             Reiniciar backend
           </button>
@@ -83,7 +83,13 @@
           <h2 id="titulo-datos">{{ tablaElegida() || 'Datos de la tabla' }}</h2>
           @if (tabla(); as detalle) {
             <p>{{ detalle.totalFilas }} {{ detalle.totalFilas === 1 ? 'fila' : 'filas' }} · Solo lectura</p>
-            @if (detalle.columnas.length) {
+            @if (estado?.soloEsquema) {
+              <dl>
+                @for (columna of detalle.columnas; track columna.nombre) {
+                  <div><dt>{{ columna.nombre }}</dt><dd>{{ columna.tipo }}</dd></div>
+                }
+              </dl>
+            } @else if (detalle.columnas.length) {
               <div class="desplazamiento" tabindex="0" role="region" [attr.aria-label]="'Filas de ' + detalle.nombre">
                 <table>
                   <thead><tr>
@@ -107,7 +113,7 @@
             } @else {
               <p>No hay columnas visibles.</p>
             }
-            @if (totalPaginas() > 1) {
+            @if (!estado?.soloEsquema && totalPaginas() > 1) {
               <div class="paginacion">
                 <button type="button" (click)="abrirTabla(detalle.nombre, detalle.pagina - 1)"
                         [disabled]="ocupado() || detalle.pagina === 1">Anterior</button>
@@ -119,7 +125,7 @@
           } @else if (tablaElegida() && ocupado()) {
             <p role="status">Cargando filas…</p>
           } @else if (!tablaElegida()) {
-            <p>Selecciona una tabla para ver sus columnas y filas.</p>
+            <p>Selecciona una tabla para consultar su estructura.</p>
           }
         </section>
       </div>

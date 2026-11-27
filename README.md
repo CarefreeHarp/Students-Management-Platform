@@ -345,7 +345,7 @@ También puedes ejecutar `make backend` y `make frontend` en dos terminales. `ma
 
 ### Panel local de administración
 
-Con el backend iniciado mediante `make backend` o `make run`, usa `admin` / `admin` en la pantalla normal de ingreso o abre <http://localhost:4200/admin>. El panel muestra el motor, el esquema, las tablas y sus filas paginadas. El visor es de solo lectura y oculta las columnas de credenciales. Las credenciales de administrador y el panel están reservados a la ejecución local y el JAR por sí solo sirve la API de estudiantes.
+Con el backend iniciado mediante `make backend` o `make run`, usa `admin` / `admin` en la pantalla normal de ingreso o abre <http://localhost:4200/admin>. El panel muestra el motor, el esquema, las tablas y sus filas paginadas. El visor es de solo lectura y oculta las columnas de credenciales. El JAR por sí solo sirve la API de estudiantes.
 
 **Reiniciar backend** pide confirmación, reinicia el proceso de Java y vuelve a cargar la demostración en una H2 nueva cuando está en memoria. Si H2 usa un archivo, los datos se conservan. Después del reinicio se requiere iniciar sesión otra vez.
 
@@ -360,7 +360,7 @@ Conecta dos servicios al mismo repositorio y rama. Railway detecta los Dockerfil
 | `backend` | `/backend` | `PORT=6767` | Privada |
 | `frontend` | `/frontend` | `PORT=8080`, `BACKEND_URL=http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:6767` | Dominio público al puerto 8080 |
 
-El contenedor de Angular sirve la SPA y reenvía `/api` al backend privado. Spring escucha en IPv6 para la red privada de Railway y arranca con H2 en memoria. Para cargar los datos de demostración, configura `STUDYFLOW_DEMO_ENABLED=true` y una contraseña propia en `STUDYFLOW_DEMO_PASSWORD`. El panel administrativo sigue deshabilitado. Configura `GEMINI_KEY` y `STUDYFLOW_JWT_KEY` como variables del backend. H2 en memoria se reinicia con cada arranque, y los adjuntos necesitan un volumen si deben conservarse entre despliegues.
+El contenedor de Angular sirve la SPA y reenvía `/api` al backend privado. Spring escucha en IPv6 para la red privada de Railway y arranca con H2 en memoria. Para cargar los datos de demostración, configura `STUDYFLOW_DEMO_ENABLED=true` y una contraseña propia en `STUDYFLOW_DEMO_PASSWORD`. El contenedor habilita el catálogo de administración con `STUDYFLOW_ADMIN_CATALOGO=true`. Se accede con `admin` / `admin` para consultar tablas, columnas y conteos. Las filas y el reinicio se reservan al panel local. Configura `GEMINI_KEY` y `STUDYFLOW_JWT_KEY` como variables del backend. H2 en memoria se reinicia con cada arranque, y los adjuntos necesitan un volumen si deben conservarse entre despliegues.
 
 WhatsApp y OpenAI mantienen sus propiedades en `backend/src/main/resources/application.properties`. La conexión externa se habilita ahí con la propiedad `enabled` y sus credenciales correspondientes.
 

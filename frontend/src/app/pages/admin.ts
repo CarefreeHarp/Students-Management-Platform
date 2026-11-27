@@ -33,7 +33,7 @@ export class Admin implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly sesion = inject(SesionAdmin);
   private readonly ruta = '/api/admin';
-  private estado?: EstadoAdmin;
+  protected estado?: EstadoAdmin;
 
   protected readonly vista = signal<'cargando' | 'acceso' | 'panel' | 'reiniciando' | 'error'>('cargando');
   protected readonly base = signal<BaseDatos | null>(null);
@@ -69,7 +69,7 @@ export class Admin implements OnInit {
       this.vista.set('panel');
     } catch {
       this.vista.set('error');
-      this.error.set('El panel local no está disponible. Comprueba que el backend se haya iniciado con make backend.');
+      this.error.set('No se pudo conectar con el panel de administración. Vuelve a intentarlo.');
     }
   }
 
