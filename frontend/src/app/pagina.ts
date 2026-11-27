@@ -6,6 +6,8 @@ import { SesionAdmin } from './sesion-admin';
 import { StudyFlowLanguage, t } from './idioma';
 import { Transporte } from './transporte';
 
+import assets from '../../.sandbox-generated/version.json';
+
 interface PageScope { signal: AbortSignal; destroy(): void }
 interface ScopeOptions {
   language: typeof StudyFlowLanguage;
@@ -20,7 +22,7 @@ interface PageData { page: string; script: string; bodyClass?: string; view?: st
 type Behavior = { mount(scope: PageScope): void };
 
 function moduleAt<T>(file: string): Promise<T> {
-  return import(/* @vite-ignore */ '/js/' + file + '.js?v=flow-horarios-20261126');
+  return import(/* @vite-ignore */ '/sandbox/' + assets.version + '/js/' + file + '.js');
 }
 const scopeModule: Promise<{ createPageScope(root: HTMLElement, options: ScopeOptions): PageScope }> =
   moduleAt('page-scope');

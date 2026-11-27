@@ -1,7 +1,7 @@
 import { createPageScope } from './page-scope.js';
 import { mount as mountCommon } from './main.js';
 import { mount as mountTour } from './recorrido.js';
-import pantallas from '/sandbox/pantallas.js';
+import pantallas from '../sandbox/pantallas.js';
 
 const paginas = {
   '/panel': ['index', 'dashboard', 'dashboard'],
@@ -92,7 +92,7 @@ async function iniciar() {
   });
   document.addEventListener('submit', event => { if (!event.defaultPrevented) event.preventDefault(); });
 
-  const behavior = await import('/js/' + script + '.js');
+  const behavior = await import('./' + script + '.js');
   mountCommon(scope);
   behavior.mount(scope);
   mountTour(scope);

@@ -90,7 +90,7 @@ export function mount(scope) {
     const query=new URLSearchParams({ruta:route});
     url.searchParams.forEach((value,key)=>{if(key!=='recorrido') query.set(key,value);});
     if(tourActive) query.set('recorrido',String(chapter));
-    next.src='/sandbox/vista.html?'+query;
+    next.src=new URL('../sandbox/vista.html?' + query, import.meta.url).href;
     const loaded=new Promise(resolve=>next.addEventListener('load',resolve,{once:true}));
     stage.append(next); frame=next;
     await loaded;

@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const layout = fs.readFileSync(path.join(__dirname, '../public/sandbox/vista.html'), 'utf8');
 const bridge = fs.readFileSync(path.join(__dirname, '../public/js/sandbox-frame.js'), 'utf8');
 const runnable = bridge.replace(/^import .*;$/gm, '')
-  .replace("const behavior = await import('/js/' + script + '.js');", 'const behavior = { mount() {} };')
+  .replace("const behavior = await import('./' + script + '.js');", 'const behavior = { mount() {} };')
   .replace('iniciar().catch(() => window.location.replace(\'/sandbox\'));', '');
 
 function fixture(parent, ruta = '/panel') {
