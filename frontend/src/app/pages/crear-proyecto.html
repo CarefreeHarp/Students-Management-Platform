@@ -1,16 +1,16 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell">
-  <a class="back-link" href="/proyectos"><i class="bi bi-arrow-left"></i> Volver a proyectos</a>
+  <a class="back-link" href="/proyectos"><i class="bi bi-arrow-left"></i> {{ t('crear_proyecto.volver_a_proyectos') }}</a>
 
   <section class="page-heading" aria-labelledby="create-project-title">
     <div>
-      <p class="eyebrow"><i class="bi bi-stars"></i> Planificación guiada</p>
-      <h1 id="create-project-title">Crea un nuevo proyecto</h1>
-      <p class="mt-2 text-muted">Cuéntanos sobre tu entrega y construye un plan claro para tu equipo.</p>
+      <p class="eyebrow"><i class="bi bi-stars"></i> {{ t('crear_proyecto.planificacion_guiada') }}</p>
+      <h1 id="create-project-title">{{ t('crear_proyecto.crea_un_nuevo_proyecto') }}</h1>
+      <p class="mt-2 text-muted">{{ t('crear_proyecto.cuentanos_sobre_tu_entrega_y_construye_un_plan') }}</p>
     </div>
-    <button id="apply-project-template" class="btn btn-secondary" type="button" title="Completa los campos vacíos con una plantilla editable"><i class="bi bi-journal-text" aria-hidden="true"></i> Usar plantilla</button>
+    <button id="apply-project-template" class="btn btn-secondary" type="button" title="{{ t('crear_proyecto.completa_los_campos_vacios_con_una_plantilla_editable') }}"><i class="bi bi-journal-text" aria-hidden="true"></i> {{ t('crear_proyecto.usar_plantilla') }}</button>
   </section>
 
   <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1.38fr)_minmax(310px,0.84fr)]">
@@ -18,23 +18,23 @@
       <section class="form-panel" aria-labelledby="basic-data-title">
         <div class="panel-heading">
           <span class="step-number">01</span>
-          <div><h2 id="basic-data-title">Información del proyecto</h2><p>Los datos principales de esta entrega.</p></div>
+          <div><h2 id="basic-data-title">{{ t('crear_proyecto.informacion_del_proyecto') }}</h2><p>{{ t('crear_proyecto.los_datos_principales_de_esta_entrega') }}</p></div>
         </div>
         <div class="form-grid">
-          <label class="form-field field-span-2">Nombre del proyecto
-            <input id="project-name" name="name" maxlength="90" aria-describedby="project-name-error" placeholder="Ej. Plataforma de bienestar universitario">
+          <label class="form-field field-span-2">{{ t('crear_proyecto.nombre_del_proyecto') }}
+            <input id="project-name" name="name" maxlength="90" aria-describedby="project-name-error" placeholder="{{ t('crear_proyecto.ej_plataforma_de_bienestar_universitario') }}">
             <small id="project-name-error" class="project-field-error" data-field-error="nombre" role="alert"></small>
           </label>
-          <label class="form-field field-span-2">Contexto o descripción
-            <textarea id="project-description" name="description" rows="4" maxlength="500" aria-describedby="project-description-error" placeholder="¿Qué deben resolver? Incluye el objetivo, alcance y entregables."></textarea>
+          <label class="form-field field-span-2">{{ t('crear_proyecto.contexto_o_descripcion') }}
+            <textarea id="project-description" name="description" rows="4" maxlength="500" aria-describedby="project-description-error" placeholder="{{ t('crear_proyecto.que_deben_resolver_incluye_el_objetivo_alcance_y') }}"></textarea>
             <small id="project-description-error" class="project-field-error" data-field-error="descripcion" role="alert"></small>
           </label>
-          <label class="form-field">Fecha de entrega
+          <label class="form-field">{{ t('crear_proyecto.fecha_de_entrega') }}
             <input id="project-due-date" name="dueDate" type="date" aria-describedby="project-due-date-error">
             <small id="project-due-date-error" class="project-field-error" data-field-error="fechaEntrega" role="alert"></small>
           </label>
           <section id="project-phases-editor" class="project-phases-editor field-span-2" aria-labelledby="project-phases-title">
-            <div class="project-phases-heading"><div><h3 id="project-phases-title">Fases del proyecto</h3><p>Crea las fases que necesites; podrás modificarlas después desde el diagrama.</p></div><button id="add-project-phase" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus"></i> Fase</button></div>
+            <div class="project-phases-heading"><div><h3 id="project-phases-title">{{ t('crear_proyecto.fases_del_proyecto') }}</h3><p>{{ t('crear_proyecto.crea_las_fases_que_necesites_podras_modificarlas_despues') }}</p></div><button id="add-project-phase" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus"></i> {{ t('crear_proyecto.fase') }}</button></div>
             <div id="project-phases" class="project-phases-list"></div>
           </section>
         </div>
@@ -42,44 +42,44 @@
 
       <section class="form-panel" aria-labelledby="members-title">
         <div class="panel-heading panel-heading--split">
-          <div class="panel-heading-content"><span class="step-number">02</span><div><h2 id="members-title">Integrantes</h2><p>Agrega nombres o identificadores de tu equipo.</p></div></div>
-          <button id="add-member" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus"></i> Integrante</button>
+          <div class="panel-heading-content"><span class="step-number">02</span><div><h2 id="members-title">{{ t('crear_proyecto.integrantes') }}</h2><p>{{ t('crear_proyecto.agrega_nombres_o_identificadores_de_tu_equipo') }}</p></div></div>
+          <button id="add-member" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus"></i> {{ t('crear_proyecto.integrante') }}</button>
         </div>
         <div id="members-list" class="members-input-list"></div>
       </section>
 
       <section class="form-panel" aria-labelledby="work-mode-title">
         <div class="panel-heading">
-          <span class="step-number">03</span><div><h2 id="work-mode-title">Modo de trabajo</h2><p>Define cómo se distribuirán las tareas cuando las crees dentro del proyecto.</p></div>
+          <span class="step-number">03</span><div><h2 id="work-mode-title">{{ t('crear_proyecto.modo_de_trabajo') }}</h2><p>{{ t('crear_proyecto.define_como_se_distribuiran_las_tareas_cuando_las') }}</p></div>
         </div>
         <fieldset id="project-assignment-mode" class="reparto-options reparto-create" aria-describedby="project-assignment-mode-error">
-          <legend>¿Cómo se reparten las tareas?</legend>
-          <label class="reparto-option"><input type="radio" name="modoReparto" value="asignado"><span><strong>Tareas asignadas</strong><small>Elige un responsable para cada tarea.</small></span></label>
-          <label class="reparto-option"><input type="radio" name="modoReparto" value="libre"><span><strong>Elección libre</strong><small>Cada persona toma la tarea disponible que quiera.</small></span></label>
+          <legend>{{ t('crear_proyecto.como_se_reparten_las_tareas') }}</legend>
+          <label class="reparto-option"><input type="radio" name="modoReparto" value="asignado"><span><strong>{{ t('crear_proyecto.tareas_asignadas') }}</strong><small>{{ t('crear_proyecto.elige_un_responsable_para_cada_tarea') }}</small></span></label>
+          <label class="reparto-option"><input type="radio" name="modoReparto" value="libre"><span><strong>{{ t('crear_proyecto.eleccion_libre') }}</strong><small>{{ t('crear_proyecto.cada_persona_toma_la_tarea_disponible_que_quiera') }}</small></span></label>
         </fieldset>
         <small id="project-assignment-mode-error" class="project-field-error" data-field-error="modoReparto" role="alert"></small>
-        <p id="reparto-create-hint" class="reparto-create-hint">Podrás crear tareas y cambiar este modo desde el diagrama de fases.</p>
+        <p id="reparto-create-hint" class="reparto-create-hint">{{ t('crear_proyecto.podras_crear_tareas_y_cambiar_este_modo_desde') }}</p>
       </section>
 
       <div class="form-actions">
-        <a href="/proyectos" class="btn btn-ghost">Cancelar</a>
-        <button class="btn btn-primary" type="submit"><i class="bi bi-rocket-takeoff"></i> Crear y ver planificación</button>
+        <a href="/proyectos" class="btn btn-ghost">{{ t('admin.cancelar') }}</a>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-rocket-takeoff"></i> {{ t('crear_proyecto.crear_y_ver_planificacion') }}</button>
       </div>
     </form>
 
     <aside class="panel lg:sticky lg:top-[90px]" aria-labelledby="planning-preview-title">
       <div class="section-head">
-        <div><p class="eyebrow">Vista previa</p><h2 id="planning-preview-title">Calendario inicial</h2></div>
-        <span id="preview-task-number" class="task-counter">0 tareas</span>
+        <div><p class="eyebrow">{{ t('crear_proyecto.vista_previa') }}</p><h2 id="planning-preview-title">{{ t('crear_proyecto.calendario_inicial') }}</h2></div>
+        <span id="preview-task-number" class="task-counter">{{ t('crear_proyecto.0_tareas') }}</span>
       </div>
-      <p class="mb-3 text-[13px] text-muted">La fecha de entrega aparecerá aquí. Crearás las tareas dentro del proyecto.</p>
+      <p class="mb-3 text-[13px] text-muted">{{ t('crear_proyecto.la_fecha_de_entrega_aparecera_aqui_crearas_las') }}</p>
       <div class="mini-calendar-header mini-calendar-header--static">
         <strong id="preview-month" aria-live="polite"></strong>
       </div>
-      <div class="mini-calendar-weekdays" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="mini-calendar-weekdays" aria-hidden="true"><span>{{ t('crear_proyecto.l') }}</span><span>{{ t('crear_proyecto.m') }}</span><span>{{ t('crear_proyecto.x') }}</span><span>{{ t('crear_proyecto.j') }}</span><span>{{ t('crear_proyecto.v') }}</span><span>{{ t('crear_proyecto.s') }}</span><span>{{ t('crear_proyecto.d') }}</span></div>
       <div id="planning-calendar" class="planning-calendar" aria-live="polite"></div>
-      <div class="preview-legend"><span><i></i> Tarea programada</span><span><i></i> Fecha de entrega</span></div>
-      <div id="project-template-hint" class="project-template-hint"><i class="bi bi-pencil-square" aria-hidden="true"></i><p>Usa una plantilla para empezar; podrás editar todos los datos antes de crear el proyecto.</p></div>
+      <div class="preview-legend"><span><i></i> {{ t('crear_proyecto.tarea_programada') }}</span><span><i></i> {{ t('crear_proyecto.fecha_de_entrega') }}</span></div>
+      <div id="project-template-hint" class="project-template-hint"><i class="bi bi-pencil-square" aria-hidden="true"></i><p>{{ t('crear_proyecto.usa_una_plantilla_para_empezar_podras_editar_todos') }}</p></div>
     </aside>
   </div>
 </main>
@@ -87,14 +87,14 @@
 <template id="member-row-template">
   <div class="member-input-row">
     <span class="member-row-avatar"></span>
-    <label class="form-field"><span class="sr-only">Nombre del integrante</span><input class="member-name" maxlength="60" placeholder="Nombre o @usuario"></label>
-    <label class="form-field"><span class="sr-only">Correo o identificador del integrante</span><input class="member-contact" maxlength="100" placeholder="Correo o identificador (opcional)"></label>
-    <button class="icon-button remove-member" type="button" aria-label="Eliminar integrante"><i class="bi bi-x-lg"></i></button>
+    <label class="form-field"><span class="sr-only">{{ t('crear_proyecto.nombre_del_integrante') }}</span><input class="member-name" maxlength="60" placeholder="{{ t('crear_proyecto.nombre_o_usuario') }}"></label>
+    <label class="form-field"><span class="sr-only">{{ t('crear_proyecto.correo_o_identificador_del_integrante') }}</span><input class="member-contact" maxlength="100" placeholder="{{ t('crear_proyecto.correo_o_identificador_opcional') }}"></label>
+    <button class="icon-button remove-member" type="button" aria-label="{{ t('crear_proyecto.eliminar_integrante') }}"><i class="bi bi-x-lg"></i></button>
   </div>
 </template>
 <template id="project-phase-row-template">
   <div class="project-phase-row">
-    <label class="form-field"><span class="sr-only">Nombre de la fase</span><input class="project-phase-name" maxlength="60" placeholder="Ej. Investigación"></label>
-    <button class="icon-button remove-project-phase" type="button" aria-label="Eliminar fase"><i class="bi bi-x-lg"></i></button>
+    <label class="form-field"><span class="sr-only">{{ t('crear_proyecto.nombre_de_la_fase') }}</span><input class="project-phase-name" maxlength="60" placeholder="{{ t('crear_proyecto.ej_investigacion') }}"></label>
+    <button class="icon-button remove-project-phase" type="button" aria-label="{{ t('crear_proyecto.eliminar_fase') }}"><i class="bi bi-x-lg"></i></button>
   </div>
 </template>

@@ -1,5 +1,6 @@
 /* Interactive, non-modal spotlight: the real interface stays usable. */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, later, animate, app: App } = scope;
   async function init() {
     const params = new URLSearchParams(location.search);
@@ -29,11 +30,11 @@ export function mount(scope) {
     const regularChapters = [
       {
         url: "/panel",
-        label: "Inicio",
+        label: uiText("main.inicio"),
         spots: [
           {
-            title: "Tu semana",
-            text: "Tus tareas, organizadas por día. Abre una para ir a su proyecto.",
+            title: uiText("crear_horario.tu_semana"),
+            text: uiText("recorrido.tus_tareas_organizadas_por_dia_abre_una_para"),
             target: ".calendar-shell",
             mobile:
               ".dashboard-agenda-day:has(.dashboard-agenda-task), .dashboard-agenda-day",
@@ -41,8 +42,8 @@ export function mount(scope) {
             fallback: ".dashboard-overview > .panel",
           },
           {
-            title: "Lo que sigue",
-            text: "Pendientes y progreso de cada proyecto, en un solo lugar.",
+            title: uiText("recorrido.lo_que_sigue"),
+            text: uiText("recorrido.pendientes_y_progreso_de_cada_proyecto_en_un"),
             target: ".overview-project",
             fallback: ".project-overview",
           },
@@ -50,13 +51,13 @@ export function mount(scope) {
       },
       {
         url: "/proyectos",
-        label: "Proyectos",
+        label: uiText("perfil.proyectos"),
         spots: [
           {
-            title: "Tus proyectos",
+            title: uiText("landing.tus_proyectos"),
             text: project
-              ? "Abre una tarjeta para trabajar con tu equipo."
-              : "Aquí aparecerán los proyectos que crees.",
+              ? uiText("recorrido.abre_una_tarjeta_para_trabajar_con_tu_equipo")
+              : uiText("recorrido.aqui_apareceran_los_proyectos_que_crees"),
             target: ".project-card",
             fallback: "#projects-grid",
             advanceLink: projectUrl,
@@ -65,13 +66,13 @@ export function mount(scope) {
       },
       {
         url: projectUrl,
-        label: "Tu proyecto",
+        label: uiText("recorrido.tu_proyecto"),
         spots: [
           {
-            title: project ? "La conversación, cerca" : "Tu primer proyecto",
+            title: project ? uiText("recorrido.la_conversacion_cerca") : uiText("recorrido.tu_primer_proyecto"),
             text: project
-              ? "Entra a los canales de este proyecto."
-              : "Crea un proyecto para reunir tareas y equipo.",
+              ? uiText("recorrido.entra_a_los_canales_de_este_proyecto")
+              : uiText("recorrido.crea_un_proyecto_para_reunir_tareas_y_equipo"),
             target: ".project-channels-link",
             fallback: ".page-heading",
             advanceLink: project ? `${projectUrl}/canales` : null,
@@ -80,42 +81,42 @@ export function mount(scope) {
       },
       {
         url: project ? `${projectUrl}/canales` : "/proyectos",
-        label: "Canales",
+        label: uiText("canales.canales"),
         spots: project
           ? [
               {
-                title: "Cada tema, su canal",
-                text: "Cambia de conversación sin salir del proyecto.",
+                title: uiText("recorrido.cada_tema_su_canal"),
+                text: uiText("recorrido.cambia_de_conversacion_sin_salir_del_proyecto"),
                 target: "#channel-list",
                 fallback: ".page-heading",
               },
               {
-                title: "Habla con tu equipo",
-                text: "Escribe un mensaje o comparte un archivo.",
+                title: uiText("recorrido.habla_con_tu_equipo"),
+                text: uiText("recorrido.escribe_un_mensaje_o_comparte_un_archivo"),
                 target: "#message-form",
                 fallback: ".page-heading",
               },
             ]
           : [
               {
-                title: "Conversaciones por proyecto",
-                text: "Cuando crees un proyecto, sus canales aparecerán dentro de él.",
+                title: uiText("recorrido.conversaciones_por_proyecto"),
+                text: uiText("recorrido.cuando_crees_un_proyecto_sus_canales_apareceran_dentro"),
                 target: ".page-heading",
               },
             ],
       },
       {
         url: "/horarios",
-        label: "Horarios",
+        label: uiText("main.horarios"),
         spots: [
           {
-            title: "Prueba tus horarios",
-            text: "Añade una materia con sus opciones de días y horas.",
+            title: uiText("recorrido.prueba_tus_horarios"),
+            text: uiText("recorrido.anade_una_materia_con_sus_opciones_de_dias"),
             target: "#subject-editor",
           },
           {
-            title: "A tu ritmo",
-            text: "Elige tus pausas y horas favoritas. La IA llegará después.",
+            title: uiText("recorrido.a_tu_ritmo"),
+            text: uiText("recorrido.elige_tus_pausas_y_horas_favoritas_la_ia"),
             target: ".schedule-preferences",
             mobile: "#schedule-preferences-title",
           },
@@ -123,27 +124,27 @@ export function mount(scope) {
       },
       {
         url: "/recordatorios",
-        label: "Recordatorios",
+        label: uiText("recordatorios.recordatorios"),
         spots: [
           {
-            title: "Que no se te pase",
-            text: "Crea un aviso y decide cuánto antes quieres recibirlo.",
+            title: uiText("recorrido.que_no_se_te_pase"),
+            text: uiText("recorrido.crea_un_aviso_y_decide_cuanto_antes_quieres"),
             target: "#open-reminder",
           },
           {
-            title: "Tus tiempos habituales",
-            text: "Define una anticipación para tareas, entregas y clases.",
+            title: uiText("recorrido.tus_tiempos_habituales"),
+            text: uiText("recorrido.define_una_anticipacion_para_tareas_entregas_y_clases"),
             target: "#open-preferences",
           },
         ],
       },
       {
         url: "/panel",
-        label: "Todo listo",
+        label: uiText("recorrido.todo_listo"),
         spots: [
           {
-            title: "Todo listo",
-            text: "Puedes repetir el recorrido desde tu perfil.",
+            title: uiText("recorrido.todo_listo"),
+            text: uiText("recorrido.puedes_repetir_el_recorrido_desde_tu_perfil"),
             target: ".profile-trigger",
           },
         ],
@@ -153,11 +154,11 @@ export function mount(scope) {
       ? [
           {
             url: "/panel",
-            label: "Inicio",
+            label: uiText("main.inicio"),
             spots: [
               {
-                title: "Este espacio es tuyo",
-                text: "El inicio reúne tu agenda y el avance de cada proyecto. Crea uno de prueba para ver cómo se conectan tareas, equipo y entregables.",
+                title: uiText("recorrido.este_espacio_es_tuyo"),
+                text: uiText("recorrido.el_inicio_reune_tu_agenda_y_el_avance"),
                 target: 'a[href="/proyectos/nuevo"]',
                 fallback: ".page-heading",
                 required: {
@@ -169,40 +170,40 @@ export function mount(scope) {
           },
           {
             url: "/proyectos/nuevo",
-            label: "Crear",
+            label: uiText("recorrido.crear"),
             spots: [
               {
-                title: "Nombra tu proyecto",
-                text: "El nombre identifica este espacio de trabajo; por ejemplo, “Prototipo de bienestar”. Podrás cambiar los datos del proyecto después.",
+                title: uiText("recorrido.nombra_tu_proyecto"),
+                text: uiText("recorrido.el_nombre_identifica_este_espacio_de_trabajo_por"),
                 target: "label.form-field:has(#project-name)",
                 fallback: "#create-project-form",
                 required: { event: "input", selector: "#project-name" },
               },
               {
-                title: "Describe el objetivo",
-                text: "Describe el objetivo y el alcance: por ejemplo, “validar una app con estudiantes”. Esta información da contexto al equipo y a la planificación.",
+                title: uiText("recorrido.describe_el_objetivo"),
+                text: uiText("recorrido.describe_el_objetivo_y_el_alcance_por_ejemplo"),
                 target: "label.form-field:has(#project-description)",
                 fallback: "#create-project-form",
                 required: { event: "input", selector: "#project-description" },
               },
               {
-                title: "Indica la entrega",
-                text: "Esta es la fecha final del proyecto. Las fechas límite de las tareas no podrán ser posteriores a ella y el calendario refleja el plazo.",
+                title: uiText("recorrido.indica_la_entrega"),
+                text: uiText("recorrido.esta_es_la_fecha_final_del_proyecto_las"),
                 target: "label.form-field:has(#project-due-date)",
                 fallback: "#create-project-form",
                 required: { event: "change", selector: "#project-due-date" },
               },
               {
-                title: "Crea una fase",
-                text: "Las fases agrupan el trabajo por momentos, como Investigación, Diseño e Implementación. Puedes crear, renombrar, reordenar o eliminar fases más adelante.",
+                title: uiText("recorrido.crea_una_fase"),
+                text: uiText("recorrido.las_fases_agrupan_el_trabajo_por_momentos_como"),
                 target: "#add-project-phase",
                 fallback: "#project-phases-editor",
                 required: { event: "click", selector: "#add-project-phase" },
                 autoAdvance: true,
               },
               {
-                title: "Nombra la fase",
-                text: "Pon un nombre que describa el momento del trabajo, como “Diseño”. Después podrás asignar cada tarea a cualquiera de las fases que hayas creado.",
+                title: uiText("recorrido.nombra_la_fase"),
+                text: uiText("recorrido.pon_un_nombre_que_describa_el_momento_del"),
                 target: ".project-phase-row:last-child .project-phase-name",
                 fallback: "#project-phases-editor",
                 required: {
@@ -211,16 +212,16 @@ export function mount(scope) {
                 },
               },
               {
-                title: "Invita a tu equipo",
-                text: "El equipo permite asignar responsables y saber quién está trabajando en cada tarea. Puedes agregar o retirar integrantes luego desde el proyecto.",
+                title: uiText("recorrido.invita_a_tu_equipo"),
+                text: uiText("recorrido.el_equipo_permite_asignar_responsables_y_saber_quien"),
                 target: "#add-member",
                 fallback: "#members-title",
                 required: { event: "click", selector: "#add-member" },
                 autoAdvance: true,
               },
               {
-                title: "Identifica al integrante",
-                text: "Usa un nombre o identificador para reconocer a esa persona en el proyecto; por ejemplo, “Laura – investigación”. Es solo información de prueba en este recorrido.",
+                title: uiText("recorrido.identifica_al_integrante"),
+                text: uiText("recorrido.usa_un_nombre_o_identificador_para_reconocer_a"),
                 target: ".member-input-row:last-child .member-name",
                 fallback: "#members-title",
                 required: {
@@ -229,8 +230,8 @@ export function mount(scope) {
                 },
               },
               {
-                title: "Elige cómo colaborar",
-                text: "En tareas asignadas eliges responsable al crearlas. En elección libre, una tarea disponible puede ser tomada por cualquier integrante cuando sus dependencias estén terminadas.",
+                title: uiText("recorrido.elige_como_colaborar"),
+                text: uiText("recorrido.en_tareas_asignadas_eliges_responsable_al_crearlas_en"),
                 target: ".reparto-create",
                 fallback: "#work-mode-title",
                 required: {
@@ -240,8 +241,8 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Crea tu proyecto",
-                text: "Al crearlo se abre su espacio de trabajo: allí verás agenda, tareas, fases, canales y entregables. Todo lo creado durante esta prueba se borrará al terminar.",
+                title: uiText("recorrido.crea_tu_proyecto"),
+                text: uiText("recorrido.al_crearlo_se_abre_su_espacio_de_trabajo"),
                 target: '#create-project-form button[type="submit"]',
                 fallback: "#create-project-form",
                 required: {
@@ -255,11 +256,11 @@ export function mount(scope) {
           },
           {
             url: projectUrl,
-            label: "Proyecto",
+            label: uiText("landing.proyecto"),
             spots: [
               {
-                title: "Crea la tarea inicial",
-                text: "Una tarea representa trabajo concreto, como “Entrevistar usuarios”. Define su fecha, estado, responsable y la fase donde debe aparecer; podrás editarla después.",
+                title: uiText("recorrido.crea_la_tarea_inicial"),
+                text: uiText("recorrido.una_tarea_representa_trabajo_concreto_como_entrevistar_usuarios"),
                 target: "[data-new-task]",
                 fallback: ".page-heading",
                 required: {
@@ -270,8 +271,8 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Crea una segunda tarea",
-                text: "Crea otra tarea, por ejemplo “Sintetizar entrevistas”. Luego indicarás que necesita el resultado de la primera para mostrar cómo el diagrama organiza el orden del trabajo.",
+                title: uiText("recorrido.crea_una_segunda_tarea"),
+                text: uiText("recorrido.crea_otra_tarea_por_ejemplo_sintetizar_entrevistas_luego"),
                 pulseCard: true,
                 target: "[data-new-task]",
                 fallback: ".page-heading",
@@ -286,11 +287,11 @@ export function mount(scope) {
           },
           {
             url: project ? `${projectUrl}/fases` : "/proyectos",
-            label: "Fases",
+            label: uiText("recorrido.fases"),
             spots: [
               {
-                title: "Abre la segunda tarea",
-                text: "Al abrir una tarea puedes actualizar su título, fase, responsable, fecha y estado. También administras las tareas de las que depende.",
+                title: uiText("recorrido.abre_la_segunda_tarea"),
+                text: uiText("recorrido.al_abrir_una_tarea_puedes_actualizar_su_titulo"),
                 target: "#diagram",
                 fallback: ".branch-panel, .page-heading",
                 required: {
@@ -300,8 +301,8 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Indica la dependencia",
-                text: "Selecciona la primera tarea como requisito de esta. Por ejemplo, “Sintetizar entrevistas” depende de “Entrevistar usuarios”; la relación aparecerá en el diagrama.",
+                title: uiText("recorrido.indica_la_dependencia"),
+                text: uiText("recorrido.selecciona_la_primera_tarea_como_requisito_de_esta"),
                 target: "#task-dependency",
                 fallback: "#task-dialog",
                 required: {
@@ -312,16 +313,16 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Cómo leer el diagrama",
-                text: "Las líneas bajan desde la tarea que debe completarse hasta la que espera: si una línea sale por debajo de una tarea, esa es la dependencia. Pasa sobre una línea para verla con claridad; pasa sobre un nodo para ver sus datos o ábrelo para editarla.",
+                title: uiText("recorrido.como_leer_el_diagrama"),
+                text: uiText("recorrido.las_lineas_bajan_desde_la_tarea_que_debe"),
                 target: "#diagram",
                 fallback: ".branch-panel, .page-heading",
                 guideOnly: true,
                 wideCard: true,
               },
               {
-                title: "Todas las piezas del diagrama",
-                text: "Este árbol muestra fases, tareas, responsables, estados y fechas. Una línea que sale por abajo identifica la tarea de la que depende otra; puedes abrir tareas o pasar sobre relaciones para revisar y modificar la planificación.",
+                title: uiText("recorrido.todas_las_piezas_del_diagrama"),
+                text: uiText("recorrido.este_arbol_muestra_fases_tareas_responsables_estados_y"),
                 target: "#diagram",
                 fallback: "#diagram, .branch-panel",
                 seedDiagram: true,
@@ -332,11 +333,11 @@ export function mount(scope) {
           },
           {
             url: project ? `${projectUrl}/canales` : "/proyectos",
-            label: "Canales",
+            label: uiText("canales.canales"),
             spots: [
               {
-                title: "Envía un mensaje",
-                text: "Los canales ordenan conversaciones dentro de cada proyecto, por ejemplo “General”, “Investigación” o una tarea específica. Envía un mensaje de prueba: nadie lo recibirá fuera de este recorrido.",
+                title: uiText("recorrido.envia_un_mensaje"),
+                text: uiText("recorrido.los_canales_ordenan_conversaciones_dentro_de_cada_proyecto"),
                 target: "#message-form",
                 fallback: "#channel-list",
                 required: {
@@ -347,33 +348,33 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Tus canales",
-                text: "Esta lista reúne las conversaciones del proyecto. Elige un canal para separar temas, como acuerdos generales, investigación o una tarea concreta.",
+                title: uiText("recorrido.tus_canales"),
+                text: uiText("recorrido.esta_lista_reune_las_conversaciones_del_proyecto_elige"),
                 target: ".channels-sidebar",
                 fallback: "#channel-list, .page-heading",
               },
               {
-                title: "La conversación",
-                text: "Aquí ves los mensajes del canal que seleccionaste. Puedes responder, adjuntar archivos y usar el resumen para recuperar rápidamente los acuerdos del equipo.",
+                title: uiText("recorrido.la_conversacion"),
+                text: uiText("recorrido.aqui_ves_los_mensajes_del_canal_que_seleccionaste"),
                 target: ".channel-conversation",
                 fallback: "#messages, #message-form",
               },
               {
-                title: "Recursos compartidos",
-                text: "En este lado aparecen imágenes, documentos y el resumen del canal. Los entregables formales del proyecto se registran en la siguiente sección.",
+                title: uiText("recorrido.recursos_compartidos"),
+                text: uiText("recorrido.en_este_lado_aparecen_imagenes_documentos_y_el"),
                 target: ".channel-resources",
                 fallback: "#documents, .channel-conversation",
-                nextLabel: "Ver documentos y entregables",
+                nextLabel: uiText("recorrido.ver_documentos_y_entregables"),
               },
             ],
           },
           {
             url: project ? `${projectUrl}/entregables` : "/proyectos",
-            label: "Documentos",
+            label: uiText("canales.documentos"),
             spots: [
               {
-                title: "Registra un documento",
-                text: "Los entregables son evidencias finales o parciales del proyecto: un documento, una presentación, un prototipo, un enlace a Figma o un repositorio. Registra uno de prueba con nombre, tipo y enlace.",
+                title: uiText("recorrido.registra_un_documento"),
+                text: uiText("recorrido.los_entregables_son_evidencias_finales_o_parciales_del"),
                 target: "#new-deliverable",
                 fallback: ".page-heading",
                 required: {
@@ -384,8 +385,8 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Así quedó tu documento",
-                text: "Aquí quedan visibles los documentos y enlaces entregados, con su tipo y estado: borrador, en revisión o final. Por ejemplo, puedes marcar una presentación como final cuando ya fue entregada.",
+                title: uiText("recorrido.asi_quedo_tu_documento"),
+                text: uiText("recorrido.aqui_quedan_visibles_los_documentos_y_enlaces_entregados"),
                 target: "#deliverables .deliverable-card",
                 fallback: "#deliverables",
               },
@@ -393,18 +394,18 @@ export function mount(scope) {
           },
           {
             url: "/horarios",
-            label: "Horarios",
+            label: uiText("main.horarios"),
             spots: [
               {
-                title: "Añade una materia",
-                text: "Aquí registras materias y todas sus opciones de horario; una materia puede tener varios días o franjas. Por ejemplo, “Cálculo” puede ofrecerse lunes y miércoles en horarios distintos.",
+                title: uiText("recorrido.anade_una_materia"),
+                text: uiText("recorrido.aqui_registras_materias_y_todas_sus_opciones_de"),
                 target: "#subject-editor",
                 required: { event: "local", path: "/horarios/materia" },
                 autoAdvance: true,
               },
               {
-                title: "Elige tu ritmo",
-                text: "Estas preferencias sirven para comparar opciones de materias según tu ritmo: empezar temprano, concentrar más créditos o evitar pausas largas. Puedes cambiarlas cuando quieras.",
+                title: uiText("recorrido.elige_tu_ritmo"),
+                text: uiText("recorrido.estas_preferencias_sirven_para_comparar_opciones_de_materias"),
                 target: ".schedule-preferences",
                 mobile: "#schedule-preferences-title",
                 required: {
@@ -417,11 +418,11 @@ export function mount(scope) {
           },
           {
             url: "/recordatorios",
-            label: "Recordatorios",
+            label: uiText("recordatorios.recordatorios"),
             spots: [
               {
-                title: "Crea un aviso",
-                text: "Un recordatorio avisa sobre algo puntual, como una entrega, una clase o una reunión. Define qué recordar, cuándo vence y con cuánta anticipación quieres el aviso.",
+                title: uiText("recorrido.crea_un_aviso"),
+                text: uiText("recorrido.un_recordatorio_avisa_sobre_algo_puntual_como_una"),
                 target: "#open-reminder",
                 required: {
                   event: "api",
@@ -431,8 +432,8 @@ export function mount(scope) {
                 autoAdvance: true,
               },
               {
-                title: "Ajusta tus tiempos",
-                text: "Esta configuración define tus avisos habituales por tipo de pendiente: por ejemplo, recordar tareas un día antes y entregas una semana antes. Es un estándar que puedes ajustar después.",
+                title: uiText("recorrido.ajusta_tus_tiempos"),
+                text: uiText("recorrido.esta_configuracion_define_tus_avisos_habituales_por_tipo"),
                 target: "#open-preferences",
                 required: {
                   event: "api",
@@ -445,11 +446,11 @@ export function mount(scope) {
           },
           {
             url: "/panel",
-            label: "Listo",
+            label: uiText("recorrido.listo"),
             spots: [
               {
-                title: "Ahora sí, tu propio flow",
-                text: "Ya viste cómo se conectan proyectos, tareas, dependencias, conversaciones, entregables, horarios y recordatorios. Puedes crear una cuenta para guardar tu trabajo o seguir explorando esta prueba.",
+                title: uiText("recorrido.ahora_si_tu_propio_flow"),
+                text: uiText("recorrido.ya_viste_como_se_conectan_proyectos_tareas_dependencias"),
                 target: ".project-overview",
                 fallback: ".page-heading",
               },
@@ -492,7 +493,7 @@ export function mount(scope) {
     const layer = document.createElement("div");
     layer.className = "tour-layer";
     layer.innerHTML =
-      '<div class="tour-blocker tour-blocker-top" aria-hidden="true"></div><div class="tour-blocker tour-blocker-right" aria-hidden="true"></div><div class="tour-blocker tour-blocker-bottom" aria-hidden="true"></div><div class="tour-blocker tour-blocker-left" aria-hidden="true"></div><div class="tour-spotlight" aria-hidden="true"></div><div class="tour-companion-halo" aria-hidden="true"></div><section class="tour-card" aria-label="Recorrido guiado" aria-describedby="tour-description"><div class="tour-card-content"></div></section>';
+      (`<div class="tour-blocker tour-blocker-top" aria-hidden="true"></div><div class="tour-blocker tour-blocker-right" aria-hidden="true"></div><div class="tour-blocker tour-blocker-bottom" aria-hidden="true"></div><div class="tour-blocker tour-blocker-left" aria-hidden="true"></div><div class="tour-spotlight" aria-hidden="true"></div><div class="tour-companion-halo" aria-hidden="true"></div><section class="tour-card" aria-label="${uiText("main.recorrido_guiado")}" aria-describedby="tour-description"><div class="tour-card-content"></div></section>`);
     document.body.append(layer);
     const spotlight = layer.querySelector(".tour-spotlight"),
       companionHalo = layer.querySelector(".tour-companion-halo"),
@@ -857,7 +858,7 @@ export function mount(scope) {
           h: 0,
         };
       let distance = 0;
-      for (const key of ["x", "y", "w", "h"]) {
+      for (const key of ["x", uiText("recorrido.y"), "w", "h"]) {
         const gap = destination[key] - position[key];
         distance += Math.abs(gap);
         position[key] =
@@ -934,8 +935,8 @@ export function mount(scope) {
       const nextControl =
         spot.autoAdvance && !reviewingCompletedAutoStep
           ? ""
-          : `<button type="button" class="btn btn-primary" data-tour-next ${spot.required && !stepComplete ? 'disabled aria-label="Completa la acción indicada para continuar"' : ""}>${reviewingCompletedAutoStep ? "Volver al paso actual" : spot.nextLabel || (chapter === chapters.length ? "Terminar" : "Siguiente")}</button>`;
-      content.innerHTML = `<button type="button" class="tour-close" aria-label="Salir del recorrido"><span aria-hidden="true">×</span></button><h2 tabindex="-1">${esc(spot.title)}</h2><p id="tour-description">${esc(spot.text)}</p><nav class="${spot.autoAdvance ? "is-auto" : ""}" aria-label="Pasos del recorrido"><button type="button" class="btn btn-secondary" data-tour-prev ${chapter === 1 && spotIndex === 0 ? "disabled" : ""}>Anterior</button>${nextControl}</nav>`;
+          : `<button type="button" class="btn btn-primary" data-tour-next ${spot.required && !stepComplete ? 'disabled aria-label="Completa la acción indicada para continuar"' : ""}>${reviewingCompletedAutoStep ? uiText("recorrido.volver_al_paso_actual") : spot.nextLabel || (chapter === chapters.length ? uiText("recorrido.terminar") : uiText("admin.siguiente"))}</button>`;
+      content.innerHTML = (`<button type="button" class="tour-close" aria-label="${uiText("recorrido.salir_del_recorrido")}"><span aria-hidden="true">×</span></button><h2 tabindex="-1">${esc(spot.title)}</h2><p id="tour-description">${esc(spot.text)}</p><nav class="${spot.autoAdvance ? "is-auto" : ""}" aria-label="${uiText("recorrido.pasos_del_recorrido")}"><button type="button" class="btn btn-secondary" data-tour-prev ${chapter === 1 && spotIndex === 0 ? "disabled" : ""}>${uiText("admin.anterior")}</button>${nextControl}</nav>`);
       content.querySelector(".tour-close").onclick = close;
       content.querySelector("[data-tour-prev]").onclick = previous;
       const nextButton = content.querySelector("[data-tour-next]");

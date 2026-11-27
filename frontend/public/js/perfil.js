@@ -1,12 +1,13 @@
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const COLOR_PALETTE = ["#6757dd", "#21b7bd", "#ee985b", "#d26795", "#4f9ee9"];
   const DEFAULT_USER = {
     id: "",
-    firstName: "Estudiante",
+    firstName: uiText("index.estudiante"),
     lastName: "",
-    name: "Estudiante",
+    name: uiText("index.estudiante"),
     email: "",
     university: "",
     career: "",
@@ -60,18 +61,18 @@ export function mount(scope) {
   }
 
   function formatDate(value) {
-    if (!value) return "Sin fecha definida";
+    if (!value) return uiText("perfil.sin_fecha_definida");
     const parsed = new Date(`${value}T12:00:00`);
     if (Number.isNaN(parsed.getTime())) return String(value);
-    return new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(parsed).replace(".", "");
+    return new Intl.DateTimeFormat(StudyFlowLanguage.locale(), { day: "numeric", month: "short" }).format(parsed).replace(".", "");
   }
 
   function formatJoined(value) {
-    if (!value) return "Sin fecha registrada";
+    if (!value) return uiText("perfil.sin_fecha_registrada");
     const partes = String(value).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     const date = new Date(partes ? `${partes[3]}-${partes[2]}-${partes[1]}T12:00:00` : value);
-    if (Number.isNaN(date.getTime())) return "Este semestre";
-    const result = new Intl.DateTimeFormat("es-CO", { month: "long", year: "numeric" }).format(date);
+    if (Number.isNaN(date.getTime())) return uiText("perfil.este_semestre");
+    const result = new Intl.DateTimeFormat(StudyFlowLanguage.locale(), { month: "long", year: "numeric" }).format(date);
     return result.charAt(0).toUpperCase() + result.slice(1);
   }
 
@@ -80,7 +81,7 @@ export function mount(scope) {
     const members = project.members || project.integrantes || project.participants || [];
     return {
       id: project.codigo || project.id || project.slug || `proyecto-${index + 1}`,
-      name: project.name || project.nombre || "Proyecto sin nombre",
+      name: project.name || project.nombre || uiText("perfil.proyecto_sin_nombre"),
       dueDate: project.dueDate || project.fechaEntrega || project.deliveryDate || "",
       members: Array.isArray(members) ? members : String(members).split(",").map((member) => member.trim()).filter(Boolean),
       progress: Math.max(0, Math.min(100, Number.isFinite(rawProgress) ? rawProgress : 0)),
@@ -93,7 +94,7 @@ export function mount(scope) {
       const projects = await scope.app.api("/api/proyectos");
       return projects.map(normaliseProject);
     } catch (error) {
-      notify("No se pudieron cargar tus proyectos.", "error");
+      notify(uiText("perfil.no_se_pudieron_cargar_tus_proyectos"), "error");
       return [];
     }
   }
@@ -118,19 +119,19 @@ export function mount(scope) {
     if (!container) return;
 
     if (!projects.length) {
-      container.innerHTML = '<div class="profile-empty">Aún no participas en proyectos. <a href="/proyectos/nuevo">Crea el primero</a>.</div>';
+      container.innerHTML = (`<div class="profile-empty">${uiText("perfil.aun_no_participas_en_proyectos") + " "}<a href="/proyectos/nuevo">${uiText("perfil.crea_el_primero")}</a>.</div>`);
       return;
     }
 
-    container.innerHTML = projects.slice(0, 3).map((project) => `
+    container.innerHTML = projects.slice(0, 3).map((project) => (`
       <a class="profile-project-card" href="/proyectos/${encodeURIComponent(project.id)}" style="--project-color: ${project.color}; --progress: ${project.progress}%">
-        <div class="project-card-top"><span class="project-tag"><span class="project-dot"></span>${project.members.length || 1} integrante${project.members.length === 1 ? "" : "s"}</span><i class="bi bi-arrow-up-right project-card-menu" aria-hidden="true"></i></div>
+        <div class="project-card-top"><span class="project-tag"><span class="project-dot"></span>${uiText("perfil.3_integrante_4", {3: project.members.length || 1, 4: project.members.length === 1 ? "" : "s"})}</span><i class="bi bi-arrow-up-right project-card-menu" aria-hidden="true"></i></div>
         <h3>${esc(project.name)}</h3>
-        <p class="project-deadline"><i class="bi bi-calendar3" aria-hidden="true"></i> Entrega: ${esc(formatDate(project.dueDate))}</p>
-        <div class="project-progress-row"><span>Avance general</span><strong>${project.progress}%</strong></div>
-        <div class="project-progress" aria-label="Avance de ${esc(project.name)}: ${project.progress}%"><span></span></div>
+        <p class="project-deadline"><i class="bi bi-calendar3" aria-hidden="true"></i>${" " + uiText("perfil.entrega_6", {6: esc(formatDate(project.dueDate))})}</p>
+        <div class="project-progress-row"><span>${uiText("proyecto.avance_general")}</span><strong>${project.progress}%</strong></div>
+        <div class="project-progress" aria-label="${uiText("perfil.avance_de_8_9", {8: esc(project.name), 9: project.progress})}"><span></span></div>
       </a>
-    `).join("");
+    `)).join("");
   }
 
   function fillEditForm(user) {
@@ -193,7 +194,7 @@ export function mount(scope) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(new Error("No fue posible leer la imagen."));
+      reader.onerror = () => reject(new Error(uiText("perfil.no_fue_posible_leer_la_imagen")));
       reader.readAsDataURL(file);
     });
   }
@@ -212,12 +213,12 @@ export function mount(scope) {
         const [file] = avatarInput.files || [];
         if (!file) return;
         if (file.size > 2 * 1024 * 1024) {
-          setEditFeedback("Elige una imagen de máximo 2 MB.", "error");
+          setEditFeedback(uiText("perfil.elige_una_imagen_de_maximo_2_mb"), "error");
           avatarInput.value = "";
           return;
         }
         if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
-          setEditFeedback("Usa una imagen PNG, JPG o WEBP.", "error");
+          setEditFeedback(uiText("perfil.usa_una_imagen_png_jpg_o_webp"), "error");
           avatarInput.value = "";
           return;
         }
@@ -226,9 +227,9 @@ export function mount(scope) {
           const preview = document.getElementById("edit-profile-avatar");
           if (preview) preview.src = avatar;
           form.dataset.pendingAvatar = avatar;
-          setEditFeedback("La nueva foto se guardará cuando confirmes los cambios.", "success");
+          setEditFeedback(uiText("perfil.la_nueva_foto_se_guardara_cuando_confirmes_los"), "success");
         } catch (error) {
-          setEditFeedback("No fue posible cargar esa imagen. Intenta de nuevo.", "error");
+          setEditFeedback(uiText("perfil.no_fue_posible_cargar_esa_imagen_intenta_de"), "error");
         }
       });
     }
@@ -247,12 +248,12 @@ export function mount(scope) {
       // Se nombran los campos que faltan y se marcan en el formulario: decir
       // solo "completa los campos requeridos" obliga a buscarlos a ojo.
       const faltantes = [
-        ["edit-first-name", "Nombre", firstName],
-        ["edit-last-name", "Apellido", lastName],
-        ["edit-university", "Universidad", university],
-        ["edit-career", "Programa", career],
-        ["edit-semester", "Semestre", semester],
-        ["edit-age", "Edad", age]
+        ["edit-first-name", uiText("editar_perfil.nombre"), firstName],
+        ["edit-last-name", uiText("editar_perfil.apellido"), lastName],
+        ["edit-university", uiText("editar_perfil.universidad"), university],
+        ["edit-career", uiText("editar_perfil.programa"), career],
+        ["edit-semester", uiText("editar_perfil.semestre"), semester],
+        ["edit-age", uiText("editar_perfil.edad"), age]
       ].filter(([, , valor]) => !valor);
 
       marcarCampos(faltantes.map(([id]) => id));
@@ -261,15 +262,15 @@ export function mount(scope) {
         const nombres = faltantes.map(([, etiqueta]) => etiqueta);
         const lista = nombres.length === 1
           ? nombres[0]
-          : `${nombres.slice(0, -1).join(", ")} y ${nombres[nombres.length - 1]}`;
+          : (uiText("perfil.0_y_1", {0: nombres.slice(0, -1).join(", "), 1: nombres[nombres.length - 1]}));
         setEditFeedback(
-          `Falta ${nombres.length === 1 ? "el campo" : "rellenar"} ${lista}.`, "error");
+          (uiText("perfil.falta_0_1", {0: nombres.length === 1 ? uiText("perfil.el_campo") : "rellenar", 1: lista})), "error");
         document.getElementById(faltantes[0][0])?.focus();
         return;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         marcarCampos(["edit-email"]);
-        setEditFeedback("El correo no tiene un formato válido. Debe parecerse a nombre@universidad.edu.", "error");
+        setEditFeedback(uiText("perfil.el_correo_no_tiene_un_formato_valido_debe"), "error");
         document.getElementById("edit-email")?.focus();
         return;
       }
@@ -297,13 +298,13 @@ export function mount(scope) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedUser)
           });
-          if (!response.ok) throw new Error((await response.json()).detail || "No se pudo actualizar el perfil.");
+          if (!response.ok) throw new Error((await response.json()).detail || uiText("perfil.no_se_pudo_actualizar_el_perfil"));
         } catch (error) {
           setEditFeedback(error.message, "error");
           return;
         }
       }
-      const message = "Cambios guardados. Tu perfil ya está actualizado.";
+      const message = uiText("perfil.cambios_guardados_tu_perfil_ya_esta_actualizado");
       setEditFeedback(message, "success");
       notify(message, "success");
       later(() => scope.app.navigate("/perfil"), 450);

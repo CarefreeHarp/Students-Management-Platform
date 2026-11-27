@@ -4,12 +4,13 @@
  * más las secciones de imágenes y documentos del canal activo.
  */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const app = scope.app || {};
   const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
   const proyecto = document.body.dataset.projectId;
-  const REACCIONES = { acuerdo: 'De acuerdo', hecho: 'Hecho', gracias: 'Gracias' };
+  const REACCIONES = { acuerdo: uiText("canales.de_acuerdo"), hecho: uiText("canales.hecho"), gracias: uiText("canales.gracias") };
 
   const avataresCargados = new Map();
   const cuentaDemo = proyecto === "cognitiva"
@@ -31,11 +32,11 @@ export function mount(scope) {
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
       app.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || detalle.message || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.status === 204 ? null : respuesta.json();
   }
@@ -72,13 +73,13 @@ export function mount(scope) {
         <span>${REACCIONES[reaccion.emoji]}</span><span>${reaccion.total}</span>
       </button>`).join("");
 
-    return `<div class="mt-1.5 flex flex-wrap items-center gap-1">
+    return (`<div class="mt-1.5 flex flex-wrap items-center gap-1">
         ${existentes}
         <button class="grid h-6 w-6 place-items-center rounded-full border border-line bg-[var(--superficie)] text-[11px] text-muted hover:border-primary hover:text-primary"
-                type="button" data-open-picker="${mensaje.id}" aria-label="Añadir reacción">
+                type="button" data-open-picker="${mensaje.id}" aria-label="${uiText("canales.anadir_reaccion")}">
           <i class="bi bi-plus" aria-hidden="true"></i>
         </button>
-      </div>`;
+      </div>`);
   }
 
   function burbujaAdjuntos(mensaje) {
@@ -97,9 +98,9 @@ export function mount(scope) {
 
   function burbuja(mensaje) {
     if (mensaje.generadoPorIa) {
-      return `<div class="self-center w-full max-w-[85%] rounded-sm border border-primary/20 bg-primary-soft/60 p-3 text-xs text-[var(--estado-primary)]">
-          <strong class="mb-1 block"><i class="bi bi-stars"></i> Asistente</strong>${esc(mensaje.contenido)}
-        </div>`;
+      return (`<div class="self-center w-full max-w-[85%] rounded-sm border border-primary/20 bg-primary-soft/60 p-3 text-xs text-[var(--estado-primary)]">
+          <strong class="mb-1 block"><i class="bi bi-stars"></i>${" " + uiText("canales.asistente")}</strong>${esc(mensaje.contenido)}
+        </div>`);
     }
     const urlAvatar = mensaje.autorAvatarUrl
       || (mensaje.propio ? scope.user?.avatarUrl : null)
@@ -174,7 +175,7 @@ export function mount(scope) {
     const alFinal = caja.scrollHeight - caja.clientHeight - posicion < 48;
     caja.innerHTML = mensajes.length
       ? mensajes.map(burbuja).join("")
-      : '<p class="m-auto text-center text-[13px] text-muted">Aún no hay mensajes en este canal.</p>';
+      : (`<p class="m-auto text-center text-[13px] text-muted">${uiText("canales.aun_no_hay_mensajes_en_este_canal")}</p>`);
     caja.scrollTop = !conservar || alFinal ? caja.scrollHeight : posicion;
     void cargarVistaPrevia(caja);
     caja.querySelectorAll("img[data-avatar-autor]").forEach(imagen => void mostrarAvatar(imagen));
@@ -252,7 +253,7 @@ export function mount(scope) {
             <img ${scope.sandbox ? 'src' : 'data-adjunto'}="${esc(imagen.url)}" alt="${esc(imagen.nombre)}"
                  class="aspect-square w-full rounded-md border border-line object-cover transition-transform hover:scale-105">
           </a>`).join("")
-      : '<p class="col-span-3 text-[13px] text-muted">Sin imágenes todavía.</p>';
+      : (`<p class="col-span-3 text-[13px] text-muted">${uiText("canales.sin_imagenes_todavia")}</p>`);
 
     void cargarVistaPrevia($("#gallery"));
     $("#documents").innerHTML = documentos.length
@@ -265,7 +266,7 @@ export function mount(scope) {
               <span class="text-muted-light">${esc(documento.tamano)} · ${esc(documento.subidoPor)}</span>
             </span>
           </a>`).join("")
-      : '<p class="text-[13px] text-muted">Sin documentos todavía.</p>';
+      : (`<p class="text-[13px] text-muted">${uiText("canales.sin_documentos_todavia")}</p>`);
   }
 
   /* ------------------------------------------------------------ resumen */
@@ -273,21 +274,21 @@ export function mount(scope) {
   function pintarResumen(resumen) {
     const caja = $("#summary-body");
     if (!resumen) {
-      $("#summary-model").textContent = "Resumen";
+      $("#summary-model").textContent = uiText("canales.resumen");
       $("#summary-model").removeAttribute("title");
-      caja.innerHTML = '<p class="text-[13px] text-muted">Pulsa «Resumir» cuando haya conversación.</p>';
+      caja.innerHTML = (`<p class="text-[13px] text-muted">${uiText("canales.pulsa_resumir_cuando_haya_conversacion")}</p>`);
       return;
     }
     const etiqueta = $("#summary-model");
-    etiqueta.textContent = resumen.modelo?.startsWith("gemini-") ? "Gemini" : (resumen.modelo || "Local");
-    etiqueta.title = resumen.modelo || "Local";
+    etiqueta.textContent = resumen.modelo?.startsWith("gemini-") ? "Gemini" : (resumen.modelo || uiText("canales.local"));
+    etiqueta.title = resumen.modelo || uiText("canales.local");
     const puntos = (resumen.puntosClave || []).length
       ? `<ul class="mt-2.5 grid gap-1.5 text-xs text-muted">${resumen.puntosClave
           .map((punto) => `<li class="flex gap-1.5"><i class="bi bi-dot text-primary"></i><span>${esc(punto)}</span></li>`)
           .join("")}</ul>`
       : "";
-    caja.innerHTML = `<p class="whitespace-pre-wrap text-[13px]">${esc(resumen.contenido)}</p>${puntos}
-      <p class="mt-2.5 text-[11px] text-muted-light">${resumen.mensajesResumidos} mensajes · ${esc(resumen.fechaGeneracion)}</p>`;
+    caja.innerHTML = (`<p class="whitespace-pre-wrap text-[13px]">${esc(resumen.contenido)}</p>${puntos}
+      <p class="mt-2.5 text-[11px] text-muted-light">${uiText("canales.2_mensajes_3", {2: resumen.mensajesResumidos, 3: esc(resumen.fechaGeneracion)})}</p>`);
   }
 
   /* ------------------------------------------------------------ carga */
@@ -306,7 +307,7 @@ export function mount(scope) {
 
     $("#channel-title").textContent = `#${canal.slug}`;
     $("#channel-description").textContent = canal.descripcion || "";
-    $("#message-input").placeholder = `Escribe en #${canal.slug}…`;
+    $("#message-input").placeholder = uiText("canales.escribir", {0: canal.slug});
     $("#delete-channel").hidden = !canal.borrable;
     $("#summarize").disabled = $("#summarize").hasAttribute("aria-busy") || !canal.mensajes.length;
 
@@ -343,7 +344,7 @@ export function mount(scope) {
     const canalId = estado.activo?.id;
     if (estado.enviando || (!contenido && !archivo)) return;
     if (!canalId || estado.seleccionado !== canalId) {
-      avisar("Abre un canal antes de escribir.", "error");
+      avisar(uiText("canales.abre_un_canal_antes_de_escribir"), "error");
       return;
     }
 
@@ -400,7 +401,7 @@ export function mount(scope) {
       $("#channel-form").reset();
       feedback.classList.remove("is-visible");
       await abrirCanal(canal.id);
-      avisar(`Canal #${canal.slug} creado.`, "success");
+      avisar(uiText("canales.creado", {0: canal.slug}), "success");
     } catch (error) {
       feedback.textContent = error.message;
       feedback.classList.add("is-visible");
@@ -429,8 +430,8 @@ export function mount(scope) {
       const caja = $("#pending-file");
       caja.classList.remove("hidden");
       caja.classList.add("flex");
-      caja.innerHTML = `<i class="bi bi-paperclip"></i><span class="flex-1 truncate">${esc(archivo.name)}</span>
-        <button class="icon-button h-6 w-6" type="button" id="clear-file" aria-label="Quitar archivo"><i class="bi bi-x"></i></button>`;
+      caja.innerHTML = (`<i class="bi bi-paperclip"></i><span class="flex-1 truncate">${esc(archivo.name)}</span>
+        <button class="icon-button h-6 w-6" type="button" id="clear-file" aria-label="${uiText("canales.quitar_archivo")}"><i class="bi bi-x"></i></button>`);
       $("#clear-file").addEventListener("click", limpiarArchivo);
     });
 
@@ -443,7 +444,7 @@ export function mount(scope) {
       try {
         const resumen = await pedir(`/api/canales/${canal.id}/resumen`, { method: "POST" });
         if (estado.activo?.id === canal.id) pintarResumen(resumen);
-        avisar(resumen.modelo?.startsWith("gemini-") ? "Resumen generado con Gemini." : "Resumen local generado.", "success");
+        avisar(resumen.modelo?.startsWith("gemini-") ? uiText("canales.resumen_generado_con_gemini") : uiText("canales.resumen_local_generado"), "success");
       } catch (error) {
         avisar(error.message, "error");
       } finally {
@@ -454,7 +455,7 @@ export function mount(scope) {
 
     $("#delete-channel").addEventListener("click", async () => {
       if (!estado.activo) return;
-      if (!window.confirm(`¿Eliminar el canal #${estado.activo.slug} y sus mensajes?`)) return;
+      if (!window.confirm(uiText("canales.confirmar_eliminar", {0: estado.activo.slug}))) return;
       await pedir(`/api/canales/${estado.activo.id}`, { method: "DELETE" });
       estado.canales = await pedir(`/api/proyectos/${proyecto}/canales`);
       if (estado.canales.length) await abrirCanal(estado.canales[0].id);
@@ -467,7 +468,7 @@ export function mount(scope) {
       boton.addEventListener("click", () => dialogo.close()));
     $("#channel-form").addEventListener("submit", crearCanal);
     $("#channel-name").addEventListener("input", (evento) => {
-      $("#slug-preview").textContent = `#${aSlug(evento.target.value) || "canal"}`;
+      $("#slug-preview").textContent = `#${aSlug(evento.target.value) || uiText("canales.canal")}`;
     });
 
     // Cerrar el selector de reacciones al pulsar fuera.
@@ -495,19 +496,18 @@ export function mount(scope) {
 
   function mostrarSinCanales() {
     estado.activo = null;
-    $("#channel-title").textContent = "Sin canales";
+    $("#channel-title").textContent = uiText("canales.sin_canales");
     $("#channel-description").textContent = "";
     $("#delete-channel").hidden = true;
     $("#summarize").disabled = true;
     $("#channel-list").innerHTML =
-      '<p class="px-2 py-1.5 text-xs text-muted">Ninguno todavía.</p>';
-    $("#messages").innerHTML = `<div class="m-auto grid max-w-[36ch] gap-3 text-center">
+      (`<p class="px-2 py-1.5 text-xs text-muted">${uiText("canales.ninguno_todavia")}</p>`);
+    $("#messages").innerHTML = (`<div class="m-auto grid max-w-[36ch] gap-3 text-center">
         <i class="bi bi-chat-square-dots text-3xl text-primary"></i>
-        <p class="text-[13px] text-muted">Este proyecto aún no tiene canales. Crea el primero para empezar a conversar.</p>
+        <p class="text-[13px] text-muted">${uiText("canales.este_proyecto_aun_no_tiene_canales_crea_el")}</p>
         <button class="btn btn-primary mx-auto" type="button" id="first-channel">
-          <i class="bi bi-plus-lg"></i> Crear el primer canal
-        </button>
-      </div>`;
+          <i class="bi bi-plus-lg"></i>${" " + uiText("canales.crear_el_primer_canal") + "\n        "}</button>
+      </div>`);
     $("#first-channel").addEventListener("click", () => $("#channel-dialog").showModal());
     pintarArchivos([]);
     pintarResumen(null);
@@ -521,7 +521,7 @@ export function mount(scope) {
 
       const detalle = await pedir(`/api/proyectos/${proyecto}`);
       $("#project-label").textContent = detalle.nombre;
-      $("#channel-task").innerHTML = '<option value="">Sin tarea</option>'
+      $("#channel-task").innerHTML = (`<option value="">${uiText("canales.sin_tarea")}</option>`)
         + detalle.tareas.map((tarea) => `<option value="${tarea.id}">${esc(tarea.titulo)}</option>`).join("");
 
       if (!estado.canales.length) {
@@ -535,9 +535,9 @@ export function mount(scope) {
       await abrirCanal(inicial.id);
       scope.poll(actualizarConversacion, 2500);
     } catch (error) {
-      avisar("No se pudieron cargar los canales: " + error.message, "error");
+      avisar((uiText("canales.no_se_pudieron_cargar_los_canales") + " ") + error.message, "error");
       $("#messages").innerHTML =
-        `<p class="m-auto text-center text-[13px] text-danger">No se pudieron cargar los canales.<br>${esc(error.message)}</p>`;
+        (`<p class="m-auto text-center text-[13px] text-danger">${uiText("canales.no_se_pudieron_cargar_los_canales_2")}<br>${esc(error.message)}</p>`);
     }
   }
 

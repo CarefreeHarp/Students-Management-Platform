@@ -1,4 +1,5 @@
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const COLORS = ["#7259e9", "#4d89f8", "#ee8a54", "#36aa8a", "#d7639d", "#5b91b4"];
@@ -77,7 +78,7 @@ export function mount(scope) {
     input.addEventListener("input", renderCalendar);
     row.querySelector(".remove-project-phase").addEventListener("click", () => {
       if (phaseRows().length === 1) {
-        showToast("El proyecto necesita al menos una fase.", "warning");
+        showToast(uiText("crear_proyecto.el_proyecto_necesita_al_menos_una_fase"), "warning");
         return;
       }
       row.remove();
@@ -106,10 +107,10 @@ export function mount(scope) {
     const hint = document.querySelector("#reparto-create-hint");
     if (!hint) return;
     hint.textContent = libre
-      ? "Las tareas empiezan libres. Se pueden tomar cuando sus dependencias estén terminadas."
+      ? uiText("crear_proyecto.las_tareas_empiezan_libres_se_pueden_tomar_cuando")
       : assignmentMode() === "asignado"
-        ? "Puedes asignar ahora o después, y cambiar el modo desde el diagrama de fases."
-        : "Elige cómo se repartirán las tareas antes de crear el proyecto.";
+        ? uiText("crear_proyecto.puedes_asignar_ahora_o_despues_y_cambiar_el")
+        : uiText("crear_proyecto.elige_como_se_repartiran_las_tareas_antes_de");
   }
 
   function updateMemberAvatars() {
@@ -133,7 +134,7 @@ export function mount(scope) {
     row.querySelector(".member-contact").value = member.contact || member.email || "";
     row.querySelector(".remove-member").addEventListener("click", () => {
       if (memberRows().length === 1) {
-        showToast("El proyecto necesita al menos un integrante.", "warning");
+        showToast(uiText("crear_proyecto.el_proyecto_necesita_al_menos_un_integrante"), "warning");
         return;
       }
       row.remove();
@@ -160,8 +161,8 @@ export function mount(scope) {
     const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1, 12);
     const daysInMonth = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0).getDate();
     const offset = (first.getDay() + 6) % 7;
-    monthName.textContent = new Intl.DateTimeFormat("es-CO", { month: "long", year: "numeric" }).format(first);
-    taskCounter.textContent = `${tasks.length} tarea${tasks.length === 1 ? "" : "s"}`;
+    monthName.textContent = new Intl.DateTimeFormat(StudyFlowLanguage.locale(), { month: "long", year: "numeric" }).format(first);
+    taskCounter.textContent = (uiText("crear_proyecto.0_tarea_1", {0: tasks.length, 1: tasks.length === 1 ? "" : "s"}));
     calendar.replaceChildren();
 
     for (let blank = 0; blank < offset; blank += 1) {
@@ -205,8 +206,8 @@ export function mount(scope) {
     const name = document.querySelector("#project-name");
     const description = document.querySelector("#project-description");
     const dueDate = document.querySelector("#project-due-date");
-    if (!name.value.trim()) name.value = "Propuesta de solución para campus inteligente";
-    if (!description.value.trim()) description.value = "Diseñar una solución centrada en estudiantes que responda al reto del curso, con investigación, prototipo y una presentación final clara.";
+    if (!name.value.trim()) name.value = uiText("crear_proyecto.propuesta_de_solucion_para_campus_inteligente");
+    if (!description.value.trim()) description.value = uiText("crear_proyecto.disenar_una_solucion_centrada_en_estudiantes_que_responda");
     if (!dueDate.value) dueDate.value = addDays(today(), 21);
     if (!currentPhases().length) addProjectPhase(DEFAULT_PHASE);
     if (currentMembers().length < 2) {
@@ -215,9 +216,9 @@ export function mount(scope) {
     }
     const hint = document.querySelector("#project-template-hint");
     hint.classList.add("is-filled");
-    hint.querySelector("p").textContent = "Plantilla aplicada. Puedes editar todos los datos antes de crear el proyecto.";
+    hint.querySelector("p").textContent = uiText("crear_proyecto.plantilla_aplicada_puedes_editar_todos_los_datos_antes");
     renderCalendar();
-    showToast("Plantilla aplicada. Revisa y edita los datos antes de crear el proyecto.", "success");
+    showToast(uiText("crear_proyecto.plantilla_aplicada_revisa_y_edita_los_datos_antes"), "success");
   }
 
   function updateProjectProgress(project) {
@@ -245,7 +246,7 @@ export function mount(scope) {
     const boton = form.querySelector("button[type='submit']");
     const textoOriginal = boton.innerHTML;
     boton.disabled = true;
-    boton.innerHTML = '<i class="bi bi-hourglass-split"></i> Creando…';
+    boton.innerHTML = (`<i class="bi bi-hourglass-split"></i>${" " + uiText("crear_proyecto.creando")}`);
 
     try {
       const respuesta = await request("/api/proyectos", {
@@ -277,12 +278,12 @@ export function mount(scope) {
 
       if (!respuesta.ok) {
         const detalle = await respuesta.json().catch(() => ({}));
-        const error = new Error(detalle.detail || detalle.mensaje || detalle.message || "No se pudo crear el proyecto.");
+        const error = new Error(detalle.detail || detalle.mensaje || detalle.message || uiText("crear_proyecto.no_se_pudo_crear_el_proyecto"));
         error.shownInForm = showProjectErrors(detalle);
         throw error;
       }
       const proyecto = await respuesta.json();
-      showToast("Proyecto creado. Abriendo su espacio de trabajo…", "success");
+      showToast(uiText("crear_proyecto.proyecto_creado_abriendo_su_espacio_de_trabajo"), "success");
       app.navigate(`/proyectos/${encodeURIComponent(proyecto.codigo)}`);
     } catch (error) {
       if (!error.shownInForm) showToast(error.message, "error");
@@ -310,7 +311,7 @@ export function mount(scope) {
       field.addEventListener("input", clearProjectErrors);
       field.addEventListener("change", clearProjectErrors);
     });
-    addMember({ name: "Tú" });
+    addMember({ name: uiText("landing.tu") });
     addProjectPhase(DEFAULT_PHASE);
     updateAssignmentMode();
     renderCalendar();

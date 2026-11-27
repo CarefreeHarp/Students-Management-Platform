@@ -1,3 +1,4 @@
+import { t } from './idioma';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
@@ -20,16 +21,16 @@ export class SesionAdmin {
   acceder(usuario: string, contrasena: string) {
     return this.estado().pipe(
       catchError(() => throwError(() => new Error(
-        'El panel de administración no responde. Vuelve a intentarlo.'
+        t("sesion_admin.el_panel_de_administracion_no_responde_vuelve_a")
       ))),
       switchMap(({ csrf }) => this.http.post<void>('/api/admin/acceder',
         new HttpParams().set('username', usuario).set('password', contrasena),
         { headers: { 'X-CSRF-TOKEN': csrf }, timeout: 15000 }
       ).pipe(catchError((error: HttpErrorResponse) => {
-        const mensaje = error.status === 401 ? 'Usuario o contraseña incorrectos.'
-          : error.status === 429 ? 'Demasiados intentos. Espera dos minutos.'
-            : error.status === 403 ? 'La sesión de acceso caducó. Intenta de nuevo.'
-              : 'No se pudo iniciar sesión. Comprueba que el backend esté disponible.';
+        const mensaje = error.status === 401 ? t("sesion_admin.usuario_o_contrasena_incorrectos")
+          : error.status === 429 ? t("sesion_admin.demasiados_intentos_espera_dos_minutos")
+            : error.status === 403 ? t("sesion_admin.la_sesion_de_acceso_caduco_intenta_de_nuevo")
+              : t("sesion_admin.no_se_pudo_iniciar_sesion_comprueba_que_el");
         return throwError(() => new Error(mensaje));
       })))
     );

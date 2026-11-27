@@ -3,6 +3,7 @@
  * Guarda el enlace donde vive cada parte del trabajo, con responsable y estado.
  */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const app = scope.app || {};
@@ -15,6 +16,9 @@ export function mount(scope) {
     FINAL: "bg-success-soft text-[var(--estado-success)]"
   };
 
+  const estadoTexto = { BORRADOR: 'entregables.borrador', EN_REVISION: 'entregables.en_revision_2', FINAL: 'entregables.final' };
+  const tipoTexto = { DOCUMENTO: 'entregables.documento', PRESENTACION: 'entregables.presentacion', DISENO: 'entregables.diseno', HOJA_CALCULO: 'entregables.hoja_de_calculo', CODIGO: 'entregables.repositorio', VIDEO: 'entregables.video', OTRO: 'entregables.otro' };
+
   const $ = (selector) => document.querySelector(selector);
   let entregables = [];
 
@@ -26,11 +30,11 @@ export function mount(scope) {
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
       app.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || detalle.message || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.status === 204 ? null : respuesta.json();
   }
@@ -52,10 +56,10 @@ export function mount(scope) {
            <i class="inline-block h-2 w-2 rounded-full" style="background:${esc(entregable.colorResponsable || "#5b5ce2")}"></i>
            ${esc(entregable.responsable)}
          </span>`
-      : '<span class="text-muted-light">Sin responsable</span>';
+      : (`<span class="text-muted-light">${uiText("entregables.sin_responsable")}</span>`);
 
     const color = entregable.colorResponsable || "#5b5ce2";
-    return `
+    return (`
       <article class="deliverable-card tarjeta-lista tarjeta-borde-color flex items-start gap-3" style="--borde:${esc(color)}">
         <span class="grid h-11 w-11 flex-none place-items-center rounded-sm bg-primary-soft text-lg text-[var(--estado-primary)]">
           <i class="bi ${esc(entregable.icono)}"></i>
@@ -65,8 +69,8 @@ export function mount(scope) {
             <a class="text-[15px] font-bold hover:text-primary" href="${esc(enlaceSeguro(entregable.url))}" target="_blank" rel="noopener">
               ${esc(entregable.nombre)} <i class="bi bi-box-arrow-up-right text-xs"></i>
             </a>
-            <span class="tag ${COLOR_ESTADO[entregable.estado] || ""}">${esc(entregable.estadoEtiqueta)}</span>
-            <span class="tag bg-[var(--chip-neutro)] text-muted">${esc(entregable.tipoEtiqueta)}</span>
+            <span class="tag ${COLOR_ESTADO[entregable.estado] || ""}">${esc(estadoTexto[entregable.estado] ? uiText(estadoTexto[entregable.estado]) : entregable.estadoEtiqueta)}</span>
+            <span class="tag bg-[var(--chip-neutro)] text-muted">${esc(tipoTexto[entregable.tipo] ? uiText(tipoTexto[entregable.tipo]) : entregable.tipoEtiqueta)}</span>
           </div>
           ${entregable.descripcion ? `<p class="mt-1 text-[13px] text-muted">${esc(entregable.descripcion)}</p>` : ""}
           <p class="mt-1.5 truncate text-[11px] text-muted-light">${esc(entregable.url)}</p>
@@ -77,15 +81,15 @@ export function mount(scope) {
           </div>
         </div>
         <div class="deliverable-actions flex flex-none gap-1">
-          <select class="min-h-0 w-auto px-1.5 py-1 text-[11px]" data-state="${entregable.id}" aria-label="Cambiar estado">
-            <option value="BORRADOR" ${entregable.estado === "BORRADOR" ? "selected" : ""}>Borrador</option>
-            <option value="EN_REVISION" ${entregable.estado === "EN_REVISION" ? "selected" : ""}>En revisión</option>
-            <option value="FINAL" ${entregable.estado === "FINAL" ? "selected" : ""}>Final</option>
+          <select class="min-h-0 w-auto px-1.5 py-1 text-[11px]" data-state="${entregable.id}" aria-label="${uiText("entregables.cambiar_estado")}">
+            <option value="BORRADOR" ${entregable.estado === "BORRADOR" ? "selected" : ""}>${uiText("entregables.borrador")}</option>
+            <option value="EN_REVISION" ${entregable.estado === "EN_REVISION" ? "selected" : ""}>${uiText("entregables.en_revision_2")}</option>
+            <option value="FINAL" ${entregable.estado === "FINAL" ? "selected" : ""}>${uiText("entregables.final")}</option>
           </select>
-          <button class="icon-button" type="button" data-edit="${entregable.id}" aria-label="Editar"><i class="bi bi-pencil"></i></button>
-          <button class="icon-button" type="button" data-delete="${entregable.id}" aria-label="Eliminar"><i class="bi bi-trash3"></i></button>
+          <button class="icon-button" type="button" data-edit="${entregable.id}" aria-label="${uiText("entregables.editar")}"><i class="bi bi-pencil"></i></button>
+          <button class="icon-button" type="button" data-delete="${entregable.id}" aria-label="${uiText("entregables.eliminar")}"><i class="bi bi-trash3"></i></button>
         </div>
-      </article>`;
+      </article>`);
   }
 
   async function cargar() {
@@ -97,11 +101,11 @@ export function mount(scope) {
 
     $("#deliverables").innerHTML = entregables.length
       ? entregables.map(tarjeta).join("")
-      : `<div class="empty-projects"><div>
+      : (`<div class="empty-projects"><div>
            <i class="bi bi-folder2-open text-2xl text-primary"></i>
-           <h3>Aún no hay documentos</h3>
-           <p>Registra el enlace del informe, la presentación o el repositorio para tenerlos todos a mano.</p>
-         </div></div>`;
+           <h3>${uiText("entregables.aun_no_hay_documentos")}</h3>
+           <p>${uiText("entregables.registra_el_enlace_del_informe_la_presentacion_o")}</p>
+         </div></div>`);
 
     $("#deliverables").querySelectorAll("[data-state]").forEach((selector) => {
       selector.addEventListener("change", async () => {
@@ -117,7 +121,7 @@ export function mount(scope) {
     });
     $("#deliverables").querySelectorAll("[data-delete]").forEach((boton) => {
       boton.addEventListener("click", async () => {
-        if (!window.confirm("¿Quitar este documento del registro?")) return;
+        if (!window.confirm(uiText("entregables.quitar_este_documento_del_registro"))) return;
         await pedir(`/api/entregables/${boton.dataset.delete}`, { method: "DELETE" });
         await cargar();
       });
@@ -126,7 +130,7 @@ export function mount(scope) {
 
   function abrirFormulario(id) {
     const entregable = id ? entregables.find((item) => item.id === id) : null;
-    $("#dialog-title").textContent = entregable ? "Editar documento" : "Registrar documento";
+    $("#dialog-title").textContent = entregable ? uiText("entregables.editar_documento") : uiText("entregables.registrar_documento");
     $("#deliverable-id").value = entregable ? entregable.id : "";
     $("#deliverable-url").value = entregable ? entregable.url : "";
     $("#deliverable-name").value = entregable ? entregable.nombre : "";
@@ -150,7 +154,7 @@ export function mount(scope) {
     };
 
     if (!cuerpo.nombre || !cuerpo.url) {
-      feedback.textContent = "El nombre y el enlace son obligatorios.";
+      feedback.textContent = uiText("entregables.el_nombre_y_el_enlace_son_obligatorios");
       feedback.classList.add("is-visible");
       return;
     }
@@ -164,7 +168,7 @@ export function mount(scope) {
       $("#deliverable-dialog").close();
       $("#deliverable-form").reset();
       await cargar();
-      avisar("Registro actualizado.", "success");
+      avisar(uiText("entregables.registro_actualizado"), "success");
     } catch (error) {
       feedback.textContent = error.message;
       feedback.classList.add("is-visible");

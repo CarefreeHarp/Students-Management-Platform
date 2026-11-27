@@ -1,5 +1,6 @@
 /* Avisos personales y estándares de recordatorios por WhatsApp. */
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
   const app = scope.app || {};
   const rutas = { recordatorios: "/api/recordatorios", preferenciasRecordatorio: "/api/recordatorios/preferencias", apuntes: "/api/apuntes", ...app.ROUTES?.api };
@@ -11,11 +12,11 @@ export function mount(scope) {
     const respuesta = await request(url, { headers: { "Content-Type": "application/json" }, ...opciones });
     if (respuesta.status === 401) {
       app.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || detalle.message || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.status === 204 ? null : respuesta.json();
   }
@@ -39,7 +40,7 @@ export function mount(scope) {
     const campo = $(selector);
     if (valor == null) return;
     if (![...campo.options].some(opcion => Number(opcion.value) === Number(valor))) {
-      campo.append(new Option(`${valor} minutos antes`, String(valor)));
+      campo.append(new Option((uiText("recordatorios.0_minutos_antes", {0: valor})), String(valor)));
     }
     campo.value = String(valor);
   }
@@ -52,15 +53,15 @@ export function mount(scope) {
     seleccionar("#advance-delivery", preferencias.minutosAntesEntrega);
     seleccionar("#advance-note", preferencias.minutosAntesApunte);
     $("#gateway-status").textContent = !preferencias.activo
-      ? "Los avisos están desactivados. Puedes activarlos en Configurar recordatorios."
+      ? uiText("recordatorios.los_avisos_estan_desactivados_puedes_activarlos_en_configurar")
       : !preferencias.pasarelaConectada
-        ? "Modo de demostración: puedes programar avisos; los mensajes de WhatsApp se simulan."
+        ? uiText("recordatorios.modo_demo")
         : preferencias.telefonoWhatsapp
-          ? `WhatsApp conectado · Avisos a ${preferencias.telefonoWhatsapp}.`
-          : "Configura tu número de WhatsApp para recibir los avisos.";
+          ? uiText("recordatorios.numero_conectado", {0: preferencias.telefonoWhatsapp})
+          : uiText("recordatorios.configura_numero");
     $("#reminder-destination").textContent = preferencias.telefonoWhatsapp
-      ? `WhatsApp de destino: ${preferencias.telefonoWhatsapp}.`
-      : "Añade tu número en Configurar recordatorios para poder recibir este aviso.";
+      ? uiText("recordatorios.numero_destino", {0: preferencias.telefonoWhatsapp})
+      : uiText("recordatorios.anade_tu_numero_en_configurar_recordatorios_para_poder");
   }
 
   async function guardarPreferencias(evento) {
@@ -82,7 +83,7 @@ export function mount(scope) {
         });
         volcarPreferencias(preferencias);
         $("#preferences-dialog").close();
-        avisar("Configuración guardada.", "success");
+        avisar(uiText("recordatorios.configuracion_guardada"), "success");
         await cargarRecordatorios();
       } catch (error) { feedback("#preferences-feedback", error.message); }
     });
@@ -92,7 +93,7 @@ export function mount(scope) {
 
   function fechaVencimiento() {
     return $("#reminder-date").value && $("#reminder-time").value
-      ? `${$("#reminder-date").value}T${$("#reminder-time").value}:00` : "";
+      ? (uiText("recordatorios.0_t_1_00", {0: $("#reminder-date").value, 1: $("#reminder-time").value})) : "";
   }
 
   function actualizarPrevisualizacion() {
@@ -100,8 +101,8 @@ export function mount(scope) {
     const minutos = antelacion();
     const aviso = fecha ? new Date(new Date(fecha).getTime() - minutos * 60000) : null;
     $("#reminder-preview").textContent = aviso && Number.isFinite(aviso.getTime())
-      ? `Recibirás el aviso el ${aviso.toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" })}.`
-      : "Elige fecha y hora para ver cuándo recibirás el aviso.";
+      ? (uiText("recordatorios.recibiras_el_aviso_el_0", {0: aviso.toLocaleString(StudyFlowLanguage.locale(), { dateStyle: "medium", timeStyle: "short" })}))
+      : uiText("recordatorios.elige_fecha_y_hora_para_ver_cuando_recibiras");
   }
 
   async function crearRecordatorio(evento) {
@@ -111,12 +112,12 @@ export function mount(scope) {
     const titulo = $("#reminder-title").value.trim();
     const minutos = antelacion();
     const vencimiento = fechaVencimiento();
-    if (!titulo) { feedback("#reminder-feedback", "Escribe qué necesitas recordar."); return; }
+    if (!titulo) { feedback("#reminder-feedback", uiText("recordatorios.escribe_que_necesitas_recordar")); return; }
     if (!Number.isInteger(minutos) || minutos < 0 || minutos > 43200) {
-      feedback("#reminder-feedback", "La antelación debe estar entre 0 minutos y 30 días."); return;
+      feedback("#reminder-feedback", uiText("recordatorios.la_antelacion_debe_estar_entre_0_minutos_y")); return;
     }
     if (new Date(vencimiento).getTime() - minutos * 60000 <= Date.now()) {
-      feedback("#reminder-feedback", "La hora del aviso ya pasó. Reduce la antelación o cambia el vencimiento."); return;
+      feedback("#reminder-feedback", uiText("recordatorios.la_hora_del_aviso_ya_paso_reduce_la")); return;
     }
     await mientrasGuarda(form.querySelector('[type="submit"]'), async () => {
       try {
@@ -126,7 +127,7 @@ export function mount(scope) {
         $("#reminder-dialog").close();
         form.reset();
         actualizarPrevisualizacion();
-        avisar("Recordatorio programado.", "success");
+        avisar(uiText("recordatorios.recordatorio_programado"), "success");
         await cargarRecordatorios();
       } catch (error) { feedback("#reminder-feedback", error.message); }
     });
@@ -134,35 +135,35 @@ export function mount(scope) {
 
   function tarjetaRecordatorio(recordatorio) {
     const programado = recordatorio.estado === "PROGRAMADO";
-    const etiquetas = { ENVIADO: "Enviado", FALLIDO: "No se pudo enviar", CANCELADO: "Cancelado" };
-    return `<article class="tarjeta-lista flex items-start gap-3">
+    const etiquetas = { ENVIADO: uiText("recordatorios.enviado"), FALLIDO: uiText("recordatorios.no_se_pudo_enviar"), CANCELADO: uiText("recordatorios.cancelado") };
+    return (`<article class="tarjeta-lista flex items-start gap-3">
       <span class="text-muted"><i class="bi bi-whatsapp" aria-hidden="true"></i></span>
       <div class="min-w-0 flex-1">
         <h3 class="text-sm">${esc(recordatorio.titulo)}</h3>
-        <p class="mt-1 text-[13px] text-muted">Aviso: ${esc(recordatorio.fechaHora)}${recordatorio.proyecto ? ` · ${esc(recordatorio.proyecto)}` : ""}</p>
-        ${recordatorio.fechaVencimiento ? `<p class="mt-1 text-xs text-muted">Vence: ${esc(recordatorio.fechaVencimiento)}</p>` : ""}
+        <p class="mt-1 text-[13px] text-muted">${uiText("recordatorios.aviso_1_2", {1: esc(recordatorio.fechaHora), 2: recordatorio.proyecto ? ` · ${esc(recordatorio.proyecto)}` : ""})}</p>
+        ${recordatorio.fechaVencimiento ? (`<p class="mt-1 text-xs text-muted">${uiText("recordatorios.vence_0", {0: esc(recordatorio.fechaVencimiento)})}</p>`) : ""}
         ${!programado ? `<p class="mt-1 text-xs text-muted">${esc(etiquetas[recordatorio.estado] || recordatorio.estado)}</p>` : ""}
-        ${recordatorio.mensaje ? `<details class="mt-2 text-xs text-muted"><summary>Ver detalle</summary><p class="mt-2 break-words">${esc(recordatorio.mensaje)}</p></details>` : ""}
+        ${recordatorio.mensaje ? (`<details class="mt-2 text-xs text-muted"><summary>${uiText("recordatorios.ver_detalle")}</summary><p class="mt-2 break-words">${esc(recordatorio.mensaje)}</p></details>`) : ""}
         ${recordatorio.errorEnvio ? `<p class="mt-1 text-xs text-danger">${esc(recordatorio.errorEnvio)}</p>` : ""}
       </div>
-      ${programado ? `<button class="icon-button" type="button" data-cancel="${recordatorio.id}" aria-label="Cancelar recordatorio: ${esc(recordatorio.titulo)}" title="Cancelar recordatorio"><i class="bi bi-x-lg" aria-hidden="true"></i></button>` : ""}
-    </article>`;
+      ${programado ? (`<button class="icon-button" type="button" data-cancel="${recordatorio.id}" aria-label="${uiText("recordatorios.cancelar_recordatorio_1", {1: esc(recordatorio.titulo)})}" title="${uiText("recordatorios.cancelar_recordatorio")}"><i class="bi bi-x-lg" aria-hidden="true"></i></button>`) : ""}
+    </article>`);
   }
 
   async function cargarRecordatorios() {
     const recordatorios = await pedir(rutas.recordatorios);
     const pendientes = recordatorios.filter(item => item.estado === "PROGRAMADO");
     const historial = recordatorios.filter(item => item.estado !== "PROGRAMADO" && item.estado !== "CANCELADO");
-    $("#scheduled-count").textContent = pendientes.length ? `${pendientes.length} aviso${pendientes.length === 1 ? "" : "s"} programado${pendientes.length === 1 ? "" : "s"}.` : "No tienes avisos pendientes.";
+    $("#scheduled-count").textContent = pendientes.length ? (uiText("recordatorios.0_aviso_1_programado_2", {0: pendientes.length, 1: pendientes.length === 1 ? "" : "s", 2: pendientes.length === 1 ? "" : "s"})) : uiText("recordatorios.no_tienes_avisos_pendientes");
     $("#reminders-list").innerHTML = pendientes.length ? pendientes.map(tarjetaRecordatorio).join("")
-      : '<p class="text-sm text-muted">Añade un recordatorio o configura los avisos de tus tareas, entregas y pendientes de clase.</p>';
+      : (`<p class="text-sm text-muted">${uiText("recordatorios.anade_un_recordatorio_o_configura_los_avisos_de")}</p>`);
     $("#reminder-history").hidden = !historial.length;
     $("#reminders-history-list").innerHTML = historial.map(tarjetaRecordatorio).join("");
     $("#reminders-list").querySelectorAll("[data-cancel]").forEach(boton => boton.addEventListener("click", async () => {
       await mientrasGuarda(boton, async () => {
         try {
           await pedir(`${rutas.recordatorios}/${boton.dataset.cancel}`, { method: "DELETE" });
-          avisar("Recordatorio cancelado.");
+          avisar(uiText("recordatorios.recordatorio_cancelado"));
           await cargarRecordatorios();
         } catch (error) { avisar(error.message, "error"); }
       });
@@ -174,9 +175,9 @@ export function mount(scope) {
     $("#class-notes").hidden = !apuntes.length;
     $("#notes-list").innerHTML = apuntes.map(apunte => `<article class="tarjeta-lista flex items-start gap-3">
       <button class="task-check ${apunte.resuelto ? "is-done" : ""}" type="button" data-toggle-note="${apunte.id}"
-        aria-label="${apunte.resuelto ? "Marcar como pendiente" : "Marcar como resuelto"}: ${esc(apunte.titulo)}"><i class="bi bi-check" aria-hidden="true"></i></button>
+        aria-label="${apunte.resuelto ? uiText("recordatorios.marcar_como_pendiente") : uiText("recordatorios.marcar_como_resuelto")}: ${esc(apunte.titulo)}"><i class="bi bi-check" aria-hidden="true"></i></button>
       <div><h3 class="text-sm ${apunte.resuelto ? "line-through text-muted" : ""}">${esc(apunte.titulo)}</h3>
-      <p class="mt-1 text-xs text-muted">${esc(apunte.materia || "Pendiente de clase")}${apunte.fechaLimite ? ` · ${esc(apunte.fechaLimite)}` : ""}</p></div>
+      <p class="mt-1 text-xs text-muted">${esc(apunte.materia || uiText("recordatorios.pendiente_de_clase"))}${apunte.fechaLimite ? ` · ${esc(apunte.fechaLimite)}` : ""}</p></div>
     </article>`).join("");
     $("#notes-list").querySelectorAll("[data-toggle-note]").forEach(boton => boton.addEventListener("click", async () => {
       await mientrasGuarda(boton, async () => {
@@ -210,14 +211,14 @@ export function mount(scope) {
       try {
         await pedir(`${rutas.recordatorios}/reprogramar`, { method: "POST" });
         await cargarRecordatorios();
-        avisar("Avisos actualizados desde tus pendientes.", "success");
+        avisar(uiText("recordatorios.avisos_actualizados_desde_tus_pendientes"), "success");
       } catch (error) { avisar(error.message, "error"); }
     }));
     $("#test-message").addEventListener("click", evento => mientrasGuarda(evento.currentTarget, async () => {
       if (!estado.preferencias
           || $("#whatsapp-phone").value.trim() !== (estado.preferencias.telefonoWhatsapp || "")
           || $("#reminders-active").checked !== estado.preferencias.activo) {
-        feedback("#preferences-feedback", "Guarda la configuración antes de enviar la prueba.");
+        feedback("#preferences-feedback", uiText("recordatorios.guarda_la_configuracion_antes_de_enviar_la_prueba"));
         return;
       }
       try {
@@ -229,8 +230,8 @@ export function mount(scope) {
       volcarPreferencias(await pedir(rutas.preferenciasRecordatorio));
       await Promise.all([cargarApuntes(), cargarRecordatorios()]);
     } catch (error) {
-      $("#gateway-status").textContent = `No se pudieron cargar los recordatorios: ${error.message}`;
-      $("#scheduled-count").textContent = "Vuelve a cargar la página para intentarlo de nuevo.";
+      $("#gateway-status").textContent = (uiText("recordatorios.no_se_pudieron_cargar_los_recordatorios_0", {0: error.message}));
+      $("#scheduled-count").textContent = uiText("recordatorios.vuelve_a_cargar_la_pagina_para_intentarlo_de");
     }
   }
   init();

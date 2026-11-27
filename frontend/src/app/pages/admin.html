@@ -5,67 +5,67 @@
       StudyFlow
     </a>
     @if (vista() === 'panel') {
-      <button type="button" (click)="salir()" [disabled]="ocupado()">Cerrar sesión</button>
+      <button type="button" (click)="salir()" [disabled]="ocupado()">{{ t('admin.cerrar_sesion') }}</button>
     }
   </header>
 
   @if (vista() === 'acceso') {
     <section class="tarjeta acceso" aria-labelledby="titulo-acceso">
-      <h1 id="titulo-acceso">Administración</h1>
-      <p>Inicia sesión para consultar la base de datos de StudyFlow.</p>
+      <h1 id="titulo-acceso">{{ t('admin.administracion') }}</h1>
+      <p>{{ t('admin.inicia_sesion_para_consultar_la_base_de_datos') }}</p>
       @if (aviso()) { <p class="aviso" role="status">{{ aviso() }}</p> }
       @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
       <form (submit)="entrar($event, usuario, contrasena)">
-        <label for="admin-usuario">Usuario</label>
+        <label for="admin-usuario">{{ t('admin.usuario') }}</label>
         <input #usuario id="admin-usuario" name="username" autocomplete="username" required maxlength="80">
-        <label for="admin-contrasena">Contraseña</label>
+        <label for="admin-contrasena">{{ t('admin.contrasena') }}</label>
         <input #contrasena id="admin-contrasena" name="password" type="password"
                autocomplete="current-password" required maxlength="72">
-        <button class="primario" type="submit" [disabled]="ocupado()">Ingresar</button>
+        <button class="primario" type="submit" [disabled]="ocupado()">{{ t('admin.ingresar') }}</button>
       </form>
     </section>
   } @else if (vista() === 'panel') {
     @if (base(); as datos) {
       <section class="introduccion" aria-labelledby="titulo-panel">
         <div>
-          <h1 id="titulo-panel">Administración</h1>
-          <p>{{ estado?.soloEsquema ? 'Catálogo de tablas y columnas de StudyFlow.' : 'Backend local y base de datos de StudyFlow.' }}</p>
+          <h1 id="titulo-panel">{{ t('admin.administracion') }}</h1>
+          <p>{{ estado?.soloEsquema ? t('admin.catalogo_de_tablas_y_columnas_de_studyflow') : t('admin.backend_local_y_base_de_datos_de_studyflow') }}</p>
         </div>
         @if (!estado?.soloEsquema && !confirmando()) {
           <button class="peligro" type="button" (click)="confirmando.set(true)" [disabled]="ocupado()">
-            Reiniciar backend
+            {{ t('admin.reiniciar_backend') }}
           </button>
         }
       </section>
       @if (confirmando()) {
         <section class="confirmacion" aria-labelledby="titulo-confirmacion">
-          <h2 id="titulo-confirmacion">¿Reiniciar el backend?</h2>
+          <h2 id="titulo-confirmacion">{{ t('admin.reiniciar_el_backend') }}</h2>
           @if (datos.enMemoria) {
-            <p>Se perderán los cambios en H2 de esta ejecución y el backend volverá a cargar los datos iniciales configurados.</p>
+            <p>{{ t('admin.se_perderan_los_cambios_en_h2_de_esta') }}</p>
           } @else {
-            <p>Las sesiones abiertas se interrumpirán. Los datos de H2 guardados en disco se conservan.</p>
+            <p>{{ t('admin.las_sesiones_abiertas_se_interrumpiran_los_datos_de') }}</p>
           }
           <div class="acciones">
-            <button type="button" (click)="confirmando.set(false)">Cancelar</button>
-            <button class="peligro" type="button" (click)="reiniciar()" [disabled]="ocupado()">Confirmar reinicio</button>
+            <button type="button" (click)="confirmando.set(false)">{{ t('admin.cancelar') }}</button>
+            <button class="peligro" type="button" (click)="reiniciar()" [disabled]="ocupado()">{{ t('admin.confirmar_reinicio') }}</button>
           </div>
         </section>
       }
       @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
 
       <section class="tarjeta base" aria-labelledby="titulo-base">
-        <h2 id="titulo-base">Base de datos</h2>
+        <h2 id="titulo-base">{{ t('admin.base_de_datos') }}</h2>
         <dl>
-          <div><dt>Motor</dt><dd>{{ datos.motor }} {{ datos.version }}</dd></div>
-          <div><dt>Almacenamiento</dt><dd>{{ datos.enMemoria ? 'En memoria' : 'En disco' }}</dd></div>
-          <div><dt>Esquema</dt><dd>{{ datos.esquema }}</dd></div>
-          <div><dt>Tablas</dt><dd>{{ datos.tablas.length }}</dd></div>
+          <div><dt>{{ t('admin.motor') }}</dt><dd>{{ datos.motor }} {{ datos.version }}</dd></div>
+          <div><dt>{{ t('admin.almacenamiento') }}</dt><dd>{{ datos.enMemoria ? t('admin.en_memoria') : t('admin.en_disco') }}</dd></div>
+          <div><dt>{{ t('admin.esquema') }}</dt><dd>{{ datos.esquema }}</dd></div>
+          <div><dt>{{ t('admin.tablas') }}</dt><dd>{{ datos.tablas.length }}</dd></div>
         </dl>
       </section>
 
       <div class="explorador">
         <aside class="tarjeta tablas" aria-labelledby="titulo-tablas">
-          <h2 id="titulo-tablas">Tablas</h2>
+          <h2 id="titulo-tablas">{{ t('admin.tablas') }}</h2>
           @if (datos.tablas.length) {
             <ul>
               @for (nombre of datos.tablas; track nombre) {
@@ -76,13 +76,13 @@
               }
             </ul>
           } @else {
-            <p>Este esquema está vacío.</p>
+            <p>{{ t('admin.este_esquema_esta_vacio') }}</p>
           }
         </aside>
         <section class="tarjeta contenido" aria-labelledby="titulo-datos">
-          <h2 id="titulo-datos">{{ tablaElegida() || 'Datos de la tabla' }}</h2>
+          <h2 id="titulo-datos">{{ tablaElegida() || t('admin.datos_de_la_tabla') }}</h2>
           @if (tabla(); as detalle) {
-            <p>{{ detalle.totalFilas }} {{ detalle.totalFilas === 1 ? 'fila' : 'filas' }} · Solo lectura</p>
+            <p>{{ detalle.totalFilas }} {{ detalle.totalFilas === 1 ? t('admin.fila') : t('admin.filas') }} {{ t('admin.solo_lectura') }}</p>
             @if (estado?.soloEsquema) {
               <dl>
                 @for (columna of detalle.columnas; track columna.nombre) {
@@ -90,7 +90,7 @@
                 }
               </dl>
             } @else if (detalle.columnas.length) {
-              <div class="desplazamiento" tabindex="0" role="region" [attr.aria-label]="'Filas de ' + detalle.nombre">
+              <div class="desplazamiento" tabindex="0" role="region" [attr.aria-label]="t('admin.filas_de', {'0': detalle.nombre})">
                 <table>
                   <thead><tr>
                     @for (columna of detalle.columnas; track columna.nombre) {
@@ -105,41 +105,41 @@
                         }
                       </tr>
                     } @empty {
-                      <tr><td [attr.colspan]="detalle.columnas.length">Esta página no tiene filas.</td></tr>
+                      <tr><td [attr.colspan]="detalle.columnas.length">{{ t('admin.esta_pagina_no_tiene_filas') }}</td></tr>
                     }
                   </tbody>
                 </table>
               </div>
             } @else {
-              <p>No hay columnas visibles.</p>
+              <p>{{ t('admin.no_hay_columnas_visibles') }}</p>
             }
             @if (!estado?.soloEsquema && totalPaginas() > 1) {
               <div class="paginacion">
                 <button type="button" (click)="abrirTabla(detalle.nombre, detalle.pagina - 1)"
-                        [disabled]="ocupado() || detalle.pagina === 1">Anterior</button>
-                <span>Página {{ detalle.pagina }} de {{ totalPaginas() }}</span>
+                        [disabled]="ocupado() || detalle.pagina === 1">{{ t('admin.anterior') }}</button>
+                <span>{{ t('admin.pagina') }} {{ detalle.pagina }} {{ t('admin.de') }} {{ totalPaginas() }}</span>
                 <button type="button" (click)="abrirTabla(detalle.nombre, detalle.pagina + 1)"
-                        [disabled]="ocupado() || detalle.pagina >= totalPaginas()">Siguiente</button>
+                        [disabled]="ocupado() || detalle.pagina >= totalPaginas()">{{ t('admin.siguiente') }}</button>
               </div>
             }
           } @else if (tablaElegida() && ocupado()) {
-            <p role="status">Cargando filas…</p>
+            <p role="status">{{ t('admin.cargando_filas') }}</p>
           } @else if (!tablaElegida()) {
-            <p>Selecciona una tabla para consultar su estructura.</p>
+            <p>{{ t('admin.selecciona_una_tabla_para_consultar_su_estructura') }}</p>
           }
         </section>
       </div>
     }
   } @else {
     <section class="tarjeta acceso" aria-labelledby="titulo-estado">
-      <h1 id="titulo-estado">Administración</h1>
+      <h1 id="titulo-estado">{{ t('admin.administracion') }}</h1>
       @if (vista() === 'reiniciando') {
-        <p role="status">Reiniciando el backend…</p>
+        <p role="status">{{ t('admin.reiniciando_el_backend') }}</p>
       } @else if (vista() === 'cargando') {
-        <p role="status">Conectando con el backend…</p>
+        <p role="status">{{ t('admin.conectando_con_el_backend') }}</p>
       } @else {
         <p class="error" role="alert">{{ error() }}</p>
-        <button type="button" class="primario" (click)="cargar()">Volver a conectar</button>
+        <button type="button" class="primario" (click)="cargar()">{{ t('admin.volver_a_conectar') }}</button>
       }
     </section>
   }

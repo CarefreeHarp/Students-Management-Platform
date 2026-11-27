@@ -1,14 +1,14 @@
 <header class="entry-header">
-  <a class="auth-brand" href="/" aria-label="StudyFlow, inicio">
+  <a class="auth-brand" href="/" aria-label="{{ t('catalogo_planes.studyflow_inicio') }}">
     <img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="48" height="48" alt="">
     <span>StudyFlow</span>
   </a>
-  <button class="tema-boton" type="button" data-action="tema" aria-label="Cambiar entre modo claro y oscuro"><i class="bi" aria-hidden="true"></i></button>
+  <button class="tema-boton" type="button" data-action="tema" aria-label="{{ t('login.cambiar_entre_modo_claro_y_oscuro') }}"><i class="bi" aria-hidden="true"></i></button>
 </header>
 <main class="entry-main">
   <div class="entry-heading">
-    <h1 id="entry-title">Encuentra tu flow.</h1>
-    <p id="entry-description">Conócelo primero. Hazlo tuyo cuando quieras.</p>
+    <h1 id="entry-title">{{ t('login.encuentra_tu_flow') }}</h1>
+    <p id="entry-description">{{ t('login.conocelo_primero_hazlo_tuyo_cuando_quieras') }}</p>
   </div>
   <div id="entry-options" class="entry-options">
     <section class="entry-card entry-card--tour" aria-labelledby="tour-entry-title">
@@ -21,46 +21,46 @@
         <span class="entry-preview-task entry-preview-task--second"></span>
         <span class="entry-preview-task entry-preview-task--third"></span>
       </div>
-      <h2 id="tour-entry-title">Tour por la app</h2>
-      <p>Un espacio vacío para crear y probar, sin cuenta.</p>
-      <a id="sandbox-button" class="btn btn-primary entry-action" href="/sandbox">Comenzar tour <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      <small>Temporal. Nada de lo que pruebes se guarda.</small>
+      <h2 id="tour-entry-title">{{ t('login.tour_por_la_app') }}</h2>
+      <p>{{ t('login.un_espacio_vacio_para_crear_y_probar_sin') }}</p>
+      <a id="sandbox-button" class="btn btn-primary entry-action" href="/sandbox">{{ t('login.comenzar_tour') }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      <small>{{ t('login.temporal_nada_de_lo_que_pruebes_se_guarda') }}</small>
     </section>
     <section class="entry-card entry-card--account" aria-labelledby="account-entry-title">
       <span class="entry-account-icon" aria-hidden="true"><i class="bi bi-person-plus"></i></span>
-      <h2 id="account-entry-title">Tu propio espacio</h2>
-      <p>Organiza tus proyectos y empieza a trabajar con tu equipo.</p>
-      <a class="btn btn-secondary entry-action" href="/registro">Crear mi cuenta <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      <button id="show-signin" class="entry-signin-link" type="button" aria-controls="signin-panel" aria-expanded="false">Ya tengo mi cuenta</button>
+      <h2 id="account-entry-title">{{ t('login.tu_propio_espacio') }}</h2>
+      <p>{{ t('login.organiza_tus_proyectos_y_empieza_a_trabajar_con') }}</p>
+      <a class="btn btn-secondary entry-action" href="/registro">{{ t('catalogo_planes.crear_mi_cuenta') }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      <button id="show-signin" class="entry-signin-link" type="button" aria-controls="signin-panel" aria-expanded="false">{{ t('login.ya_tengo_mi_cuenta') }}</button>
     </section>
   </div>
   <section id="signin-panel" class="entry-signin" aria-labelledby="entry-title" hidden>
     <form id="password-form" method="post" class="cuadro-formulario auth-form" novalidate>
       <div class="form-field">
-        <label for="login-email">Correo o usuario</label>
+        <label for="login-email">{{ t('login.correo_o_usuario') }}</label>
         <span class="input-wrap">
           <i class="bi bi-envelope" aria-hidden="true"></i>
           <input id="login-email" name="username" type="text" inputmode="email" autocomplete="username"
-                 autocapitalize="none" spellcheck="false" placeholder="tu.correo@universidad.edu" required>
+                 autocapitalize="none" spellcheck="false" placeholder="{{ t('login.tu_correo_universidad_edu') }}" required>
         </span>
       </div>
       <div class="form-field">
-        <label for="login-password">Contraseña</label>
+        <label for="login-password">{{ t('admin.contrasena') }}</label>
         <span class="input-wrap">
           <i class="bi bi-lock" aria-hidden="true"></i>
-          <input id="login-password" name="contrasena" type="password" autocomplete="current-password" placeholder="Tu contraseña" required>
-          <button class="password-toggle" type="button" data-password-toggle="login-password" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+          <input id="login-password" name="contrasena" type="password" autocomplete="current-password" placeholder="{{ t('login.tu_contrasena') }}" required>
+          <button class="password-toggle" type="button" data-password-toggle="login-password" aria-label="{{ t('login.mostrar_contrasena') }}" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
         </span>
       </div>
       <p id="login-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
-      <button id="signin-submit" class="btn btn-primary entry-action" type="submit">Ingresar <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+      <button id="signin-submit" class="btn btn-primary entry-action" type="submit">{{ t('admin.ingresar') }} <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
       <div id="cuentas-demo" hidden>
-        <p>Cuentas de demostración</p>
-        <button type="button" class="btn btn-secondary entry-action" data-demo="0">Ingresar con Valentina</button>
-        <button type="button" class="btn btn-secondary entry-action" data-demo="1">Ingresar con Mateo</button>
+        <p>{{ t('login.cuentas_de_demostracion') }}</p>
+        <button type="button" class="btn btn-secondary entry-action" data-demo="0">{{ t('login.ingresar_con_valentina') }}</button>
+        <button type="button" class="btn btn-secondary entry-action" data-demo="1">{{ t('login.ingresar_con_mateo') }}</button>
       </div>
     </form>
-    <button id="hide-signin" class="entry-back" type="button"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver</button>
+    <button id="hide-signin" class="entry-back" type="button"><i class="bi bi-arrow-left" aria-hidden="true"></i> {{ t('login.volver') }}</button>
   </section>
 </main>
-<footer class="entry-footer"><a href="/">Volver al inicio</a></footer>
+<footer class="entry-footer"><a href="/">{{ t('catalogo_planes.volver_al_inicio') }}</a></footer>

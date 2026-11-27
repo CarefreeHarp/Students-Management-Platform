@@ -1,11 +1,11 @@
-<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('landing.saltar_al_contenido') }}</a>
 <div class="scene" aria-hidden="true">
   <div class="scene-glow"></div>
   <canvas id="flow-universe"></canvas>
   <div class="scene-vignette"></div>
 </div>
 <header class="landing-nav">
-  <a class="wordmark" href="/" aria-label="StudyFlow, inicio"
+  <a class="wordmark" href="/" aria-label="{{ t('catalogo_planes.studyflow_inicio') }}"
     ><img
       src="/assets/img/studyflow-isotipo.png"
       width="34"
@@ -13,59 +13,57 @@
       alt=""
     /><span>Study<span class="brand-accent">Flow</span></span></a
   >
-  <button class="landing-menu-toggle" type="button" aria-controls="landing-links" aria-expanded="false" aria-label="Abrir menú de navegación">
+  <button class="landing-menu-toggle" type="button" aria-controls="landing-links" aria-expanded="false" aria-label="{{ t('landing.abrir_menu_de_navegacion') }}">
     <i class="bi bi-list" aria-hidden="true"></i>
   </button>
-  <nav id="landing-links" aria-label="Navegación principal">
-    <a href="#tu-semana">Así funciona</a
-    ><a href="#por-que">Por qué StudyFlow</a><a href="/planes">Planes</a>
+  <nav id="landing-links" aria-label="{{ t('catalogo_planes.navegacion_principal') }}">
+    <a href="#tu-semana">{{ t('landing.asi_funciona') }}</a
+    ><a href="#por-que">{{ t('landing.por_que_studyflow') }}</a><a href="/planes">{{ t('landing.planes') }}</a>
   </nav>
   <a class="nav-enter" href="/login"
-    >Ingresa <span aria-hidden="true">↗</span></a
+    >{{ t('landing.ingresa') }} <span aria-hidden="true">↗</span></a
   >
 </header>
 <main id="contenido">
   <section class="hero chapter" data-scene="0" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="eyebrow">
-        <i class="bi bi-stars tiny-star" aria-hidden="true"></i> Para estudiantes
-        universitarios
+        <i class="bi bi-stars tiny-star" aria-hidden="true"></i> {{ t('landing.para_estudiantes_universitarios') }}
       </p>
       <h1 id="hero-title">
-        Tu vida universitaria.<br /><span>En un mismo lugar.</span>
+        {{ t('landing.tu_vida_universitaria') }}<br /><span>{{ t('landing.en_un_mismo_lugar') }}</span>
       </h1>
       <p class="hero-slogan">
-        Sencillo, rápido y presente en las aplicaciones que ya usas.
+        {{ t('landing.sencillo_rapido_y_presente_en_las_aplicaciones_que') }}
       </p>
       <p class="hero-description">
-        Dale espacio a lo que quieres aprender.<br />Tu horario, tus
-        proyectos y tus pendientes encuentran su lugar en StudyFlow.
+        {{ t('landing.dale_espacio_a_lo_que_quieres_aprender') }}<br />{{ t('landing.tu_horario_tus_proyectos_y_tus_pendientes_encuentran') }}
       </p>
       <div class="hero-actions">
         <a class="button button-primary" href="/registro"
-          >Empieza a organizarte <span aria-hidden="true">↗</span></a
+          >{{ t('landing.empieza_a_organizarte') }} <span aria-hidden="true">↗</span></a
         ><a class="button button-text" href="#tu-semana"
-          >Descubre cómo <span aria-hidden="true">↓</span></a
+          >{{ t('landing.descubre_como') }} <span aria-hidden="true">↓</span></a
         >
       </div>
     </div>
     <div class="hero-orbit" aria-hidden="true">
       <div class="floating-note note-one">
         <span class="note-icon">▦</span>
-        <div>Tu próxima clase<small>Cálculo · 10:00 a. m.</small></div>
+        <div>{{ t('landing.tu_proxima_clase') }}<small>{{ t('landing.calculo_10_00_a_m') }}</small></div>
       </div>
       <div class="floating-note note-two">
         <span class="note-icon cyan"><i class="bi bi-check" aria-hidden="true"></i></span>
         <div>
-          Un pendiente menos<small>Entrega lista para revisión</small>
+          {{ t('landing.un_pendiente_menos') }}<small>{{ t('landing.entrega_lista_para_revision') }}</small>
         </div>
       </div>
-      <div class="orbit-label label-bottom">TU SEMANA, EN TU ÓRBITA</div>
+      <div class="orbit-label label-bottom">{{ t('landing.tu_semana_en_tu_orbita') }}</div>
     </div>
     <div class="hero-bottom">
-      <span>Menos pendientes en tu cabeza. Más espacio para ti.</span
-      ><a href="#tu-semana" aria-label="Bajar a las funcionalidades"
-        >Explora a tu ritmo <span aria-hidden="true">↓</span></a
+      <span>{{ t('landing.menos_pendientes_en_tu_cabeza_mas_espacio_para') }}</span
+      ><a href="#tu-semana" aria-label="{{ t('landing.bajar_a_las_funcionalidades') }}"
+        >{{ t('landing.explora_a_tu_ritmo') }} <span aria-hidden="true">↓</span></a
       >
     </div>
   </section>
@@ -78,82 +76,81 @@
   >
     <div class="feature-copy">
       <p class="eyebrow">
-        <span class="section-number">01 /</span> Tu organización personal
+        <span class="section-number">01 /</span> {{ t('landing.tu_organizacion_personal') }}
       </p>
-      <h2 id="week-title">Hazle espacio<br />a tu <em>semana.</em></h2>
+      <h2 id="week-title">{{ t('catalogo_planes.hazle_espacio') }}<br />{{ t('landing.a_tu') }} <em>{{ t('landing.semana') }}</em></h2>
       <p>
-        Clases, actividades y fechas de entrega. Encuentra lo que viene en
-        una sola vista y decide por dónde empezar.
+        {{ t('landing.clases_actividades_y_fechas_de_entrega_encuentra_lo') }}
       </p>
       <ul class="feature-list">
-        <li>Construye tu horario y compara opciones.</li>
-        <li>Reúne tus tareas y fechas importantes.</li>
-        <li>Guarda lo que necesitas recordar después de clase.</li>
+        <li>{{ t('landing.construye_tu_horario_y_compara_opciones') }}</li>
+        <li>{{ t('landing.reune_tus_tareas_y_fechas_importantes') }}</li>
+        <li>{{ t('landing.guarda_lo_que_necesitas_recordar_despues_de_clase') }}</li>
       </ul>
       <a class="text-link" href="/horarios"
-        >Organiza tu horario <span aria-hidden="true">↗</span></a
+        >{{ t('landing.organiza_tu_horario') }} <span aria-hidden="true">↗</span></a
       >
     </div>
     <div class="product-visual calendar-visual" data-depth="1">
       <div class="window-bar">
         <span class="window-dots">● ● ●</span
-        ><span>Tu espacio · StudyFlow</span><i class="bi bi-stars" aria-hidden="true"></i>
+        ><span>{{ t('landing.tu_espacio_studyflow') }}</span><i class="bi bi-stars" aria-hidden="true"></i>
       </div>
       <div class="preview-body">
         <div class="preview-heading">
           <div>
-            <span class="mini-label">CADA COSA A SU TIEMPO</span>
-            <h3>Tu semana, más clara.</h3>
+            <span class="mini-label">{{ t('landing.cada_cosa_a_su_tiempo') }}</span>
+            <h3>{{ t('landing.tu_semana_mas_clara') }}</h3>
           </div>
-          <span class="soft-tag">Esta semana</span>
+          <span class="soft-tag">{{ t('landing.esta_semana') }}</span>
         </div>
         <div class="week-grid">
           <div class="week-day">
-            <div class="day">LUN<span>07</span></div>
+            <div class="day">{{ t('landing.lun') }}<span>07</span></div>
             <div class="class-block purple">
-              Cálculo<small>08:00 – 10:00</small>
+              {{ t('landing.calculo') }}<small>08:00 – 10:00</small>
             </div>
           </div>
           <div class="week-day">
-            <div class="day selected">MAR<span>08</span></div>
+            <div class="day selected">{{ t('landing.mar') }}<span>08</span></div>
             <div class="class-block cyan">
-              Diseño<small>09:00 – 11:00</small>
+              {{ t('entregables.diseno') }}<small>09:00 – 11:00</small>
             </div>
             <div class="class-block peach">
-              Proyecto<small>14:00 – 16:00</small>
+              {{ t('landing.proyecto') }}<small>14:00 – 16:00</small>
             </div>
           </div>
           <div class="week-day">
-            <div class="day">MIÉ<span>09</span></div>
+            <div class="day">{{ t('landing.mie') }}<span>09</span></div>
             <div class="class-block purple">
-              Cálculo<small>08:00 – 10:00</small>
+              {{ t('landing.calculo') }}<small>08:00 – 10:00</small>
             </div>
           </div>
           <div class="week-day">
-            <div class="day">JUE<span>10</span></div>
+            <div class="day">{{ t('landing.jue') }}<span>10</span></div>
             <div class="class-block cyan">
-              Diseño<small>09:00 – 11:00</small>
+              {{ t('entregables.diseno') }}<small>09:00 – 11:00</small>
             </div>
             <div class="class-block violet">
-              Física<small>14:00 – 16:00</small>
+              {{ t('landing.fisica') }}<small>14:00 – 16:00</small>
             </div>
           </div>
           <div class="week-day">
-            <div class="day">VIE<span>11</span></div>
+            <div class="day">{{ t('landing.vie') }}<span>11</span></div>
             <div class="class-block blank"></div>
             <div class="class-block peach">
-              Proyecto<small>14:00 – 16:00</small>
+              {{ t('landing.proyecto') }}<small>14:00 – 16:00</small>
             </div>
           </div>
         </div>
         <div class="preview-task">
           <span class="task-check"><i class="bi bi-check" aria-hidden="true"></i></span
-          ><span>Preparar la entrega de Diseño</span
-          ><span class="soft-tag">Hoy</span>
+          ><span>{{ t('landing.preparar_la_entrega_de_diseno') }}</span
+          ><span class="soft-tag">{{ t('landing.hoy') }}</span>
         </div>
       </div>
       <span class="visual-caption"
-        >Una vista de ejemplo de lo que puedes organizar.</span
+        >{{ t('landing.una_vista_de_ejemplo_de_lo_que_puedes') }}</span
       >
     </div>
   </section>
@@ -166,72 +163,70 @@
   >
     <div class="feature-copy">
       <p class="eyebrow">
-        <span class="section-number">02 /</span> Tu trabajo en equipo
+        <span class="section-number">02 /</span> {{ t('landing.tu_trabajo_en_equipo') }}
       </p>
       <h2 id="project-title">
-        Ten claro tu paso.<br />Y el <em>siguiente.</em>
+        {{ t('landing.ten_claro_tu_paso') }}<br />{{ t('landing.y_el') }} <em>{{ t('landing.siguiente') }}</em>
       </h2>
       <p>
-        Descubre qué te toca, para cuándo y cómo se conecta con el trabajo
-        de tu equipo. Avanza con el contexto a la mano.
+        {{ t('landing.descubre_que_te_toca_para_cuando_y_como') }}
       </p>
       <ul class="feature-list">
-        <li>Responsables, fases y dependencias visibles.</li>
-        <li>Conversaciones y archivos dentro de cada proyecto.</li>
-        <li>Entregables, versiones y progreso en un mismo espacio.</li>
+        <li>{{ t('landing.responsables_fases_y_dependencias_visibles') }}</li>
+        <li>{{ t('landing.conversaciones_y_archivos_dentro_de_cada_proyecto') }}</li>
+        <li>{{ t('landing.entregables_versiones_y_progreso_en_un_mismo_espacio') }}</li>
       </ul>
       <a class="text-link" href="/proyectos"
-        >Dale forma a tu proyecto <span aria-hidden="true">↗</span></a
+        >{{ t('landing.dale_forma_a_tu_proyecto') }} <span aria-hidden="true">↗</span></a
       >
     </div>
     <div class="product-visual project-visual" data-depth="2">
       <div class="window-bar">
-        <span class="window-dots">● ● ●</span><span>Proyecto de Diseño</span
+        <span class="window-dots">● ● ●</span><span>{{ t('landing.proyecto_de_diseno') }}</span
         ><span>↗</span>
       </div>
       <div class="preview-body">
         <div class="preview-heading">
           <div>
-            <span class="mini-label">DEL PRIMER PASO A LA ENTREGA</span>
-            <h3>Cada avance cuenta.</h3>
+            <span class="mini-label">{{ t('landing.del_primer_paso_a_la_entrega') }}</span>
+            <h3>{{ t('landing.cada_avance_cuenta') }}</h3>
           </div>
           <div class="avatars">
-            <span>V</span><span>D</span><span>Tú</span>
+            <span>{{ t('crear_proyecto.v') }}</span><span>{{ t('crear_proyecto.d') }}</span><span>{{ t('landing.tu') }}</span>
           </div>
         </div>
         <div class="phase-flow">
           <div class="phase-card done">
-            <span class="phase-status"><i class="bi bi-check" aria-hidden="true"></i> Terminada</span
-            ><strong>Investigar</strong><small>El punto de partida</small>
+            <span class="phase-status"><i class="bi bi-check" aria-hidden="true"></i> {{ t('fases.terminada') }}</span
+            ><strong>{{ t('landing.investigar') }}</strong><small>{{ t('landing.el_punto_de_partida') }}</small>
           </div>
           <span class="phase-arrow">→</span>
           <div class="phase-card current">
-            <span class="phase-status">◉ En proceso</span
-            ><strong>Prototipar</strong><small>Tu siguiente paso</small>
+            <span class="phase-status">{{ t('landing.en_proceso') }}</span
+            ><strong>{{ t('landing.prototipar') }}</strong><small>{{ t('landing.tu_siguiente_paso') }}</small>
           </div>
           <span class="phase-arrow">→</span>
           <div class="phase-card">
-            <span class="phase-status">○ Por empezar</span
-            ><strong>Validar</strong><small>Todo está conectado</small>
+            <span class="phase-status">{{ t('landing.por_empezar') }}</span
+            ><strong>{{ t('landing.validar') }}</strong><small>{{ t('landing.todo_esta_conectado') }}</small>
           </div>
         </div>
         <div class="project-message">
           <span class="note-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
           <div>
-            <strong>Ponte al día con IA</strong>
+            <strong>{{ t('landing.ponte_al_dia_con_ia') }}</strong>
             <p>
-              Consulta un resumen de los acuerdos y las decisiones del
-              canal.
+              {{ t('landing.consulta_un_resumen_de_los_acuerdos_y_las') }}
             </p>
           </div>
         </div>
         <div class="progress-line">
-          <span>Avance del proyecto</span><strong>60 %</strong>
+          <span>{{ t('landing.avance_del_proyecto') }}</span><strong>60 %</strong>
         </div>
         <div class="progress-track"><span></span></div>
       </div>
       <span class="visual-caption"
-        >Ejemplo ilustrativo de un proyecto y sus fases.</span
+        >{{ t('landing.ejemplo_ilustrativo_de_un_proyecto_y_sus_fases') }}</span
       >
     </div>
   </section>
@@ -244,22 +239,21 @@
   >
     <div class="feature-copy">
       <p class="eyebrow">
-        <span class="section-number">03 /</span> Presente en tu día
+        <span class="section-number">03 /</span> {{ t('landing.presente_en_tu_dia') }}
       </p>
       <h2 id="reminder-title">
-        Que no dependa<br />de tu <em>memoria.</em>
+        {{ t('landing.que_no_dependa') }}<br />{{ t('landing.de_tu') }} <em>{{ t('landing.memoria') }}</em>
       </h2>
       <p>
-        Configura cuándo quieres recordar una clase o una entrega. Y
-        conserva ese pendiente que apareció justo al terminar la clase.
+        {{ t('landing.configura_cuando_quieres_recordar_una_clase_o_una') }}
       </p>
       <ul class="feature-list">
-        <li>Recordatorios con la anticipación que elijas.</li>
-        <li>Apuntes de clase conectados con tus pendientes.</li>
-        <li>Integración configurable con WhatsApp.</li>
+        <li>{{ t('landing.recordatorios_con_la_anticipacion_que_elijas') }}</li>
+        <li>{{ t('landing.apuntes_de_clase_conectados_con_tus_pendientes') }}</li>
+        <li>{{ t('landing.integracion_configurable_con_whatsapp') }}</li>
       </ul>
       <a class="text-link" href="/recordatorios"
-        >Prepara tus recordatorios <span aria-hidden="true">↗</span></a
+        >{{ t('landing.prepara_tus_recordatorios') }} <span aria-hidden="true">↗</span></a
       >
     </div>
     <div class="reminder-visual" data-depth="3">
@@ -270,22 +264,21 @@
             width="30"
             height="30"
             alt=""
-          /><strong>StudyFlow</strong><span>Tu recordatorio</span>
+          /><strong>StudyFlow</strong><span>{{ t('landing.tu_recordatorio') }}</span>
         </div>
-        <h3>Tu entrega se acerca</h3>
+        <h3>{{ t('landing.tu_entrega_se_acerca') }}</h3>
         <p>
-          Revisar el prototipo de Diseño.<br />Un pequeño paso hoy, más
-          tranquilidad mañana.
+          {{ t('landing.revisar_el_prototipo_de_diseno') }}<br />{{ t('landing.un_pequeno_paso_hoy_mas_tranquilidad_manana') }}
         </p>
         <div class="notification-footer">
-          <span class="status-dot"></span> A tu ritmo. Con tiempo.
+          <span class="status-dot"></span> {{ t('landing.a_tu_ritmo_con_tiempo') }}
         </div>
       </div>
       <div class="reminder-note">
         <i class="bi bi-pencil" aria-hidden="true"></i>
         <div>
-          <strong>Antes de que se te olvide</strong>
-          <p>Guarda una idea, una tarea o un apunte después de clase.</p>
+          <strong>{{ t('landing.antes_de_que_se_te_olvide') }}</strong>
+          <p>{{ t('landing.guarda_una_idea_una_tarea_o_un_apunte') }}</p>
         </div>
       </div>
       <p class="integration-note"></p>
@@ -293,37 +286,33 @@
   </section>
 
   <section class="why-section" id="por-que" aria-labelledby="why-title">
-    <p class="eyebrow">Tres piezas. Una sola app.</p>
+    <p class="eyebrow">{{ t('landing.tres_piezas_una_sola_app') }}</p>
     <h2 id="why-title">
-      Menos saltos entre herramientas.<br /><em>Más claridad para ti.</em>
+      {{ t('landing.menos_saltos_entre_herramientas') }}<br /><em>{{ t('landing.mas_claridad_para_ti') }}</em>
     </h2>
     <p class="section-intro">
-      Tu vida académica tiene muchas partes. Organizarlas puede ser
-      sencillo.
+      {{ t('landing.tu_vida_academica_tiene_muchas_partes_organizarlas_puede') }}
     </p>
     <div class="benefit-grid">
       <article>
         <span class="benefit-icon">▦</span>
-        <h3>Más que una agenda</h3>
+        <h3>{{ t('landing.mas_que_una_agenda') }}</h3>
         <p>
-          Relaciona tu horario con tus tareas y tus proyectos. Ve tu vida
-          académica completa.
+          {{ t('landing.relaciona_tu_horario_con_tus_tareas_y_tus') }}
         </p>
       </article>
       <article>
         <span class="benefit-icon">↗</span>
-        <h3>Más contexto que un chat</h3>
+        <h3>{{ t('landing.mas_contexto_que_un_chat') }}</h3>
         <p>
-          Encuentra una conversación junto a su tarea, sus archivos y su
-          fecha de entrega.
+          {{ t('landing.encuentra_una_conversacion_junto_a_su_tarea_sus') }}
         </p>
       </article>
       <article>
         <i class="bi bi-stars benefit-icon" aria-hidden="true"></i>
-        <h3>Un inicio más sencillo</h3>
+        <h3>{{ t('landing.un_inicio_mas_sencillo') }}</h3>
         <p>
-          Apóyate en la IA para dar forma a un proyecto o resumir los
-          acuerdos de un canal.
+          {{ t('landing.apoyate_en_la_ia_para_dar_forma_a') }}
         </p>
       </article>
     </div>
@@ -331,54 +320,48 @@
 
   <section class="faq-section" aria-labelledby="faq-title">
     <div>
-      <p class="eyebrow">Sin darle tantas vueltas</p>
-      <h2 id="faq-title">Antes de<br /><em>empezar.</em></h2>
+      <p class="eyebrow">{{ t('landing.sin_darle_tantas_vueltas') }}</p>
+      <h2 id="faq-title">{{ t('landing.antes_de') }}<br /><em>{{ t('landing.empezar') }}</em></h2>
     </div>
     <div class="faq-list">
       <details>
         <summary>
-          ¿StudyFlow es para mí?<span aria-hidden="true">+</span>
+          {{ t('landing.studyflow_es_para_mi') }}<span aria-hidden="true">+</span>
         </summary>
         <p>
-          Si eres estudiante universitario y quieres organizar tus clases,
-          tus pendientes y tus trabajos grupales desde un mismo lugar,
-          StudyFlow está pensado para ti.
+          {{ t('landing.si_eres_estudiante_universitario_y_quieres_organizar_tus') }}
         </p>
       </details>
       <details>
         <summary>
-          ¿Puedo usarlo para organizarme por mi cuenta?<span
+          {{ t('landing.puedo_usarlo_para_organizarme_por_mi_cuenta') }}<span
             aria-hidden="true"
             >+</span
           >
         </summary>
         <p>
-          Sí. Puedes empezar por tu horario y tus recordatorios. Cuando
-          tengas un trabajo grupal, crea un proyecto y organiza sus tareas,
-          fases y entregables.
+          {{ t('landing.si_puedes_empezar_por_tu_horario_y_tus') }}
         </p>
       </details>
       <details>
         <summary>
-          ¿Cómo funcionan WhatsApp y la IA?<span aria-hidden="true">+</span>
+          {{ t('landing.como_funcionan_whatsapp_y_la_ia') }}<span aria-hidden="true">+</span>
         </summary>
         <p>
-          StudyFlow incluye la integración para enviar recordatorios por
-          WhatsApp y usar IA al organizar proyectos o resumir canales.
+          {{ t('landing.studyflow_incluye_la_integracion_para_enviar_recordatorios_por') }}
         </p>
       </details>
       <details>
         <summary>
-          ¿Cómo puedo conocer la aplicación?<span aria-hidden="true"
+          {{ t('landing.como_puedo_conocer_la_aplicacion') }}<span aria-hidden="true"
             >+</span
           >
         </summary>
         <p>
-          Entra a la pantalla de acceso y elige el recorrido guiado. También
-          puedes crear tu cuenta para empezar a organizar tu propio espacio.
+          {{ t('landing.entra_a_la_pantalla_de_acceso_y_elige') }}
         </p>
         <a class="text-link" href="/login"
-          >Ir al acceso <span aria-hidden="true">↗</span></a
+          >{{ t('landing.ir_al_acceso') }} <span aria-hidden="true">↗</span></a
         >
       </details>
     </div>
@@ -395,20 +378,20 @@
       width="64"
       height="64"
     />
-    <p class="eyebrow">Para estudiantes universitarios</p>
+    <p class="eyebrow">{{ t('landing.para_estudiantes_universitarios') }}</p>
     <h2 id="closing-title">
-      Tu próximo paso,<br /><em>un poco más claro.</em>
+      {{ t('landing.tu_proximo_paso') }}<br /><em>{{ t('landing.un_poco_mas_claro') }}</em>
     </h2>
-    <p>Sencillo, rápido y presente en las aplicaciones que ya usas.</p>
+    <p>{{ t('landing.sencillo_rapido_y_presente_en_las_aplicaciones_que') }}</p>
     <a class="button button-primary" href="/sandbox"
-      >Encuentra tu flow <span aria-hidden="true">↗</span></a
-    ><a class="closing-login" href="/login?acceso=cuenta">Ya tengo mi cuenta →</a>
+      >{{ t('landing.encuentra_tu_flow') }} <span aria-hidden="true">↗</span></a
+    ><a class="closing-login" href="/login?acceso=cuenta">{{ t('landing.ya_tengo_mi_cuenta') }}</a>
   </section>
 </main>
 <footer class="site-footer">
   <div class="footer-main">
     <div class="footer-brand">
-      <a class="wordmark" href="/" aria-label="StudyFlow, inicio"
+      <a class="wordmark" href="/" aria-label="{{ t('catalogo_planes.studyflow_inicio') }}"
         ><img
           src="/assets/img/studyflow-isotipo.png"
           width="46"
@@ -416,44 +399,44 @@
           alt=""
         /><span>Study<span class="brand-accent">Flow</span></span></a
       >
-      <p>Tu vida académica tiene su espacio.<br />Hazlo tuyo.</p>
-      <div class="social-links" aria-label="Redes sociales">
+      <p>{{ t('landing.tu_vida_academica_tiene_su_espacio') }}<br />{{ t('landing.hazlo_tuyo') }}</p>
+      <div class="social-links" aria-label="{{ t('landing.redes_sociales') }}">
         <a
-          href="https://www.youtube.com/"
+          href="https://youtu.be/12Ek_AdYR80?si=nglOUm1p30ZgOatX"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="YouTube, página principal (abre en otra pestaña)"
+          aria-label="{{ t('landing.video_studyflow') }}"
           ><i class="bi bi-youtube" aria-hidden="true"></i
-          ><span>YouTube</span><span aria-hidden="true">↗</span></a
+          ><span>{{ t('landing.youtube') }}</span><span aria-hidden="true">↗</span></a
         >
         <a
           href="https://www.instagram.com/"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Instagram, página principal (abre en otra pestaña)"
+          aria-label="{{ t('landing.instagram_pagina_principal_abre_en_otra_pestana') }}"
           ><i class="bi bi-instagram" aria-hidden="true"></i
-          ><span>Instagram</span><span aria-hidden="true">↗</span></a
+          ><span>{{ t('landing.instagram') }}</span><span aria-hidden="true">↗</span></a
         >
       </div>
     </div>
-    <nav class="footer-column" aria-label="Explorar StudyFlow">
-      <h3>Encuentra tu flow</h3>
-      <a href="#tu-semana">Tu organización</a>
-      <a href="#tus-proyectos">Tus proyectos</a>
-      <a href="#tus-recordatorios">Tus recordatorios</a>
-      <a href="#por-que">Por qué StudyFlow</a>
+    <nav class="footer-column" aria-label="{{ t('landing.explorar_studyflow') }}">
+      <h3>{{ t('landing.encuentra_tu_flow') }}</h3>
+      <a href="#tu-semana">{{ t('landing.tu_organizacion') }}</a>
+      <a href="#tus-proyectos">{{ t('landing.tus_proyectos') }}</a>
+      <a href="#tus-recordatorios">{{ t('landing.tus_recordatorios') }}</a>
+      <a href="#por-que">{{ t('landing.por_que_studyflow') }}</a>
     </nav>
-    <nav class="footer-column" aria-label="Tu espacio en StudyFlow">
-      <h3>Tu próximo paso</h3>
-      <a href="/registro">Crea tu cuenta ↗</a>
-      <a href="/login?acceso=cuenta">Entra a tu espacio ↗</a>
-      <p>Para estudiantes<br />universitarios.</p>
+    <nav class="footer-column" aria-label="{{ t('landing.tu_espacio_en_studyflow') }}">
+      <h3>{{ t('landing.tu_proximo_paso_2') }}</h3>
+      <a href="/registro">{{ t('landing.crea_tu_cuenta') }}</a>
+      <a href="/login?acceso=cuenta">{{ t('landing.entra_a_tu_espacio') }}</a>
+      <p>{{ t('landing.para_estudiantes') }}<br />{{ t('landing.universitarios') }}</p>
     </nav>
   </div>
   <div class="footer-bottom">
-    <span>© StudyFlow · Una sola app para tu vida académica.</span
+    <span>{{ t('landing.studyflow_una_sola_app_para_tu_vida_academica') }}</span
     ><a href="#contenido"
-      >Volver arriba <span aria-hidden="true">↑</span></a
+      >{{ t('landing.volver_arriba') }} <span aria-hidden="true">↑</span></a
     >
   </div>
 </footer>
@@ -461,8 +444,8 @@
   class="motion-toggle"
   type="button"
   aria-pressed="false"
-  aria-label="Pausar animación"
+  aria-label="{{ t('landing.pausar_animacion') }}"
 >
   <span aria-hidden="true">Ⅱ</span
-  ><span class="motion-label">Pausar movimiento</span>
+  ><span class="motion-label">{{ t('landing.pausar_movimiento') }}</span>
 </button>

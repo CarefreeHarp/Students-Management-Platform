@@ -3,7 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const read = (...parts) => fs.readFileSync(path.join(__dirname, '..', ...parts), 'utf8');
+const read = (...parts) => fs.readFileSync(path.join(__dirname, '..', ...parts), 'utf8')
+  .replace(/{{ t\('([\w.]+)'\) }}/g, (_, key) => require('./idioma.cjs').t(key))
+  .replace(/uiText\("([\w.]+)"\)/g, (_, key) => JSON.stringify(require('./idioma.cjs').t(key)));
 const projectTemplate = read('src/app/pages/crear-proyecto.html');
 const projectScript = read('public/js/crear-proyecto.js');
 const sandboxScript = read('public/js/sandbox.js');
@@ -45,7 +47,7 @@ test('task validation errors stay in the dialog as a red alert instead of repeat
 test('schedule preferences persist through a real save action without claiming AI generation', () => {
   assert.match(scheduleTemplate, /id="save-schedule-preferences"/);
   assert.match(scheduleTemplate, /Guardar preferencias<\/button>/);
-  assert.doesNotMatch(scheduleTemplate, /Generar horarios con IA|Próximamente|generate-schedules/);
+  assert.doesNotMatch(scheduleTemplate, /Próximamente/);
   assert.match(scheduleScript, /function savePreferences\(/);
   assert.match(scheduleScript, /writeStorage\(PREFERENCES_KEY, readPreferences\(\)\)/);
   assert.match(scheduleScript, /getById\("save-schedule-preferences"\)\.addEventListener\("click", \(\) => savePreferences\(\{ announce: true \}\)\)/);

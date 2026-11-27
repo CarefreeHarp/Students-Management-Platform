@@ -1,5 +1,5 @@
 /* Ephemeral API: deliberately no fetch, IndexedDB, cookies or browser storage. */
-export default function createSandboxStore(initialTheme='oscuro') {
+export default function createSandboxStore(initialTheme='oscuro', uiText) {
     let sequence = 0;
     const id = () => ++sequence;
     const copy = value => JSON.parse(JSON.stringify(value));
@@ -17,8 +17,8 @@ export default function createSandboxStore(initialTheme='oscuro') {
     local.setItem('studyflow_user',JSON.stringify({firstName:'Visitante',lastName:'',name:'Visitante',email:'',university:'',career:'',semester:'',description:'',avatar:''}));
     local.setItem('studyflow_projects','[]'); local.setItem('studyflow.schedule.subjects.v2','[]');
     const fail = (message, status=400, field=null) => {throw Object.assign(new Error(message),{status,field});};
-    const findProject = code => data.projects.find(p=>p.codigo===code) || fail('Proyecto no encontrado',404);
-    const findTask = taskId => data.projects.flatMap(p=>p.tareas).find(t=>t.id===Number(taskId)) || fail('Tarea no encontrada',404);
+    const findProject = code => data.projects.find(p=>p.codigo===code) || fail(uiText("sandbox_store.proyecto_no_encontrado"),404);
+    const findTask = taskId => data.projects.flatMap(p=>p.tareas).find(t=>t.id===Number(taskId)) || fail(uiText("sandbox_store.tarea_no_encontrada"),404);
     const projectOf = task => data.projects.find(p=>p.tareas.includes(task));
     const labels = {'sin-empezar':'Sin empezar','en-proceso':'En proceso','en-revision':'En revisión',terminada:'Terminada'};
     const normalizeState = value => ({pending:'sin-empezar',progress:'en-proceso',done:'terminada','in-progress':'en-proceso','in-review':'en-revision',completed:'terminada'}[value] || (labels[value] ? value : 'sin-empezar'));
@@ -32,23 +32,23 @@ export default function createSandboxStore(initialTheme='oscuro') {
     }
     function phaseId(project,name) {return ensurePhaseIds(project)[phaseKey(name)];}
     function updatePhases(project,body) {
-      if(!Array.isArray(body.fases)||!body.fases.length) fail('El proyecto debe conservar al menos una fase');
-      if(!Number.isInteger(body.etapaActualIndice)||body.etapaActualIndice<0||body.etapaActualIndice>=body.fases.length) fail('Elige una fase predeterminada válida para las tareas nuevas');
+      if(!Array.isArray(body.fases)||!body.fases.length) fail(uiText("sandbox_store.el_proyecto_debe_conservar_al_menos_una_fase"));
+      if(!Number.isInteger(body.etapaActualIndice)||body.etapaActualIndice<0||body.etapaActualIndice>=body.fases.length) fail(uiText("sandbox_store.elige_una_fase_predeterminada_valida_para_las_tareas"));
       const ids=ensurePhaseIds(project),existing=new Map(project.etapas.map(name=>[Number(ids[phaseKey(name)]),name]));
       const requestedIds=new Set(),names=new Set(),plan=[];
       body.fases.forEach(entry=>{
         const nombre=String(entry?.nombre||'').trim();
-        if(!nombre) fail('Cada fase necesita un nombre');
-        if(nombre.length>60) fail('El nombre de una fase no puede superar 60 caracteres');
-        const clave=phaseKey(nombre);if(names.has(clave)) fail('No puede haber dos fases con el mismo nombre');names.add(clave);
+        if(!nombre) fail(uiText("sandbox_store.cada_fase_necesita_un_nombre"));
+        if(nombre.length>60) fail(uiText("sandbox_store.el_nombre_de_una_fase_no_puede_superar"));
+        const clave=phaseKey(nombre);if(names.has(clave)) fail(uiText("sandbox_store.no_puede_haber_dos_fases_con_el_mismo"));names.add(clave);
         const phase=entry?.id==null?null:Number(entry.id);
-        if(phase!=null&&(!Number.isInteger(phase)||!existing.has(phase))) fail('La fase que intentas editar no pertenece a este proyecto');
-        if(phase!=null&&requestedIds.has(phase)) fail('Una fase solo puede aparecer una vez en el orden');
+        if(phase!=null&&(!Number.isInteger(phase)||!existing.has(phase))) fail(uiText("sandbox_store.la_fase_que_intentas_editar_no_pertenece_a"));
+        if(phase!=null&&requestedIds.has(phase)) fail(uiText("sandbox_store.una_fase_solo_puede_aparecer_una_vez_en"));
         if(phase!=null) requestedIds.add(phase);
         plan.push({id:phase,nombre});
       });
       const removed=project.etapas.filter(name=>!requestedIds.has(Number(ids[phaseKey(name)])));
-      removed.forEach(name=>{const count=project.tareas.filter(task=>phaseKey(task.etapa)===phaseKey(name)).length;if(count) fail(`No puedes eliminar la fase «${name}» porque tiene ${count} ${count===1?'tarea':'tareas'}. Mueve esas tareas a otra fase antes de guardarla.`);});
+      removed.forEach(name=>{const count=project.tareas.filter(task=>phaseKey(task.etapa)===phaseKey(name)).length;if(count) fail((uiText("sandbox_store.no_puedes_eliminar_la_fase_0_porque_tiene", {0: name, 1: count, 2: count===1?'tarea':'tareas'})));});
       plan.forEach(item=>{
         if(item.id==null) item.id=id();
         const previous=existing.get(item.id);
@@ -69,14 +69,14 @@ export default function createSandboxStore(initialTheme='oscuro') {
         fail(`La fecha límite de la tarea no puede ser posterior a la fecha de entrega del proyecto (${entrega}).`);
       }
     }
-    function task(body, project) {if(!body.titulo?.trim()) fail('Escribe un título para la tarea');const etapa=body.etapa||project.etapaActual;if(!project.etapas.includes(etapa)) fail('La etapa elegida no pertenece a este proyecto');validarFechaContraEntrega(project,body.fechaLimite);const estado=normalizeState(body.estado);return {id:id(),codigo:'t-'+sequence,titulo:body.titulo.trim(),descripcion:body.descripcion||'',responsable:body.responsable==='Tú'?'Visitante':body.responsable||null,colorResponsable:'#8b75d7',etapa,fechaLimite:body.fechaLimite||null,horaLimite:body.horaLimite||null,estado,estadoEtiqueta:labels[estado],generadaPorIa:false,resultadoTexto:null,archivoResultadoNombre:null,archivoResultadoUrl:null,tieneResultado:false,dependencias:[]};}
+    function task(body, project) {if(!body.titulo?.trim()) fail(uiText("sandbox_store.escribe_un_titulo_para_la_tarea"));const etapa=body.etapa||project.etapaActual;if(!project.etapas.includes(etapa)) fail(uiText("sandbox_store.la_etapa_elegida_no_pertenece_a_este_proyecto"));validarFechaContraEntrega(project,body.fechaLimite);const estado=normalizeState(body.estado);return {id:id(),codigo:'t-'+sequence,titulo:body.titulo.trim(),descripcion:body.descripcion||'',responsable:body.responsable==='Tú'?'Visitante':body.responsable||null,colorResponsable:'#8b75d7',etapa,fechaLimite:body.fechaLimite||null,horaLimite:body.horaLimite||null,estado,estadoEtiqueta:labels[estado],generadaPorIa:false,resultadoTexto:null,archivoResultadoNombre:null,archivoResultadoUrl:null,tieneResultado:false,dependencias:[]};}
     function projectDTO(project) {project.progreso=project.tareas.length?Math.round(project.tareas.filter(done).length/project.tareas.length*100):0;return project;}
-    function channel(project,body) {if(!body.nombre?.trim()) fail('Escribe un nombre para el canal');const general=body.tipo==='general';const c={id:id(),nombre:body.nombre.trim(),slug:general?'general':'canal-'+sequence,tipo:body.tipo||'tema',descripcion:body.descripcion||'',proyectoCodigo:project.codigo,proyectoNombre:project.nombre,color:project.color,totalMensajes:0,totalArchivos:0,ultimaActividad:null,borrable:!general,mensajes:[],archivos:[],resumenes:[],ultimoResumen:null};data.channels.push(c);return c;}
+    function channel(project,body) {if(!body.nombre?.trim()) fail(uiText("sandbox_store.escribe_un_nombre_para_el_canal"));const general=body.tipo==='general';const c={id:id(),nombre:body.nombre.trim(),slug:general?'general':'canal-'+sequence,tipo:body.tipo||'tema',descripcion:body.descripcion||'',proyectoCodigo:project.codigo,proyectoNombre:project.nombre,color:project.color,totalMensajes:0,totalArchivos:0,ultimaActividad:null,borrable:!general,mensajes:[],archivos:[],resumenes:[],ultimoResumen:null};data.channels.push(c);return c;}
     const marcasResumen=['quedamos','acordamos','hagamos','me encargo','yo hago','listo','entrega','fecha','pendiente','falta','necesito','revisar','?'];
     const resumirTexto = (texto, maximo=140) => {const limpio=String(texto||'').replace(/\s+/g,' ').trim();return limpio.length>maximo?`${limpio.slice(0,maximo)}…`:limpio;};
     function resumenLocal(canal) {
       const mensajes=canal.mensajes||[];
-      if(!mensajes.length) fail('El canal aún no tiene mensajes que resumir.');
+      if(!mensajes.length) fail(uiText("sandbox_store.el_canal_aun_no_tiene_mensajes_que_resumir"));
       const relevantes=mensajes.filter(mensaje=>marcasResumen.some(marca=>mensaje.contenido.toLocaleLowerCase('es').includes(marca)));
       const seleccion=(relevantes.length?relevantes:mensajes).slice(0,5);
       const participantes=[...new Set(mensajes.map(mensaje=>mensaje.autorNombre).filter(Boolean))].slice(0,4);
@@ -113,7 +113,7 @@ export default function createSandboxStore(initialTheme='oscuro') {
     async function request(path, options={}) {
       try {
         const url=new URL(path,'http://sandbox.local'), parts=url.pathname.split('/').filter(Boolean), method=(options.method||'GET').toUpperCase();
-        if(url.origin!=='http://sandbox.local'||!allowedRoutes.some(([methods,route])=>methods.split('|').includes(method)&&route.test(url.pathname))) fail('Esta acción no está disponible en la prueba.',404);
+        if(url.origin!=='http://sandbox.local'||!allowedRoutes.some(([methods,route])=>methods.split('|').includes(method)&&route.test(url.pathname))) fail(uiText("sandbox_store.esta_accion_no_esta_disponible_en_la_prueba"),404);
         const body=typeof options.body==='string'?JSON.parse(options.body):options.body||{};
         let result;
         if(url.pathname==='/api/sesion/actual') result={iniciada:true,usuario:copy(user),cuentaDemostracion:''};
@@ -122,17 +122,17 @@ export default function createSandboxStore(initialTheme='oscuro') {
         else if(url.pathname==='/api/materias') result=[];
         else if(parts[1]==='apuntes') {
           if(parts.length===2&&method==='GET') result=data.notes;
-          else if(parts.length===2&&method==='POST') {if(!body.titulo?.trim()) fail('Escribe un título');result={...body,id:id(),resuelto:false,fechaCreacion:now()};data.notes.push(result);}
-          else {const note=data.notes.find(n=>n.id===Number(parts[2]))||fail('Pendiente no encontrado',404);if(method==='DELETE') {data.notes=data.notes.filter(n=>n!==note);result=null;}else {note.resuelto=body.resuelto!==false;result=note;}}
+          else if(parts.length===2&&method==='POST') {if(!body.titulo?.trim()) fail(uiText("sandbox_store.escribe_un_titulo"));result={...body,id:id(),resuelto:false,fechaCreacion:now()};data.notes.push(result);}
+          else {const note=data.notes.find(n=>n.id===Number(parts[2]))||fail(uiText("sandbox_store.pendiente_no_encontrado"),404);if(method==='DELETE') {data.notes=data.notes.filter(n=>n!==note);result=null;}else {note.resuelto=body.resuelto!==false;result=note;}}
         }
-        else if(parts[1]==='organizador') {if(method==='GET') result={disponible:false,configurado:false};else fail('La IA no está conectada en la prueba. Crea las tareas manualmente.',503);}
+        else if(parts[1]==='organizador') {if(method==='GET') result={disponible:false,configurado:false};else fail(uiText("sandbox_store.la_ia_no_esta_conectada_en_la_prueba"),503);}
         else if(parts[1]==='proyectos') {
           if(parts.length===2) {
             if(method==='POST') {
-              if(!body.nombre?.trim()) fail('Escribe un nombre para el proyecto');
-              if(!body.descripcion?.trim()) fail('Describe el objetivo del proyecto');
-              if(!body.fechaEntrega) fail('Indica la fecha de entrega',400,'fechaEntrega');const fechaEntrega=new Date(`${body.fechaEntrega}T00:00:00`),hoy=new Date();hoy.setHours(0,0,0,0);if(Number.isNaN(fechaEntrega.getTime())||fechaEntrega<=hoy) fail('La fecha de entrega debe ser posterior a la fecha actual.',400,'fechaEntrega');
-              if(!['asignado','libre'].includes(body.modoReparto)) fail('Elige cómo se repartirán las tareas',400,'modoReparto');
+              if(!body.nombre?.trim()) fail(uiText("sandbox_store.escribe_un_nombre_para_el_proyecto"));
+              if(!body.descripcion?.trim()) fail(uiText("sandbox_store.describe_el_objetivo_del_proyecto"));
+              if(!body.fechaEntrega) fail(uiText("sandbox_store.indica_la_fecha_de_entrega"),400,'fechaEntrega');const fechaEntrega=new Date(`${body.fechaEntrega}T00:00:00`),hoy=new Date();hoy.setHours(0,0,0,0);if(Number.isNaN(fechaEntrega.getTime())||fechaEntrega<=hoy) fail(uiText("sandbox_store.la_fecha_de_entrega_debe_ser_posterior_a"),400,'fechaEntrega');
+              if(!['asignado','libre'].includes(body.modoReparto)) fail(uiText("sandbox_store.elige_como_se_repartiran_las_tareas"),400,'modoReparto');
               const etapas=(body.etapas||[]).reduce((lista,entrada)=>{const nombre=String(entrada||'').trim();return nombre&&!lista.some(item=>item.toLocaleLowerCase('es')===nombre.toLocaleLowerCase('es'))?[...lista,nombre]:lista;},[])||[];
               if(!etapas.length) etapas.push('Planeación');
               const etapaActual=etapas[0];
@@ -147,55 +147,55 @@ export default function createSandboxStore(initialTheme='oscuro') {
             else if(parts[3]==='tareas'&&method==='POST') {result=task(body,project);project.tareas.push(result);}
             else if(parts[3]==='tareas') result=project.tareas;
             else if(parts[3]==='integrantes') {if(method!=='GET') project.integrantes=body.map(m=>({...m,id:m.id||id(),iniciales:m.nombre.slice(0,2),color:m.color||'#8b75d7',rol:'integrante'}));result=project.integrantes;}
-            else if(parts[3]==='reparto'&&method==='PATCH') {if(!['asignado','libre'].includes(body.modoReparto)) fail('Elige un modo de reparto');project.modoReparto=body.modoReparto;result=projectDTO(project);}
+            else if(parts[3]==='reparto'&&method==='PATCH') {if(!['asignado','libre'].includes(body.modoReparto)) fail(uiText("sandbox_store.elige_un_modo_de_reparto"));project.modoReparto=body.modoReparto;result=projectDTO(project);}
             else if(parts[3]==='fases') result=method==='PUT'?updatePhases(project,body):graph(project);
             else if(parts[3]==='archivos') result=data.channels.filter(c=>c.proyectoCodigo===project.codigo).flatMap(c=>c.archivos);
             else if(parts[3]==='canales') result=method==='POST'?channel(project,body):data.channels.filter(c=>c.proyectoCodigo===project.codigo);
             else if(parts[3]==='entregables') {
-              if(method==='POST') {if(!body.nombre?.trim()||!/^https?:\/\//i.test(body.url||''))fail('Escribe un nombre y un enlace válido');result=formatDeliverable({...body,id:id(),proyectoCodigo:project.codigo,colorResponsable:'#8b75d7',tarea:null,fechaRegistro:dateLabel(now())});data.deliverables.push(result);}
+              if(method==='POST') {if(!body.nombre?.trim()||!/^https?:\/\//i.test(body.url||''))fail(uiText("sandbox_store.escribe_un_nombre_y_un_enlace_valido"));result=formatDeliverable({...body,id:id(),proyectoCodigo:project.codigo,colorResponsable:'#8b75d7',tarea:null,fechaRegistro:dateLabel(now())});data.deliverables.push(result);}
               else result=data.deliverables.filter(d=>d.proyectoCodigo===project.codigo);
-            } else fail('Acción no disponible en la prueba',404);
+            } else fail(uiText("sandbox_store.accion_no_disponible_en_la_prueba"),404);
           }
         } else if(parts[1]==='tareas') {
           const t=findTask(parts[2]), project=projectOf(t);
           if(parts[3]==='dependencias') {
             if(method==='DELETE') t.dependencias=t.dependencias.filter(d=>d!==Number(parts[4]));
-            else {const dependency=findTask(body.dependeDe);if(projectOf(dependency)!==project) fail('La dependencia pertenece a otro proyecto');const fechaTarea=t.fechaLimite&&new Date(`${t.fechaLimite}T00:00:00`),fechaDependencia=dependency.fechaLimite&&new Date(`${dependency.fechaLimite}T00:00:00`);if(fechaTarea&&fechaDependencia&&fechaDependencia>fechaTarea) fail(`Verifica las fechas: «${dependency.titulo}» vence el ${dependency.fechaLimite}, después de «${t.titulo}» (${t.fechaLimite}). Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);const reaches=(node,target,seen=new Set())=>node.id===target||(!seen.has(node.id)&&(seen.add(node.id),node.dependencias.some(d=>reaches(findTask(d),target,seen))));if(reaches(dependency,t.id)) fail('Esta dependencia crearía un ciclo');if(!t.dependencias.includes(dependency.id)) t.dependencias.push(dependency.id);}
-          } else if(parts[3]==='reclamar') {if(project.modoReparto!=='libre'||t.responsable||blocked(t).length||done(t)) fail('Esta tarea no está disponible');t.responsable='Visitante';if(t.estado==='sin-empezar'){t.estado='en-proceso';t.estadoEtiqueta=labels[t.estado];}}
-          else if(parts[3]==='liberar') {if(project.modoReparto!=='libre') fail('El proyecto usa tareas asignadas');t.responsable=null;t.estado='sin-empezar';t.estadoEtiqueta=labels[t.estado];}
-          else if(parts[3]==='completar') {const resultado=String(body.get?.('resultado')||'').trim(),archivo=body.get?.('archivo');if(!resultado&&!archivo&&!t.tieneResultado) fail('Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.');if(resultado)t.resultadoTexto=resultado;if(archivo){t.archivoResultadoNombre=archivo.name;t.archivoResultadoUrl=URL.createObjectURL(archivo);data.urls.push(t.archivoResultadoUrl);}t.tieneResultado=true;t.estado='terminada';t.estadoEtiqueta=labels[t.estado];}
-          else if(parts[3]==='estado') {const siguiente=normalizeState(body.estado);if(siguiente==='terminada'&&!t.tieneResultado) fail('Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.');t.estado=siguiente;t.estadoEtiqueta=labels[t.estado];}
-          else if(method==='PUT') {if(!body.titulo?.trim()) fail('Escribe un título para la tarea');if('etapa'in body&&!project.etapas.includes(body.etapa)) fail('La etapa elegida no pertenece a este proyecto');if(body.responsable&&!project.integrantes.some(i=>i.nombre===body.responsable)) fail('El responsable elegido no pertenece al proyecto.');const fechaNueva=body.fechaLimite??t.fechaLimite;validarFechaContraEntrega(project,fechaNueva);const fechaNuevaDate=fechaNueva&&new Date(`${fechaNueva}T00:00:00`),dependenciaTardia=t.dependencias.map(findTask).find(d=>fechaNuevaDate&&d.fechaLimite&&new Date(`${d.fechaLimite}T00:00:00`)>fechaNuevaDate),tareaQueEspera=project.tareas.find(otra=>otra.dependencias.includes(t.id)&&fechaNuevaDate&&otra.fechaLimite&&fechaNuevaDate>new Date(`${otra.fechaLimite}T00:00:00`));if(dependenciaTardia) fail(`Verifica las fechas: «${dependenciaTardia.titulo}» vence después de esta tarea. Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);if(tareaQueEspera) fail(`Verifica las fechas: «${tareaQueEspera.titulo}» espera a esta tarea y vence antes. Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);['titulo','descripcion','responsable','etapa','fechaLimite','horaLimite'].forEach(key=>{if(key in body)t[key]=body[key];});const siguiente=normalizeState(body.estado||t.estado);if(siguiente==='terminada'&&!t.tieneResultado) fail('Para terminar una tarea debes registrar un resultado escrito o adjuntar un archivo.');t.estado=siguiente;t.estadoEtiqueta=labels[t.estado];}
+            else {const dependency=findTask(body.dependeDe);if(projectOf(dependency)!==project) fail(uiText("sandbox_store.la_dependencia_pertenece_a_otro_proyecto"));const fechaTarea=t.fechaLimite&&new Date(`${t.fechaLimite}T00:00:00`),fechaDependencia=dependency.fechaLimite&&new Date(`${dependency.fechaLimite}T00:00:00`);if(fechaTarea&&fechaDependencia&&fechaDependencia>fechaTarea) fail(`Verifica las fechas: «${dependency.titulo}» vence el ${dependency.fechaLimite}, después de «${t.titulo}» (${t.fechaLimite}). Una dependencia debe vencer antes o el mismo día que la tarea que espera.`);const reaches=(node,target,seen=new Set())=>node.id===target||(!seen.has(node.id)&&(seen.add(node.id),node.dependencias.some(d=>reaches(findTask(d),target,seen))));if(reaches(dependency,t.id)) fail(uiText("sandbox_store.esta_dependencia_crearia_un_ciclo"));if(!t.dependencias.includes(dependency.id)) t.dependencias.push(dependency.id);}
+          } else if(parts[3]==='reclamar') {if(project.modoReparto!=='libre'||t.responsable||blocked(t).length||done(t)) fail(uiText("sandbox_store.esta_tarea_no_esta_disponible"));t.responsable='Visitante';if(t.estado==='sin-empezar'){t.estado='en-proceso';t.estadoEtiqueta=labels[t.estado];}}
+          else if(parts[3]==='liberar') {if(project.modoReparto!=='libre') fail(uiText("sandbox_store.el_proyecto_usa_tareas_asignadas"));t.responsable=null;t.estado='sin-empezar';t.estadoEtiqueta=labels[t.estado];}
+          else if(parts[3]==='completar') {const resultado=String(body.get?.('resultado')||'').trim(),archivo=body.get?.('archivo');if(!resultado&&!archivo&&!t.tieneResultado) fail(uiText("sandbox_store.para_terminar_una_tarea_debes_registrar_un_resultado"));if(resultado)t.resultadoTexto=resultado;if(archivo){t.archivoResultadoNombre=archivo.name;t.archivoResultadoUrl=URL.createObjectURL(archivo);data.urls.push(t.archivoResultadoUrl);}t.tieneResultado=true;t.estado='terminada';t.estadoEtiqueta=labels[t.estado];}
+          else if(parts[3]==='estado') {const siguiente=normalizeState(body.estado);if(siguiente==='terminada'&&!t.tieneResultado) fail(uiText("sandbox_store.para_terminar_una_tarea_debes_registrar_un_resultado"));t.estado=siguiente;t.estadoEtiqueta=labels[t.estado];}
+          else if(method==='PUT') {if(!body.titulo?.trim()) fail(uiText("sandbox_store.escribe_un_titulo_para_la_tarea"));if('etapa'in body&&!project.etapas.includes(body.etapa)) fail(uiText("sandbox_store.la_etapa_elegida_no_pertenece_a_este_proyecto"));if(body.responsable&&!project.integrantes.some(i=>i.nombre===body.responsable)) fail(uiText("sandbox_store.el_responsable_elegido_no_pertenece_al_proyecto"));const fechaNueva=body.fechaLimite??t.fechaLimite;validarFechaContraEntrega(project,fechaNueva);const fechaNuevaDate=fechaNueva&&new Date(`${fechaNueva}T00:00:00`),dependenciaTardia=t.dependencias.map(findTask).find(d=>fechaNuevaDate&&d.fechaLimite&&new Date(`${d.fechaLimite}T00:00:00`)>fechaNuevaDate),tareaQueEspera=project.tareas.find(otra=>otra.dependencias.includes(t.id)&&fechaNuevaDate&&otra.fechaLimite&&fechaNuevaDate>new Date(`${otra.fechaLimite}T00:00:00`));if(dependenciaTardia) fail((uiText("sandbox_store.verifica_las_fechas_0_vence_despues_de_esta", {0: dependenciaTardia.titulo})));if(tareaQueEspera) fail((uiText("sandbox_store.verifica_las_fechas_0_espera_a_esta_tarea", {0: tareaQueEspera.titulo})));['titulo','descripcion','responsable','etapa','fechaLimite','horaLimite'].forEach(key=>{if(key in body)t[key]=body[key];});const siguiente=normalizeState(body.estado||t.estado);if(siguiente==='terminada'&&!t.tieneResultado) fail(uiText("sandbox_store.para_terminar_una_tarea_debes_registrar_un_resultado"));t.estado=siguiente;t.estadoEtiqueta=labels[t.estado];}
           result=t;
         } else if(parts[1]==='canales') {
-          const c=data.channels.find(c=>c.id===Number(parts[2]))||fail('Canal no encontrado',404);
-          if(parts[3]==='mensajes') {if(!body.contenido?.trim()) fail('Escribe un mensaje');result={id:id(),autorNombre:'Visitante',autorColor:'#8b75d7',iniciales:'V',contenido:body.contenido,fechaEnvio:now(),generadoPorIa:false,propio:true,reacciones:[],adjuntos:[]};c.mensajes.push(result);c.totalMensajes=c.mensajes.length;c.ultimaActividad=now();}
+          const c=data.channels.find(c=>c.id===Number(parts[2]))||fail(uiText("sandbox_store.canal_no_encontrado"),404);
+          if(parts[3]==='mensajes') {if(!body.contenido?.trim()) fail(uiText("canales.escribe_un_mensaje"));result={id:id(),autorNombre:'Visitante',autorColor:'#8b75d7',iniciales:'V',contenido:body.contenido,fechaEnvio:now(),generadoPorIa:false,propio:true,reacciones:[],adjuntos:[]};c.mensajes.push(result);c.totalMensajes=c.mensajes.length;c.ultimaActividad=now();}
           else if(parts[3]==='archivos') {
-            if(method==='POST') {const file=body.get('archivo');if(!file) fail('Elige un archivo');if(file.size>10*1024*1024) fail('Máximo 10 MB en la prueba');const blobUrl=URL.createObjectURL(file);data.urls.push(blobUrl);result={id:id(),nombre:file.name,url:blobUrl,tamano:Math.round(file.size/1024)+' KB',esImagen:file.type.startsWith('image/'),tipoMime:file.type,fechaSubida:now(),subidoPor:'Visitante',canal:c.nombre};c.archivos.push(result);c.totalArchivos=c.archivos.length;c.mensajes.find(m=>m.id===Number(url.searchParams.get('mensajeId')||body.get('mensajeId')))?.adjuntos.push(result);}
+            if(method==='POST') {const file=body.get('archivo');if(!file) fail(uiText("sandbox_store.elige_un_archivo"));if(file.size>10*1024*1024) fail(uiText("sandbox_store.maximo_10_mb_en_la_prueba"));const blobUrl=URL.createObjectURL(file);data.urls.push(blobUrl);result={id:id(),nombre:file.name,url:blobUrl,tamano:Math.round(file.size/1024)+' KB',esImagen:file.type.startsWith('image/'),tipoMime:file.type,fechaSubida:now(),subidoPor:'Visitante',canal:c.nombre};c.archivos.push(result);c.totalArchivos=c.archivos.length;c.mensajes.find(m=>m.id===Number(url.searchParams.get('mensajeId')||body.get('mensajeId')))?.adjuntos.push(result);}
             else result=url.searchParams.get('soloImagenes')==='true'?c.archivos.filter(f=>f.esImagen):c.archivos;
           } else if(parts[3]==='resumen') {const resumen=resumenLocal(c);c.ultimoResumen=resumen;(c.resumenes||=[]).unshift(resumen);result=resumen;}
           else if(parts[3]==='resumenes') result=c.resumenes||[];
-          else if(method==='DELETE') {if(!c.borrable)fail('El canal general no se puede eliminar');data.channels=data.channels.filter(item=>item!==c);result=null;}
+          else if(method==='DELETE') {if(!c.borrable)fail(uiText("sandbox_store.el_canal_general_no_se_puede_eliminar"));data.channels=data.channels.filter(item=>item!==c);result=null;}
           else result=c;
         } else if(parts[1]==='mensajes'&&parts[3]==='reacciones') {
-          if(!['acuerdo','hecho','gracias'].includes(body.emoji)) fail('Reacción no admitida');
-          const message=data.channels.flatMap(c=>c.mensajes).find(m=>m.id===Number(parts[2]))||fail('Mensaje no encontrado',404);
+          if(!['acuerdo','hecho','gracias'].includes(body.emoji)) fail(uiText("sandbox_store.reaccion_no_admitida"));
+          const message=data.channels.flatMap(c=>c.mensajes).find(m=>m.id===Number(parts[2]))||fail(uiText("sandbox_store.mensaje_no_encontrado"),404);
           const prior=message.reacciones.find(r=>r.emoji===body.emoji);message.reacciones=prior?message.reacciones.filter(r=>r!==prior):[...message.reacciones,{emoji:body.emoji,total:1,propia:true,personas:['Visitante']}];result=message;
         } else if(parts[1]==='archivos') {
-          const channel=data.channels.find(c=>c.archivos.some(f=>f.id===Number(parts[2])))||fail('Archivo no encontrado',404);
+          const channel=data.channels.find(c=>c.archivos.some(f=>f.id===Number(parts[2])))||fail(uiText("sandbox_store.archivo_no_encontrado"),404);
           const file=channel.archivos.find(f=>f.id===Number(parts[2]));URL.revokeObjectURL(file.url);data.urls=data.urls.filter(url=>url!==file.url);channel.archivos=channel.archivos.filter(f=>f!==file);channel.totalArchivos=channel.archivos.length;channel.mensajes.forEach(m=>m.adjuntos=m.adjuntos.filter(f=>f!==file));result=null;
         } else if(parts[1]==='entregables') {
-          const item=data.deliverables.find(d=>d.id===Number(parts[2]))||fail('Entregable no encontrado',404);
+          const item=data.deliverables.find(d=>d.id===Number(parts[2]))||fail(uiText("sandbox_store.entregable_no_encontrado"),404);
           if(method==='DELETE') {data.deliverables=data.deliverables.filter(d=>d!==item);result=null;}
           else {Object.assign(item,body);result=formatDeliverable(item);}
         } else if(parts[1]==='recordatorios') {
           if(parts[2]==='preferencias') {if(method==='PUT') Object.assign(data.preferences,body,{pasarelaConectada:false});result=data.preferences;}
           else if(parts[2]==='prueba'||parts[2]==='reprogramar') result={mensaje:'Simulación completada. No se envió ningún mensaje.',programados:0};
-          else if(parts[3]==='enviar') {result=data.reminders.find(r=>r.id===Number(parts[2]))||fail('Recordatorio no encontrado',404);result.estado='ENVIADO';result.mensaje=(result.mensaje?result.mensaje+' · ':'')+'Simulación: no se envió ningún mensaje.';}
-          else if(method==='DELETE') {const reminder=data.reminders.find(r=>r.id===Number(parts[2]))||fail('Recordatorio no encontrado',404);reminder.estado='CANCELADO';result=null;}
-          else if(method==='POST') {const due=new Date(body.fechaVencimiento),lead=Number(body.minutosAntes);if(!body.titulo?.trim()||body.titulo.length>150||!Number.isFinite(due.getTime())||due.getTime()<=Date.now()) fail('Completa el título y una fecha futura');if(!Number.isInteger(lead)||lead<0||lead>43200||due.getTime()-lead*60000<=Date.now()) fail('Elige una antelación válida y futura');result={id:id(),tipo:'PERSONAL',tipoEtiqueta:'Personal',canal:'WHATSAPP',estado:'PROGRAMADO',titulo:body.titulo,mensaje:body.mensaje||'',fechaVencimiento:dateLabel(due),fechaHora:dateLabel(due.getTime()-lead*60000),proyecto:null,errorEnvio:null};data.reminders.push(result);}
+          else if(parts[3]==='enviar') {result=data.reminders.find(r=>r.id===Number(parts[2]))||fail(uiText("sandbox_store.recordatorio_no_encontrado"),404);result.estado='ENVIADO';result.mensaje=(result.mensaje?result.mensaje+' · ':'')+'Simulación: no se envió ningún mensaje.';}
+          else if(method==='DELETE') {const reminder=data.reminders.find(r=>r.id===Number(parts[2]))||fail(uiText("sandbox_store.recordatorio_no_encontrado"),404);reminder.estado='CANCELADO';result=null;}
+          else if(method==='POST') {const due=new Date(body.fechaVencimiento),lead=Number(body.minutosAntes);if(!body.titulo?.trim()||body.titulo.length>150||!Number.isFinite(due.getTime())||due.getTime()<=Date.now()) fail(uiText("sandbox_store.completa_el_titulo_y_una_fecha_futura"));if(!Number.isInteger(lead)||lead<0||lead>43200||due.getTime()-lead*60000<=Date.now()) fail(uiText("sandbox_store.elige_una_antelacion_valida_y_futura"));result={id:id(),tipo:'PERSONAL',tipoEtiqueta:'Personal',canal:'WHATSAPP',estado:'PROGRAMADO',titulo:body.titulo,mensaje:body.mensaje||'',fechaVencimiento:dateLabel(due),fechaHora:dateLabel(due.getTime()-lead*60000),proyecto:null,errorEnvio:null};data.reminders.push(result);}
           else result=data.reminders;
-        } else fail('Esta acción no está disponible en la prueba.',404);
+        } else fail(uiText("sandbox_store.esta_accion_no_esta_disponible_en_la_prueba"),404);
         local.setItem('studyflow_projects',JSON.stringify(data.projects.map(projectDTO)));
         return {status:result===null?204:200,data:copy(result)};
       } catch(error) {return {status:error.status||400,data:{mensaje:error.message,message:error.message,errores:error.field?{[error.field]:error.message}:undefined}};}
@@ -226,7 +226,7 @@ export default function createSandboxStore(initialTheme='oscuro') {
       if (project.tourDiagramReady) return copy(projectDTO(project));
 
       const roots = project.tareas.filter(tarea => !tarea.tourDiagramTask).slice(0, 2);
-      if (roots.length < 2) fail('Crea las dos tareas iniciales antes de abrir el diagrama completo.');
+      if (roots.length < 2) fail(uiText("sandbox_store.crea_las_dos_tareas_iniciales_antes_de_abrir"));
 
       const phases = ['Planeación', 'Diseño', 'Implementación', 'Revisión'];
       phases.forEach(phase => {

@@ -7,6 +7,7 @@
  * quedarse mintiendo.
  */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
 
   /** «rgb(91, 92, 226)» → «#5b5ce2». Devuelve el original si no sabe leerlo. */
@@ -32,7 +33,7 @@ export function mount(scope) {
   async function copiar(valor) {
     try {
       await navigator.clipboard.writeText(valor);
-      avisar('Copiado: ' + valor);
+      avisar((uiText("paleta.copiado") + " ") + valor);
     } catch (error) {
       // El portapapeles falla sin contexto seguro o sin permiso; no es motivo
       // para dejar al usuario sin el valor.
@@ -42,7 +43,7 @@ export function mount(scope) {
 
   function hacerCopiable(elemento, valor) {
     elemento.style.cursor = 'pointer';
-    elemento.title = valor + ' · pulsa para copiar';
+    elemento.title = valor + (" " + uiText("paleta.pulsa_para_copiar"));
     elemento.addEventListener('click', () => copiar(valor));
   }
 

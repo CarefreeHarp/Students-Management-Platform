@@ -1,16 +1,16 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell">
   <section class="page-heading" aria-labelledby="dashboard-title">
     <div>
-      <p class="eyebrow" id="dashboard-date">Miércoles, 12 de agosto</p>
-      <h1 id="dashboard-title">Hola, <span data-user-first-name>Estudiante</span></h1>
-      <p class="mt-2 text-muted">Tu agenda y el avance de tus proyectos, en un solo lugar.</p>
+      <p class="eyebrow" id="dashboard-date">{{ t('index.miercoles_12_de_agosto') }}</p>
+      <h1 id="dashboard-title">{{ t('index.hola') }} <span data-user-first-name>{{ t('index.estudiante') }}</span></h1>
+      <p class="mt-2 text-muted">{{ t('index.tu_agenda_y_el_avance_de_tus_proyectos') }}</p>
     </div>
     <div class="flex flex-wrap gap-2.5">
-      <a class="btn btn-secondary" href="/horarios"><i class="bi bi-calendar-plus"></i> Mi horario</a>
-      <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> Nuevo proyecto</a>
+      <a class="btn btn-secondary" href="/horarios"><i class="bi bi-calendar-plus"></i> {{ t('index.mi_horario') }}</a>
+      <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> {{ t('chats.nuevo_proyecto') }}</a>
     </div>
   </section>
 
@@ -18,20 +18,20 @@
     <div class="panel">
       <div class="section-head flex-wrap">
         <div>
-          <h2>Tu agenda académica</h2>
-          <p>Una vista de los compromisos de todos tus proyectos.</p>
+          <h2>{{ t('index.tu_agenda_academica') }}</h2>
+          <p>{{ t('index.una_vista_de_los_compromisos_de_todos_tus') }}</p>
         </div>
-        <div class="project-legend" id="project-legend" aria-label="Proyectos en el calendario"></div>
+        <div class="project-legend" id="project-legend" aria-label="{{ t('index.proyectos_en_el_calendario') }}"></div>
       </div>
       <p id="dashboard-agenda-status" class="text-xs text-muted" role="status"></p>
-      <div id="dashboard-calendar" aria-label="Calendario semanal de tareas"></div>
+      <div id="dashboard-calendar" aria-label="{{ t('index.calendario_semanal_de_tareas') }}"></div>
     </div>
 
     <div class="dashboard-side">
   <section class="panel flow-card" aria-labelledby="flow-title" data-flow>
-    <div class="section-head"><h2 id="flow-title">Mi mascota Flow</h2></div>
+    <div class="section-head"><h2 id="flow-title">{{ t('index.mi_mascota_flow') }}</h2></div>
     <div class="flow-scene" data-flow-color="violeta">
-      <div class="flow-portrait" role="img" aria-label="Flow, una chispa sonriente de color violeta">
+      <div class="flow-portrait" role="img" aria-label="{{ t('index.flow_una_chispa_sonriente_de_color_violeta') }}">
         <span class="flow-foot" aria-hidden="true"></span>
         <span class="flow-body" aria-hidden="true">
           <span class="flow-bolt"></span>
@@ -39,25 +39,25 @@
           <span class="flow-smile"></span>
         </span>
       </div>
-      <p class="flow-score"><strong data-flow-puntos>…</strong>Mis puntos</p>
+      <p class="flow-score"><strong data-flow-puntos>…</strong>{{ t('index.mis_puntos') }}</p>
     </div>
-    <p class="flow-rule">Racha de tareas <strong data-flow-racha>…</strong></p>
-    <p class="flow-rule">Ganas 10 puntos por cada tarea que termines a tiempo.</p>
+    <p class="flow-rule">{{ t('index.racha_de_tareas') }} <strong data-flow-racha>…</strong></p>
+    <p class="flow-rule">{{ t('index.ganas_10_puntos_por_cada_tarea_que_termines') }}</p>
     <div class="flow-controls">
-      <label for="flow-color">Color de Flow</label>
+      <label for="flow-color">{{ t('index.color_de_flow') }}</label>
       <select id="flow-color" data-flow-selector disabled>
-        <option value="violeta">Violeta</option>
-        <option value="turquesa">Turquesa</option>
-        <option value="coral">Coral</option>
+        <option value="violeta">{{ t('index.violeta') }}</option>
+        <option value="turquesa">{{ t('index.turquesa') }}</option>
+        <option value="coral">{{ t('index.coral') }}</option>
       </select>
     </div>
-    <p role="status" data-flow-estado>Cargando tu mascota…</p>
-    <button type="button" class="text-action" data-flow-reintento hidden>Volver a cargar</button>
+    <p role="status" data-flow-estado>{{ t('index.cargando_tu_mascota') }}</p>
+    <button type="button" class="text-action" data-flow-reintento hidden>{{ t('index.volver_a_cargar') }}</button>
   </section>
     <aside class="panel project-overview" aria-labelledby="projects-snapshot-title">
       <div class="section-head">
-        <div><h2 id="projects-snapshot-title">Estado general</h2><p id="pending-count">Cargando tus pendientes…</p></div>
-        <a class="text-action" href="/proyectos" aria-label="Ver todos los proyectos"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <div><h2 id="projects-snapshot-title">{{ t('index.estado_general') }}</h2><p id="pending-count">{{ t('index.cargando_tus_pendientes') }}</p></div>
+        <a class="text-action" href="/proyectos" aria-label="{{ t('index.ver_todos_los_proyectos') }}"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
       </div>
       <div id="project-snapshot-list" class="overview-projects" aria-live="polite"></div>
     </aside>

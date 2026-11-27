@@ -1,4 +1,5 @@
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const accountSuffix = scope.user ? `.${scope.user.id}` : "";
@@ -9,12 +10,12 @@ export function mount(scope) {
   const CALENDAR_START = 6 * 60;
   const CALENDAR_END = 22 * 60;
   const DAYS = [
-    { id: "lunes", label: "Lunes", short: "Lun" },
-    { id: "martes", label: "Martes", short: "Mar" },
-    { id: "miercoles", label: "Miércoles", short: "Mié" },
-    { id: "jueves", label: "Jueves", short: "Jue" },
-    { id: "viernes", label: "Viernes", short: "Vie" },
-    { id: "sabado", label: "Sábado", short: "Sáb" },
+    { id: "lunes", label: uiText("crear_horario.lunes"), short: uiText("crear_horario.lun") },
+    { id: "martes", label: uiText("crear_horario.martes"), short: uiText("crear_horario.mar") },
+    { id: "miercoles", label: uiText("crear_horario.miercoles"), short: uiText("crear_horario.mie") },
+    { id: "jueves", label: uiText("crear_horario.jueves"), short: uiText("crear_horario.jue") },
+    { id: "viernes", label: uiText("crear_horario.viernes"), short: uiText("crear_horario.vie") },
+    { id: "sabado", label: uiText("crear_horario.sabado"), short: uiText("crear_horario.sab") },
   ];
 
   const exampleSubjects = [
@@ -101,7 +102,7 @@ export function mount(scope) {
       window.localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (_) {
-      getById("schedule-storage-status").textContent = "No se pudo guardar en este navegador. Conserva esta pestaña abierta para mantener el borrador.";
+      getById("schedule-storage-status").textContent = uiText("crear_horario.no_se_pudo_guardar_en_este_navegador_conserva");
       return false;
     }
   }
@@ -181,23 +182,23 @@ export function mount(scope) {
     getById("clear-subjects").disabled = !subjects.length;
     getById("subject-list").innerHTML = subjects.length ? subjects.map((subject, index) => {
       const selected = subject.options.find((option) => option.id === choices[subject.id]);
-      return `<article class="schedule-subject-card">
+      return (`<article class="schedule-subject-card">
         <div class="schedule-row">
-          <h3>${escapeHTML(subject.name)}${subject.example ? ' <span class="schedule-example-label">Ejemplo</span>' : ""}</h3>
-          <span class="schedule-muted schedule-small">${subject.credits} cr.</span>
+          <h3>${escapeHTML(subject.name)}${subject.example ? (` <span class="schedule-example-label">${uiText("crear_horario.ejemplo")}</span>`) : ""}</h3>
+          <span class="schedule-muted schedule-small">${uiText("crear_horario.2_cr", {2: subject.credits})}</span>
         </div>
         <div class="schedule-subject-controls">
-          <label class="sr-only" for="subject-choice-${index}">Opción de ${escapeHTML(subject.name)}</label>
+          <label class="sr-only" for="subject-choice-${index}">${uiText("crear_horario.opcion_de_4", {4: escapeHTML(subject.name)})}</label>
           <select id="subject-choice-${index}" data-subject-choice="${escapeHTML(subject.id)}">
-            <option value=""${selected ? "" : " selected"}>No incluir por ahora</option>
-            ${subject.options.map((option, optionIndex) => `<option value="${escapeHTML(option.id)}"${option.id === selected?.id ? " selected" : ""}>Opción ${optionIndex + 1} · ${option.sessions.length} ${option.sessions.length === 1 ? "clase" : "clases"}</option>`).join("")}
+            <option value=""${selected ? "" : " selected"}>${uiText("crear_horario.no_incluir_por_ahora")}</option>
+            ${subject.options.map((option, optionIndex) => (`<option value="${escapeHTML(option.id)}"${option.id === selected?.id ? " selected" : ""}>${uiText("crear_horario.opcion_2_3_4", {2: optionIndex + 1, 3: option.sessions.length, 4: option.sessions.length === 1 ? uiText("horarios.clase") : uiText("horarios.clases")})}</option>`)).join("")}
           </select>
-          <button class="btn btn-ghost btn-sm" type="button" data-edit-subject="${escapeHTML(subject.id)}" aria-label="Editar ${escapeHTML(subject.name)}" title="Editar materia"><i class="bi bi-pencil" aria-hidden="true"></i></button>
-          <button class="btn btn-ghost btn-sm" type="button" data-remove-subject="${escapeHTML(subject.id)}" aria-label="Eliminar ${escapeHTML(subject.name)}" title="Eliminar materia"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+          <button class="btn btn-ghost btn-sm" type="button" data-edit-subject="${escapeHTML(subject.id)}" aria-label="${uiText("crear_horario.editar_10", {10: escapeHTML(subject.name)})}" title="${uiText("crear_horario.editar_materia")}"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+          <button class="btn btn-ghost btn-sm" type="button" data-remove-subject="${escapeHTML(subject.id)}" aria-label="${uiText("crear_horario.eliminar_12", {12: escapeHTML(subject.name)})}" title="${uiText("crear_horario.eliminar_materia")}"><i class="bi bi-trash3" aria-hidden="true"></i></button>
         </div>
-        <p class="schedule-subject-sessions">${selected ? selected.sessions.map((session) => `${dayLabel(session.day)} ${session.start}–${session.end}`).join("<br>") : "Esta materia no aparece en la vista previa."}</p>
-      </article>`;
-    }).join("") : '<p class="schedule-muted schedule-small">Añade una materia o carga ejemplos para explorar el planificador.</p>';
+        <p class="schedule-subject-sessions">${selected ? selected.sessions.map((session) => `${dayLabel(session.day)} ${session.start}–${session.end}`).join("<br>") : uiText("crear_horario.esta_materia_no_aparece_en_la_vista_previa")}</p>
+      </article>`);
+    }).join("") : (`<p class="schedule-muted schedule-small">${uiText("crear_horario.anade_una_materia_o_carga_ejemplos_para_explorar")}</p>`);
   }
 
   function renderCalendar() {
@@ -207,7 +208,7 @@ export function mount(scope) {
       color: materia.indiceColor, section: materia.opcion,
     }))) : selectedSessions();
     const conflicts = getConflicts(sessions);
-    const days = sessions.some((s) => s.day === "domingo") ? [...DAYS, {id: "domingo", label: "Domingo", short: "Dom"}] : DAYS;
+    const days = sessions.some((s) => s.day === "domingo") ? [...DAYS, {id: "domingo", label: uiText("crear_horario.domingo"), short: uiText("crear_horario.dom")}] : DAYS;
     const firstHour = Math.floor(Math.min(CALENDAR_START, ...sessions.map((s) => timeToMinutes(s.start))) / 60);
     const lastHour = Math.ceil(Math.max(CALENDAR_END, ...sessions.map((s) => timeToMinutes(s.end))) / 60);
     const span = lastHour - firstHour;
@@ -215,26 +216,26 @@ export function mount(scope) {
     const calendar = getById("draft-calendar");
     calendar.style.setProperty("--dias", days.length);
     calendar.style.setProperty("--hora", `${100 / span}%`);
-    calendar.innerHTML = `<div class="schedule-calendar__header-time">Hora</div>
+    calendar.innerHTML = (`<div class="schedule-calendar__header-time">${uiText("crear_horario.hora")}</div>
       ${days.map((day) => `<div class="schedule-calendar__day-name"><span>${day.short}</span>${day.label}</div>`).join("")}
       <div class="schedule-calendar__time-axis">${hours.map((hour) => `<span class="schedule-time-label${hour === lastHour ? " schedule-time-label--last" : ""}" style="top:${(hour - firstHour) / span * 100}%">${String(hour).padStart(2, "0")}:00</span>`).join("")}</div>
       ${days.map((day) => `<div class="schedule-calendar__day" data-day="${day.id}">${sessions.filter((session) => session.day === day.id).map((session) => {
         const top = (timeToMinutes(session.start) / 60 - firstHour) / span * 100;
         const height = (timeToMinutes(session.end) - timeToMinutes(session.start)) / (span * 60) * 100;
         const color = session.color ?? subjects.findIndex((subject) => subject.id === session.subjectId) % 6;
-        const label = `${session.name}${session.section ? ", opción " + session.section : ""}, ${day.label}, ${session.start} a ${session.end}`;
-        return `<article class="schedule-event schedule-color-${color}" style="top:${top}%;height:calc(${height}% - 3px)" title="${escapeHTML(label)}" aria-label="${escapeHTML(label)}"><span class="schedule-event__name">${escapeHTML(session.name)}</span><span class="schedule-event__time">${session.start}–${session.end}${session.section ? " · Op. " + session.section : ""}</span></article>`;
-      }).join("")}</div>`).join("")}`;
-    const caption = `${included.length} ${included.length === 1 ? "materia" : "materias"} · ${sessions.length} ${sessions.length === 1 ? "clase" : "clases"} por semana`;
-    getById("draft-calendar-caption").textContent = included.length ? (preview ? `${preview.nombre} · ${caption}` : caption) : "Selecciona una opción de cada materia para verla aquí.";
+        const label = `${session.name}${session.section ? (uiText("crear_horario.opcion") + " ") + session.section : ""}, ${day.label}, ${session.start} a ${session.end}`;
+        return `<article class="schedule-event schedule-color-${color}" style="top:${top}%;height:calc(${height}% - 3px)" title="${escapeHTML(label)}" aria-label="${escapeHTML(label)}"><span class="schedule-event__name">${escapeHTML(session.name)}</span><span class="schedule-event__time">${session.start}–${session.end}${session.section ? (" " + uiText("crear_horario.op") + " ") + session.section : ""}</span></article>`;
+      }).join("")}</div>`).join("")}`);
+    const caption = (uiText("crear_horario.0_1_2_3_por_semana", {0: included.length, 1: included.length === 1 ? uiText("horarios.materia") : uiText("crear_horario.materias"), 2: sessions.length, 3: sessions.length === 1 ? uiText("horarios.clase") : uiText("horarios.clases")}));
+    getById("draft-calendar-caption").textContent = included.length ? (preview ? `${preview.nombre} · ${caption}` : caption) : uiText("crear_horario.selecciona_una_opcion_de_cada_materia_para_verla");
     const credits = preview ? preview.totalCreditos : included.reduce((total, subject) => total + subject.credits, 0);
-    getById("draft-credit-count").textContent = `${credits} ${credits === 1 ? "crédito" : "créditos"}`;
+    getById("draft-credit-count").textContent = `${credits} ${credits === 1 ? uiText("crear_horario.credito") : uiText("crear_horario.creditos_2")}`;
     getById("schedule-conflicts").hidden = !conflicts.length;
-    getById("schedule-conflicts").textContent = `Hay cruces de horario: ${conflicts.join("; ")}. Elige otra opción o excluye una materia para guardar.`;
-    getById("schedule-preview-source").textContent = preview?.tipo === "gemini" ? `Gemini · ${preview.nombre}`
-      : preview ? "Horario manual de tu cuenta." : "Vista previa de las opciones que elegiste.";
+    getById("schedule-conflicts").textContent = (uiText("crear_horario.hay_cruces_de_horario_0_elige_otra_opcion", {0: conflicts.join("; ")}));
+    getById("schedule-preview-source").textContent = preview?.tipo === "gemini" ? (uiText("crear_horario.gemini_0", {0: preview.nombre}))
+      : preview ? uiText("crear_horario.horario_manual_de_tu_cuenta") : uiText("crear_horario.vista_previa_de_las_opciones_que_elegiste");
     getById("return-to-draft").hidden = !preview;
-    getById("save-schedule").textContent = preview?.seleccionado ? "Guardado en tu cuenta" : "Guardar horario";
+    getById("save-schedule").textContent = preview?.seleccionado ? uiText("crear_horario.guardado_en_tu_cuenta") : uiText("crear_horario.guardar_horario");
     getById("save-schedule").disabled = busy || !included.length || Boolean(conflicts.length) || Boolean(preview?.seleccionado);
   }
 
@@ -252,25 +253,25 @@ export function mount(scope) {
   }
 
   function renderEditor() {
-    getById("subject-options").innerHTML = editorOptions.map((option, optionIndex) => `<fieldset class="schedule-option-editor">
-      <legend>Opción ${optionIndex + 1}</legend>
+    getById("subject-options").innerHTML = editorOptions.map((option, optionIndex) => (`<fieldset class="schedule-option-editor">
+      <legend>${uiText("crear_horario.opcion_0", {0: optionIndex + 1})}</legend>
       ${option.sessions.map((session, sessionIndex) => {
         const prefix = `session-${optionIndex}-${sessionIndex}`;
-        return `<div class="schedule-session-editor" data-option-index="${optionIndex}" data-session-index="${sessionIndex}">
-          <div class="form-field schedule-session-day"><label for="${prefix}-day">Día</label><select id="${prefix}-day" data-session-field="day">${DAYS.map((day) => `<option value="${day.id}"${session.day === day.id ? " selected" : ""}>${day.label}</option>`).join("")}</select></div>
-          <div class="form-field"><label for="${prefix}-start">Desde</label><input id="${prefix}-start" type="time" min="06:00" max="22:00" value="${escapeHTML(session.start)}" data-session-field="start" required></div>
-          <div class="form-field"><label for="${prefix}-end">Hasta</label><input id="${prefix}-end" type="time" min="06:00" max="22:00" value="${escapeHTML(session.end)}" data-session-field="end" required></div>
-          ${option.sessions.length > 1 ? `<button class="schedule-remove-session text-action" type="button" data-remove-session="${sessionIndex}" data-option="${optionIndex}" aria-label="Quitar clase ${sessionIndex + 1} de opción ${optionIndex + 1}">Quitar clase</button>` : ""}
-        </div>`;
+        return (`<div class="schedule-session-editor" data-option-index="${optionIndex}" data-session-index="${sessionIndex}">
+          <div class="form-field schedule-session-day"><label for="${prefix}-day">${uiText("crear_horario.dia")}</label><select id="${prefix}-day" data-session-field="day">${DAYS.map((day) => `<option value="${day.id}"${session.day === day.id ? " selected" : ""}>${day.label}</option>`).join("")}</select></div>
+          <div class="form-field"><label for="${prefix}-start">${uiText("crear_horario.desde")}</label><input id="${prefix}-start" type="time" min="06:00" max="22:00" value="${escapeHTML(session.start)}" data-session-field="start" required></div>
+          <div class="form-field"><label for="${prefix}-end">${uiText("crear_horario.hasta")}</label><input id="${prefix}-end" type="time" min="06:00" max="22:00" value="${escapeHTML(session.end)}" data-session-field="end" required></div>
+          ${option.sessions.length > 1 ? (`<button class="schedule-remove-session text-action" type="button" data-remove-session="${sessionIndex}" data-option="${optionIndex}" aria-label="${uiText("crear_horario.quitar_clase_2_de_opcion_3", {2: sessionIndex + 1, 3: optionIndex + 1})}">${uiText("crear_horario.quitar_clase")}</button>`) : ""}
+        </div>`);
       }).join("")}
-      <div class="schedule-row"><button class="text-action schedule-small" type="button" data-add-session="${optionIndex}">+ Añadir día o franja</button>${editorOptions.length > 1 ? `<button class="text-action schedule-small" type="button" data-remove-option="${optionIndex}">Quitar opción</button>` : ""}</div>
-    </fieldset>`).join("");
+      <div class="schedule-row"><button class="text-action schedule-small" type="button" data-add-session="${optionIndex}">${uiText("crear_horario.anadir_dia_o_franja")}</button>${editorOptions.length > 1 ? (`<button class="text-action schedule-small" type="button" data-remove-option="${optionIndex}">${uiText("crear_horario.quitar_opcion")}</button>`) : ""}</div>
+    </fieldset>`)).join("");
   }
 
   function resetEditor(close = true) {
     editingId = null;
     getById("subject-form").reset();
-    getById("subject-editor-title").innerHTML = '<i class="bi bi-plus-lg" aria-hidden="true"></i> Añadir materia';
+    getById("subject-editor-title").innerHTML = (`<i class="bi bi-plus-lg" aria-hidden="true"></i>${" " + uiText("crear_horario.anadir_materia")}`);
     getById("subject-form-error").hidden = true;
     editorOptions = [newOption()];
     renderEditor();
@@ -286,11 +287,11 @@ export function mount(scope) {
     event.preventDefault();
     const name = getById("subject-name").value.trim();
     const credits = Number(getById("subject-credits").value);
-    if (!name) { showError("Escribe el nombre de la materia."); getById("subject-name").focus(); return; }
-    if (!Number.isInteger(credits) || credits < 1 || credits > 30) { showError("Indica entre 1 y 30 créditos."); return; }
+    if (!name) { showError(uiText("crear_horario.escribe_el_nombre_de_la_materia")); getById("subject-name").focus(); return; }
+    if (!Number.isInteger(credits) || credits < 1 || credits > 30) { showError(uiText("crear_horario.indica_entre_1_y_30_creditos")); return; }
     for (const [index, option] of editorOptions.entries()) {
-      if (option.sessions.some((session) => !normalizeSession(session))) { showError(`Revisa la opción ${index + 1}: cada clase debe empezar antes de terminar, entre las 06:00 y las 22:00.`); return; }
-      if (option.sessions.some((session, sessionIndex) => option.sessions.slice(sessionIndex + 1).some((other) => overlap(session, other)))) { showError(`Las clases de la opción ${index + 1} se cruzan. Si son alternativas, sepáralas en opciones diferentes.`); return; }
+      if (option.sessions.some((session) => !normalizeSession(session))) { showError((uiText("crear_horario.revisa_la_opcion_0_cada_clase_debe_empezar", {0: index + 1}))); return; }
+      if (option.sessions.some((session, sessionIndex) => option.sessions.slice(sessionIndex + 1).some((other) => overlap(session, other)))) { showError((uiText("crear_horario.las_clases_de_la_opcion_0_se_cruzan", {0: index + 1}))); return; }
     }
     const subject = normalizeSubject({ id: editingId || createId(), name, credits, options: editorOptions });
     if (editingId) subjects = subjects.map((entry) => entry.id === editingId ? subject : entry);
@@ -299,7 +300,7 @@ export function mount(scope) {
     persistDraft();
     resetEditor();
     document.dispatchEvent(new CustomEvent("studyflow:tour-action", { detail: { method: "LOCAL", path: "/horarios/materia" } }));
-    showToast("Materia guardada con sus opciones de horario.", "success");
+    showToast(uiText("crear_horario.materia_guardada_con_sus_opciones_de_horario"), "success");
   }
 
   function handleEditorInput(event) {
@@ -333,7 +334,7 @@ export function mount(scope) {
       getById("subject-name").value = subject.name;
       getById("subject-credits").value = subject.credits;
       editorOptions = subject.options.map((option) => ({ ...option, sessions: option.sessions.map((session) => ({ ...session })) }));
-      getById("subject-editor-title").textContent = "Editar materia";
+      getById("subject-editor-title").textContent = uiText("crear_horario.editar_materia");
       getById("subject-form-error").hidden = true;
       renderEditor();
       getById("subject-editor").open = true;
@@ -360,11 +361,11 @@ export function mount(scope) {
     const saved = writeStorage(PREFERENCES_KEY, readPreferences());
     const status = getById("schedule-preference-status");
     if (saved) {
-      status.textContent = "Preferencias guardadas en este navegador.";
-      if (announce) showToast("Preferencias de horario guardadas.", "success");
+      status.textContent = uiText("crear_horario.preferencias_guardadas_en_este_navegador");
+      if (announce) showToast(uiText("crear_horario.preferencias_de_horario_guardadas"), "success");
     } else {
-      status.textContent = "No se pudieron guardar las preferencias en este navegador.";
-      if (announce) showToast("No se pudieron guardar las preferencias.", "warning");
+      status.textContent = uiText("crear_horario.no_se_pudieron_guardar_las_preferencias_en_este");
+      if (announce) showToast(uiText("crear_horario.no_se_pudieron_guardar_las_preferencias"), "warning");
     }
     return saved;
   }
@@ -377,8 +378,8 @@ export function mount(scope) {
       <button type="button" class="schedule-alternative" data-preview-schedule="${a.id}" aria-pressed="${a.id === preview?.id}">
         <strong>${escapeHTML(a.nombre)}</strong>
         <span class="schedule-small">${escapeHTML(a.descripcion)}</span>
-        <span class="schedule-muted schedule-small">${a.materias.length} ${a.materias.length === 1 ? "materia" : "materias"} · ${a.totalCreditos} ${a.totalCreditos === 1 ? "crédito" : "créditos"}${a.seleccionado ? " · Guardado" : ""}</span>
-        ${a.omitidas.length ? `<span class="schedule-small">${a.omitidas.map(escapeHTML).join(", ")} ${a.omitidas.length === 1 ? "queda" : "quedan"} fuera por cruce.</span>` : ""}
+        <span class="schedule-muted schedule-small">${a.materias.length} ${a.materias.length === 1 ? uiText("horarios.materia") : uiText("crear_horario.materias")} · ${a.totalCreditos} ${a.totalCreditos === 1 ? uiText("crear_horario.credito") : uiText("crear_horario.creditos_2")}${a.seleccionado ? (" " + uiText("crear_horario.guardado")) : ""}</span>
+        ${a.omitidas.length ? (`<span class="schedule-small">${uiText("crear_horario.0_1_fuera_por_cruce", {0: a.omitidas.map(escapeHTML).join(", "), 1: a.omitidas.length === 1 ? "queda" : "quedan"})}</span>`) : ""}
       </button>`).join("");
   }
 
@@ -390,10 +391,10 @@ export function mount(scope) {
 
   async function scheduleApi(path, options = {}) {
     const response = await request("/api/horarios" + path, options);
-    if (response.status === 401) throw new Error("Tu sesión terminó. Vuelve a iniciar sesión para consultar tus horarios.");
+    if (response.status === 401) throw new Error(uiText("crear_horario.tu_sesion_termino_vuelve_a_iniciar_sesion_para"));
     if (!response.ok) {
       const problem = await response.json().catch(() => ({}));
-      throw new Error(problem.detail || problem.message || "No se pudo completar la operación. Intenta de nuevo.");
+      throw new Error(problem.detail || problem.message || uiText("crear_horario.no_se_pudo_completar_la_operacion_intenta_de"));
     }
     return response.json();
   }
@@ -429,7 +430,7 @@ export function mount(scope) {
       preferencias: { jornada: preferences.day, pausas: preferences.breaks, masCreditos: preferences.moreCredits },
     };
     setBusy(true);
-    aiStatus("Gemini está comparando tus secciones…");
+    aiStatus(uiText("crear_horario.gemini_esta_comparando_tus_secciones"));
     try {
       const generated = await scheduleApi("/generar", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request),
@@ -437,9 +438,9 @@ export function mount(scope) {
       const saved = alternatives.find((a) => a.seleccionado && !generated.some((g) => g.id === a.id));
       alternatives = saved ? [...generated, saved] : generated;
       if (revision === draftRevision) preview = generated[0];
-      aiStatus(revision !== draftRevision ? "Ya están las alternativas para el borrador anterior."
-        : generated.length === 1 ? "Hay una alternativa. Ya puedes verla en Tu semana."
-        : `Hay ${generated.length} alternativas. Elige una para verla en Tu semana.`);
+      aiStatus(revision !== draftRevision ? uiText("crear_horario.ya_estan_las_alternativas_para_el_borrador_anterior")
+        : generated.length === 1 ? uiText("crear_horario.hay_una_alternativa_ya_puedes_verla_en_tu")
+        : (uiText("crear_horario.hay_0_alternativas_elige_una_para_verla_en", {0: generated.length})));
     } catch (error) {
       aiStatus(error.message, true);
     } finally {
@@ -454,7 +455,7 @@ export function mount(scope) {
     try {
       await scheduleApi(`/${id}/seleccionar`, { method: "PATCH" });
       alternatives.forEach((a) => { a.seleccionado = a.id === id; });
-      aiStatus("Horario guardado en tu cuenta.");
+      aiStatus(uiText("crear_horario.horario_guardado_en_tu_cuenta"));
     } catch (error) {
       aiStatus(error.message, true);
     } finally {
@@ -475,7 +476,7 @@ export function mount(scope) {
     if (preview) return saveGeneratedSchedule();
     const courses = selectedSessions();
     if (busy || !courses.length || getConflicts(courses).length) return;
-    const selected = { id: "manual", name: "Mi horario", courses, subjects: selectedSubjects(), choices, preferences: readPreferences(), savedAt: new Date().toISOString() };
+    const selected = { id: "manual", name: uiText("index.mi_horario"), courses, subjects: selectedSubjects(), choices, preferences: readPreferences(), savedAt: new Date().toISOString() };
     if (getById("generate-schedules")) {
       const revision = draftRevision;
       const materias = selected.subjects.map((subject) => materiaParaApi(subject,
@@ -487,7 +488,7 @@ export function mount(scope) {
         });
         alternatives.forEach((a) => { a.seleccionado = false; });
         if (revision === draftRevision) preview = saved;
-        showToast("Horario guardado en tu cuenta y en la agenda.", "success");
+        showToast(uiText("crear_horario.horario_guardado_en_tu_cuenta_y_en_la"), "success");
       } catch (error) {
         showToast(error.message, "error");
         return;
@@ -497,8 +498,8 @@ export function mount(scope) {
     }
     if (writeStorage(SELECTED_SCHEDULE_KEY, selected)) {
       getById("restore-schedule").disabled = false;
-      if (!getById("generate-schedules")) showToast("Horario guardado en este navegador.", "success");
-    } else showToast("No se pudo guardar el horario en este navegador.", "warning");
+      if (!getById("generate-schedules")) showToast(uiText("crear_horario.horario_guardado_en_este_navegador"), "success");
+    } else showToast(uiText("crear_horario.no_se_pudo_guardar_el_horario_en_este"), "warning");
   }
 
   function readSavedSchedule() {
@@ -517,11 +518,11 @@ export function mount(scope) {
 
   function restoreSavedSchedule() {
     const saved = readSavedSchedule();
-    if (!saved) { showToast("Todavía no hay un horario guardado para recuperar.", "info"); return; }
+    if (!saved) { showToast(uiText("crear_horario.todavia_no_hay_un_horario_guardado_para_recuperar"), "info"); return; }
     const different = JSON.stringify(subjects) !== JSON.stringify(saved.subjects)
       || subjects.some((subject) => choices[subject.id] !== saved.choices[subject.id])
       || JSON.stringify(readPreferences()) !== JSON.stringify(saved.preferences);
-    if (subjects.length && different && !window.confirm("¿Reemplazar el borrador actual por tu horario guardado? También se recuperarán sus preferencias.")) return;
+    if (subjects.length && different && !window.confirm(uiText("crear_horario.reemplazar_el_borrador_actual_por_tu_horario_guardado"))) return;
     subjects = saved.subjects;
     choices = saved.choices;
     loadPreferences(saved.preferences);
@@ -529,7 +530,7 @@ export function mount(scope) {
     renderDraft();
     persistDraft();
     writeStorage(PREFERENCES_KEY, readPreferences());
-    showToast("Horario guardado recuperado.", "success");
+    showToast(uiText("crear_horario.horario_guardado_recuperado"), "success");
   }
 
   async function initialisePage() {
@@ -540,7 +541,7 @@ export function mount(scope) {
     resetEditor();
     renderDraft();
     loadPreferences();
-    getById("schedule-preference-status").textContent = "Las preferencias se guardan con tu horario.";
+    getById("schedule-preference-status").textContent = uiText("crear_horario.las_preferencias_se_guardan_con_tu_horario");
     getById("subject-form").addEventListener("submit", handleSubjectSubmit);
     getById("subject-options").addEventListener("input", handleEditorInput);
     getById("subject-options").addEventListener("change", handleEditorInput);
@@ -557,7 +558,7 @@ export function mount(scope) {
       document.querySelectorAll("[data-subject-choice]").forEach((select) => { if (select.dataset.subjectChoice === id) select.focus(); });
     });
     getById("clear-subjects").addEventListener("click", () => {
-      if (!subjects.length || !window.confirm("¿Quitar todas las materias del borrador? El horario guardado se conservará.")) return;
+      if (!subjects.length || !window.confirm(uiText("crear_horario.quitar_todas_las_materias_del_borrador_el_horario"))) return;
       subjects = [];
       choices = {};
       resetEditor();
@@ -569,7 +570,7 @@ export function mount(scope) {
       exampleSubjects.forEach((example) => { if (!names.has(example.name.toLocaleLowerCase("es")) && !subjects.some((subject) => subject.id === example.id)) subjects.push(normalizeSubject(example)); });
       renderDraft();
       persistDraft();
-      showToast("Ejemplos de salud, economía, derecho, diseño e investigación disponibles.", "success");
+      showToast(uiText("crear_horario.ejemplos_de_salud_economia_derecho_diseno_e_investigacion"), "success");
     });
     getById("schedule-preferences").addEventListener("change", () => {
       draftRevision++;

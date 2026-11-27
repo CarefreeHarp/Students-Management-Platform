@@ -1,5 +1,6 @@
 import createSandboxStore from "./sandbox-store.js";
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
   const THEME_KEY='studyflow-tema';
   const initialTheme=(()=>{
@@ -9,7 +10,7 @@ export function mount(scope) {
     } catch (_) { /* The system preference is a safe visual fallback. */ }
     return matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro';
   })();
-  const store=createSandboxStore(initialTheme), stage=document.querySelector('#sandbox-stage'), themeButton=document.querySelector('#sandbox-theme');
+  const store=createSandboxStore(initialTheme, uiText), stage=document.querySelector('#sandbox-stage'), themeButton=document.querySelector('#sandbox-theme');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let frame=null, version=0, tourActive=true, chapter=1, pausedFocus=0, route='/panel', theme=initialTheme;
   // Last required spot in each chapter. Keep this in sync with recorrido.js so
@@ -26,9 +27,9 @@ export function mount(scope) {
     document.documentElement.style.colorScheme=theme;
     store.setTheme(theme);
     if(remember) try {localStorage.setItem(THEME_KEY,theme);} catch (_) { /* The tour still changes tone for this visit. */ }
-    themeButton.textContent=oscuro?'Cambiar a modo claro':'Cambiar a modo oscuro';
+    themeButton.textContent=oscuro?uiText("sandbox.cambiar_a_modo_claro"):uiText("main.cambiar_a_modo_oscuro");
     themeButton.setAttribute('aria-pressed',String(oscuro));
-    themeButton.setAttribute('title',oscuro?'Usar modo claro':'Usar modo oscuro');
+    themeButton.setAttribute('title',oscuro?uiText("sandbox.usar_modo_claro"):uiText("sandbox.usar_modo_oscuro"));
     try {
       frame?.contentDocument?.documentElement.classList.toggle('dark',oscuro);
       frame?.contentWindow?.dispatchEvent(new frame.contentWindow.CustomEvent('studyflow:tema-cambiar',{detail:{oscuro}}));
@@ -83,7 +84,7 @@ export function mount(scope) {
     await delay(previous?320:0);
     if(currentVersion!==version) return;
     const next=document.createElement('iframe');
-    next.title='StudyFlow: espacio de prueba temporal';
+    next.title=uiText("sandbox.titulo");
     next.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups');
     next.className='is-entering';
     const query=new URLSearchParams({ruta:route});
@@ -97,17 +98,22 @@ export function mount(scope) {
     previous?.remove();
     await delay(60);next.classList.remove('is-entering');
   }
-  window.StudyFlowSandbox={...store,navigate,finishTour,completeTourStep,isTourStepComplete(tourChapter,spot){return completedTourSteps.has(`${tourChapter}:${spot}`);},pauseTour(tourChapter=chapter,spot=pausedFocus){
+  window.StudyFlowSandbox={...store,language: StudyFlowLanguage,navigate,finishTour,completeTourStep,isTourStepComplete(tourChapter,spot){return completedTourSteps.has(`${tourChapter}:${spot}`);},pauseTour(tourChapter=chapter,spot=pausedFocus){
     if(Number.isInteger(tourChapter)&&tourChapter>=1&&tourChapter<=9) chapter=tourChapter;
     if(Number.isInteger(spot)&&spot>=0) pausedFocus=spot;
     tourActive=false;
     showGuideButton(true);
   },get tourActive(){return tourActive;},get chapter(){return chapter;}};
   themeButton.onclick=()=>applyTheme(theme==='oscuro'?'claro':'oscuro');
+  listen(window, 'studyflow:idioma', () => {
+    applyTheme(theme, false);
+    if (frame) frame.contentWindow.location.reload();
+    document.title = uiText('rutas.tu_espacio_de_prueba') + ' · StudyFlow';
+  });
   applyTheme(initialTheme,false);
   showGuideButton(false);
   guideButton.onclick=()=>navigate(routes()[Math.min(chapter-1,8)]+'?recorrido='+chapter+'&enfoque='+pausedFocus);
-  document.querySelector('#sandbox-reset').onclick=()=>{if(confirm('¿Borrar lo que has probado y empezar de nuevo?')) { store.destroy(); location.reload(); }};
+  document.querySelector('#sandbox-reset').onclick=()=>{if(confirm(uiText("sandbox.borrar_lo_que_has_probado_y_empezar_de"))) { store.destroy(); location.reload(); }};
   document.querySelector('#sandbox-register').onclick=()=>finishTour();
   document.querySelector('#sandbox-finish-register').onclick=()=>exit('/registro');
   document.querySelector('#sandbox-keep').onclick=()=>{document.querySelector('#sandbox-finish').close();showGuideButton(true);};

@@ -36,6 +36,7 @@ export function createPageScope(root, options) {
   }
 
   const scope = {
+    t: options.language.t, StudyFlowLanguage: options.language,
     root, signal, document: viewDocument, listen, later, animate, objectUrl,
     onDestroy: callback => cleanups.push(callback),
     request: (url, info) => options.request(url, info, signal),

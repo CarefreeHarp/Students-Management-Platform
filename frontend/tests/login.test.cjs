@@ -26,7 +26,7 @@ function fixture({ query = '', result = { acceso:true }, ok = true } = {}) {
     fetch:async(url,options)=>{requests.push({url,options});return {ok,json:async()=>result};}
   };
   context.window=context;
-  context.scope = { document: context.document, request: context.fetch, navigate: context.location.assign };
+  context.scope = { t: require('./idioma.cjs').t, StudyFlowLanguage: require('./idioma.cjs'), document: context.document, request: context.fetch, navigate: context.location.assign };
   vm.runInNewContext(source.replace('export function', 'function') + '\nmount(scope);', context);
   return {nodes,requests,navigation,toggle,icon,submit:()=>nodes.get('#password-form').listeners.submit({preventDefault(){}})};
 }

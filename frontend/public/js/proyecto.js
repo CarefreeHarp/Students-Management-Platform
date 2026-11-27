@@ -7,6 +7,7 @@
  * su URL no se encontraba nada y la página se quedaba cargando para siempre.
  */
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const app = scope.app || {};
@@ -22,7 +23,7 @@ export function mount(scope) {
   };
   /* Bandas horarias del calendario del proyecto. */
   const BANDAS = ["08:00", "10:00", "12:00", "14:00", "16:00"];
-  const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const DIAS = [uiText("crear_horario.lun"), uiText("crear_horario.mar"), uiText("crear_horario.mie"), uiText("crear_horario.jue"), uiText("crear_horario.vie"), uiText("crear_horario.sab"), uiText("crear_horario.dom")];
 
   const estado = { proyecto: null, filtro: "all" };
   const $ = (selector) => document.querySelector(selector);
@@ -36,11 +37,11 @@ export function mount(scope) {
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
       app.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || detalle.message || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.status === 204 ? null : respuesta.json();
   }
@@ -67,11 +68,11 @@ export function mount(scope) {
     .map((parte) => parte[0]).join("").toUpperCase();
 
   function fechaCorta(iso) {
-    if (!iso) return "Sin fecha";
+    if (!iso) return uiText("fases.sin_fecha");
     const fecha = new Date(`${iso}T12:00:00`);
     return Number.isNaN(fecha.getTime())
       ? iso
-      : new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(fecha).replace(".", "");
+      : new Intl.DateTimeFormat(StudyFlowLanguage.locale(), { day: "numeric", month: "short" }).format(fecha).replace(".", "");
   }
 
   function diasRestantes(iso) {
@@ -81,9 +82,9 @@ export function mount(scope) {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const dias = Math.round((fecha - hoy) / 86400000);
-    if (dias < 0) return `Venció hace ${Math.abs(dias)} día${Math.abs(dias) === 1 ? "" : "s"}`;
-    if (dias === 0) return "Es hoy";
-    return dias === 1 ? "Falta 1 día" : `Faltan ${dias} días`;
+    if (dias < 0) return (uiText("proyecto.vencio_hace_0_dia_1", {0: Math.abs(dias), 1: Math.abs(dias) === 1 ? "" : "s"}));
+    if (dias === 0) return uiText("proyecto.es_hoy");
+    return dias === 1 ? uiText("proyecto.falta_1_dia") : (uiText("proyecto.faltan_0_dias", {0: dias}));
   }
 
   /* ------------------------------------------------------------ cabecera */
@@ -91,15 +92,15 @@ export function mount(scope) {
   function pintarCabecera(proyecto) {
     $("[data-manage-members]").hidden = !scope.sandbox && proyecto.propietarioId !== scope.user?.id;
     $(".project-color-mark").style.background = proyecto.color || "#5b5ce2";
-    $(".project-stage-label").textContent = proyecto.etapaActual || "En curso";
+    $(".project-stage-label").textContent = proyecto.etapaActual || uiText("proyectos.en_curso");
     $(".detail-project-name").textContent = proyecto.nombre;
-    $(".detail-project-description").textContent = proyecto.descripcion || "Sin descripción todavía.";
+    $(".detail-project-description").textContent = proyecto.descripcion || uiText("proyecto.sin_descripcion_todavia");
 
     $(".detail-progress-value").textContent = `${proyecto.progreso}%`;
     $(".progress-fill").style.setProperty("--progress", `${proyecto.progreso}%`);
     const terminadas = proyecto.tareas.filter((tarea) => tarea.estado === "terminada").length;
     $(".progress-caption").textContent =
-      `${terminadas} de ${proyecto.tareas.length} tarea${proyecto.tareas.length === 1 ? "" : "s"} terminada${terminadas === 1 ? "" : "s"}`;
+      (uiText("proyecto.0_de_1_tarea_2_terminada_3", {0: terminadas, 1: proyecto.tareas.length, 2: proyecto.tareas.length === 1 ? "" : "s", 3: terminadas === 1 ? "" : "s"}));
 
     $(".detail-due-date").textContent = fechaCorta(proyecto.fechaEntrega);
     $(".detail-days-left").textContent = diasRestantes(proyecto.fechaEntrega);
@@ -148,7 +149,7 @@ export function mount(scope) {
         });
         const esEntrega = proyecto.fechaEntrega === dia && indiceBanda === 0;
         html += `<div class="calendar-cell${esEntrega ? " is-due-date" : ""}">
-          ${esEntrega ? '<span class="calendar-due-marker"><i class="bi bi-flag"></i> Entrega</span>' : ""}
+          ${esEntrega ? (`<span class="calendar-due-marker"><i class="bi bi-flag"></i>${" " + uiText("proyecto.entrega")}</span>`) : ""}
           ${enBanda.map((tarea) => tarjetaCalendario(tarea)).join("")}
         </div>`;
       });
@@ -167,9 +168,9 @@ export function mount(scope) {
         ${esc(tarea.titulo)}
         <span class="task-popover">
           <strong>${esc(tarea.titulo)}</strong>
-          <span><i class="bi bi-person"></i> ${esc(tarea.responsable || "Sin responsable")}</span>
+          <span><i class="bi bi-person"></i> ${esc(tarea.responsable || uiText("entregables.sin_responsable"))}</span>
           <span><i class="bi bi-calendar3"></i> ${esc(fechaCorta(tarea.fechaLimite))} · ${esc(tarea.horaLimite || "09:00")}</span>
-          <span><i class="bi bi-flag"></i> ${esc(tarea.estadoEtiqueta)}</span>
+          <span><i class="bi bi-flag"></i> ${esc(app.statusLabel(tarea.estado))}</span>
         </span>
       </button>`;
   }
@@ -182,11 +183,11 @@ export function mount(scope) {
       estado.filtro === "all" || tarea.estado === estado.filtro);
 
     if (!visibles.length) {
-      contenedor.innerHTML = `<div class="empty-tasks"><div>
+      contenedor.innerHTML = (`<div class="empty-tasks"><div>
           <i class="bi bi-list-check text-2xl text-primary"></i>
-          <h3>No hay tareas que mostrar</h3>
-          <p>Cambia el filtro o crea una tarea nueva.</p>
-        </div></div>`;
+          <h3>${uiText("proyecto.no_hay_tareas_que_mostrar")}</h3>
+          <p>${uiText("proyecto.cambia_el_filtro_o_crea_una_tarea_nueva")}</p>
+        </div></div>`);
       return;
     }
 
@@ -200,13 +201,13 @@ export function mount(scope) {
       tarjeta.classList.toggle("is-completed", tarea.estado === "terminada");
 
       const chip = fragmento.querySelector(".task-status");
-      chip.textContent = tarea.estadoEtiqueta;
+      chip.textContent = app.statusLabel(tarea.estado);
       (COLOR_ESTADO[tarea.estado] || "").split(" ").filter(Boolean)
         .forEach((clase) => chip.classList.add(clase));
 
       fragmento.querySelector(".task-title").textContent = tarea.titulo;
-      fragmento.querySelector(".task-description").textContent = tarea.descripcion || "Sin descripción.";
-      fragmento.querySelector(".task-stage").textContent = tarea.etapa || "Sin etapa";
+      fragmento.querySelector(".task-description").textContent = tarea.descripcion || uiText("proyecto.sin_descripcion");
+      fragmento.querySelector(".task-stage").textContent = tarea.etapa || uiText("proyecto.sin_etapa");
       fragmento.querySelector(".task-date time").textContent = fechaCorta(tarea.fechaLimite);
 
       // El color va en la tarjeta, no solo en el punto: pinta también el
@@ -215,7 +216,7 @@ export function mount(scope) {
       tarjeta.style.setProperty("--assignee-color", color);
       const responsable = fragmento.querySelector(".task-assignee");
       responsable.querySelector(".assignee-dot").style.setProperty("--assignee-color", color);
-      responsable.querySelector("span").textContent = tarea.responsable || "Sin responsable";
+      responsable.querySelector("span").textContent = tarea.responsable || uiText("entregables.sin_responsable");
 
       fragmento.querySelector(".task-check")
         .addEventListener("click", () => alternarTerminada(tarea));
@@ -245,7 +246,7 @@ export function mount(scope) {
   /* ------------------------------------------------------------ diálogos */
 
   function opcionesResponsable(select, seleccionado) {
-    select.innerHTML = '<option value="">Sin asignar</option>'
+    select.innerHTML = (`<option value="">${uiText("fases.sin_asignar")}</option>`)
       + estado.proyecto.integrantes.map((integrante) =>
           `<option value="${esc(integrante.nombre)}"${integrante.nombre === seleccionado ? " selected" : ""}>${esc(integrante.nombre)}</option>`
         ).join("");
@@ -266,7 +267,7 @@ export function mount(scope) {
     enlace.hidden = !tarea?.archivoResultadoUrl;
     if (tarea?.archivoResultadoUrl) {
       enlace.href = tarea.archivoResultadoUrl;
-      enlace.querySelector("span").textContent = tarea.archivoResultadoNombre || "Archivo de resultado";
+      enlace.querySelector("span").textContent = tarea.archivoResultadoNombre || uiText("fases.archivo_de_resultado");
     }
   }
 
@@ -281,8 +282,8 @@ export function mount(scope) {
     const tarea = tareaId ? estado.proyecto.tareas.find((item) => item.id === tareaId) : null;
 
     limpiarErrorTarea();
-    $("#task-dialog-kicker").textContent = tarea ? "Editar tarea" : "Nueva tarea";
-    $("#task-dialog-title").textContent = tarea ? tarea.titulo : "Añadir tarea";
+    $("#task-dialog-kicker").textContent = tarea ? uiText("fases.editar_tarea") : uiText("proyecto.nueva_tarea");
+    $("#task-dialog-title").textContent = tarea ? tarea.titulo : uiText("proyecto.anadir_tarea");
     $("#editing-task-id").value = tarea ? tarea.id : "";
     $("#task-title-input").value = tarea ? tarea.titulo : "";
     $("#task-description-input").value = tarea ? tarea.descripcion || "" : "";
@@ -301,7 +302,7 @@ export function mount(scope) {
     limpiarErrorTarea();
     const titulo = $("#task-title-input").value.trim();
     if (!titulo) {
-      mostrarErrorTarea("La tarea necesita un nombre.");
+      mostrarErrorTarea(uiText("proyecto.la_tarea_necesita_un_nombre"));
       return;
     }
     const quiereTerminar = $("#task-status-input").value === "terminada";
@@ -311,7 +312,7 @@ export function mount(scope) {
       ? estado.proyecto.tareas.find((item) => item.id === Number($("#editing-task-id").value))
       : null;
     if (quiereTerminar && !resultado && !archivo && !tareaPrevia?.tieneResultado) {
-      mostrarErrorTarea("Para terminar la tarea debes escribir un resultado o adjuntar un archivo.");
+      mostrarErrorTarea(uiText("fases.para_terminar_la_tarea_debes_escribir_un_resultado"));
       return;
     }
     const cuerpo = {
@@ -339,7 +340,7 @@ export function mount(scope) {
       }
       $("#task-dialog").close();
       await cargar();
-      avisar(id ? "Tarea actualizada." : "Tarea creada.", "success");
+      avisar(id ? uiText("fases.tarea_actualizada") : uiText("proyecto.tarea_creada"), "success");
     } catch (error) {
       mostrarErrorTarea(error.message);
     }
@@ -361,9 +362,9 @@ export function mount(scope) {
           const link = `${location.origin}/invitacion#${token}`;
           try {
             await navigator.clipboard.writeText(link);
-            avisar("Enlace de invitación copiado.", "success");
+            avisar(uiText("proyecto.enlace_de_invitacion_copiado"), "success");
           } catch (_) {
-            window.prompt("Copia el enlace de invitación.", link);
+            window.prompt(uiText("proyecto.copia_el_enlace_de_invitacion"), link);
           }
         } catch (error) {
           avisar(error.message, "error");
@@ -407,7 +408,7 @@ export function mount(scope) {
       });
       $("#members-dialog").close();
       await cargar();
-      avisar("Equipo actualizado.", "success");
+      avisar(uiText("proyecto.equipo_actualizado"), "success");
     } catch (error) {
       avisar(error.message, "error");
     }
@@ -464,12 +465,12 @@ export function mount(scope) {
     try {
       await cargar();
     } catch (error) {
-      $("#project-content").innerHTML = `<section class="empty-tasks"><div>
+      $("#project-content").innerHTML = (`<section class="empty-tasks"><div>
           <i class="bi bi-folder-x text-2xl text-danger"></i>
-          <h3>No encontramos este proyecto</h3>
+          <h3>${uiText("proyecto.no_encontramos_este_proyecto")}</h3>
           <p>${esc(error.message)}</p>
-          <a class="btn btn-primary mt-3" href="/proyectos">Volver a proyectos</a>
-        </div></section>`;
+          <a class="btn btn-primary mt-3" href="/proyectos">${uiText("crear_proyecto.volver_a_proyectos")}</a>
+        </div></section>`);
     }
   }
 

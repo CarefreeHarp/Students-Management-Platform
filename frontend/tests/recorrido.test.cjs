@@ -140,7 +140,7 @@ function fixture({ query = '?recorrido=1', pathname = '/panel', width = 390, hei
     }
   }
   vm.createContext(context);
-  context.scope = {
+  context.scope = { t: require('./idioma.cjs').t, StudyFlowLanguage: require('./idioma.cjs'),
     document, app: context.App, animate: context.requestAnimationFrame,
     listen: (target, ...args) => target?.addEventListener(...args), onDestroy() {},
     later: setTimeout, navigate: context.location.assign
@@ -538,7 +538,7 @@ test('sandbox requires two separate tasks before it unlocks the dependency diagr
 
 test('the second-task prompt pulses softly when it becomes visible', () => {
   const styles = fs.readFileSync(path.join(__dirname, '../public/css/recorrido.css'), 'utf8');
-  assert.match(source, /title: "Crea una segunda tarea"[\s\S]*pulseCard: true/);
+  assert.match(source, /title: uiText\("recorrido\.crea_una_segunda_tarea"\)[\s\S]*pulseCard: true/);
   assert.match(styles, /\.tour-card\.tour-card--pulse \{ animation:tour-card-pulse/);
 });
 

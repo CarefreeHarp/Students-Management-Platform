@@ -1,18 +1,17 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 
 <main id="contenido" class="page-shell">
   <section class="page-heading" aria-labelledby="paleta-title">
     <div>
-      <p class="eyebrow"><i class="bi bi-palette"></i> Guía de estilo</p>
-      <h1 id="paleta-title">Paleta de StudyFlow</h1>
+      <p class="eyebrow"><i class="bi bi-palette"></i> {{ t('paleta.guia_de_estilo') }}</p>
+      <h1 id="paleta-title">{{ t('paleta.paleta_de_studyflow') }}</h1>
       <p class="mt-2 max-w-[68ch] text-muted">
-        Los valores se leen de la hoja de estilos ya compilada, no están escritos aquí.
-        Pulsa cualquier color para copiarlo.
+        {{ t('paleta.los_valores_se_leen_de_la_hoja_de') }}
       </p>
     </div>
     <div class="flex items-center gap-2.5">
-      <button class="tema-boton tema-boton--suelto" type="button" data-action="tema" aria-label="Cambiar entre modo claro y oscuro"><i class="bi" aria-hidden="true"></i></button>
-      <a class="text-action" href="/panel"><i class="bi bi-arrow-left"></i> Volver al panel</a>
+      <button class="tema-boton tema-boton--suelto" type="button" data-action="tema" aria-label="{{ t('login.cambiar_entre_modo_claro_y_oscuro') }}"><i class="bi" aria-hidden="true"></i></button>
+      <a class="text-action" href="/panel"><i class="bi bi-arrow-left"></i> {{ t('paleta.volver_al_panel') }}</a>
     </div>
   </section>
 
@@ -20,73 +19,73 @@
   <section class="panel mb-5" aria-labelledby="nombrados-title">
     <div class="section-head flex-wrap">
       <div>
-        <p class="eyebrow">Definidos en tailwind.config.js</p>
-        <h2 id="nombrados-title">Colores con nombre</h2>
-        <p>Se usan como <code>bg-primary</code>, <code>text-muted</code>, <code>border-line</code>…</p>
+        <p class="eyebrow">{{ t('paleta.definidos_en_tailwind_config_js') }}</p>
+        <h2 id="nombrados-title">{{ t('paleta.colores_con_nombre') }}</h2>
+        <p>{{ t('paleta.se_usan_como') }} <code>{{ t('paleta.bg_primary') }}</code>, <code>{{ t('paleta.text_muted') }}</code>, <code>{{ t('paleta.border_line') }}</code>…</p>
       </div>
-      <span class="tag bg-primary-soft text-[var(--estado-primary)]">15 tokens</span>
+      <span class="tag bg-primary-soft text-[var(--estado-primary)]">{{ t('paleta.15_tokens') }}</span>
     </div>
 
     <div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-ink shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">ink</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Texto principal y títulos.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.ink') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.texto_principal_y_titulos') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-muted shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">muted</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Texto secundario y descripciones.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.muted') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.texto_secundario_y_descripciones') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-muted-light shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">muted-light</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Pistas, marcas de agua, texto de apoyo.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.muted_light') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.pistas_marcas_de_agua_texto_de_apoyo') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-canvas shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">canvas</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Fondo de todas las pantallas.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.canvas') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.fondo_de_todas_las_pantallas') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-line shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">line</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Separadores y bordes suaves.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.line') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.separadores_y_bordes_suaves') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-primary shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">primary</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Color de marca: botones, enlaces, activo.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.primary') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.color_de_marca_botones_enlaces_activo') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-primary-dark shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">primary-dark</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">El primario al pasar el ratón o pulsar.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.primary_dark') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.el_primario_al_pasar_el_raton_o_pulsar') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-primary-soft shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">primary-soft</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Fondo de etiquetas y avisos de marca.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.primary_soft') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.fondo_de_etiquetas_y_avisos_de_marca') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-cyan shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">cyan</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Acento secundario; cierra el degradado de marca.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.cyan') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.acento_secundario_cierra_el_degradado_de_marca') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-success shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">success</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Terminado, al día, confirmaciones.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.success') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.terminado_al_dia_confirmaciones') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-success-soft shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">success-soft</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Su fondo claro.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.success_soft') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.su_fondo_claro') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-warning shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">warning</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Vence pronto, requiere atención.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.warning') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.vence_pronto_requiere_atencion') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-warning-soft shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">warning-soft</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Su fondo claro.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.warning_soft') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.su_fondo_claro') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-danger shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">danger</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Vencido, errores, eliminar.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.danger') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.vencido_errores_eliminar') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-16 rounded-sm border border-line bg-danger-soft shadow-sm" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">danger-soft</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Su fondo claro.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.danger_soft') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.su_fondo_claro') }}</small></figcaption></figure>
     </div>
   </section>
 
@@ -94,32 +93,30 @@
   <section class="panel mb-5" aria-labelledby="tonos-title">
     <div class="section-head flex-wrap">
       <div>
-        <p class="eyebrow">Variable --tono</p>
-        <h2 id="tonos-title">Tonos de tarjeta</h2>
+        <p class="eyebrow">{{ t('paleta.variable_tono') }}</p>
+        <h2 id="tonos-title">{{ t('paleta.tonos_de_tarjeta') }}</h2>
         <p>
-          <code>.tarjeta-color</code> más una clase de tono. El degradado, el filete
-          superior y el borde salen del mismo valor con <code>color-mix</code>, así que
-          cambiar el tono basta para recolorear la tarjeta entera.
+          <code>{{ t('paleta.tarjeta_color') }}</code> {{ t('paleta.mas_una_clase_de_tono_el_degradado_el') }} <code>{{ t('paleta.color_mix') }}</code>{{ t('paleta.asi_que_cambiar_el_tono_basta_para_recolorear') }}
         </p>
       </div>
     </div>
 
     <div class="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-4">
-      <article class="tarjeta-color tono-indigo"><p class="eyebrow">tono-indigo</p>
+      <article class="tarjeta-color tono-indigo"><p class="eyebrow">{{ t('paleta.tono_indigo') }}</p>
         <p class="mt-1 font-display text-lg" data-hex-tono></p>
-        <p class="text-[12px] text-muted">Resúmenes y datos de marca.</p></article>
-      <article class="tarjeta-color tono-cian"><p class="eyebrow">tono-cian</p>
+        <p class="text-[12px] text-muted">{{ t('paleta.resumenes_y_datos_de_marca') }}</p></article>
+      <article class="tarjeta-color tono-cian"><p class="eyebrow">{{ t('paleta.tono_cian') }}</p>
         <p class="mt-1 font-display text-lg" data-hex-tono></p>
-        <p class="text-[12px] text-muted">Progreso y ritmo de trabajo.</p></article>
-      <article class="tarjeta-color tono-verde"><p class="eyebrow">tono-verde</p>
+        <p class="text-[12px] text-muted">{{ t('paleta.progreso_y_ritmo_de_trabajo') }}</p></article>
+      <article class="tarjeta-color tono-verde"><p class="eyebrow">{{ t('paleta.tono_verde') }}</p>
         <p class="mt-1 font-display text-lg" data-hex-tono></p>
-        <p class="text-[12px] text-muted">Completado y proyectos.</p></article>
-      <article class="tarjeta-color tono-ambar"><p class="eyebrow">tono-ambar</p>
+        <p class="text-[12px] text-muted">{{ t('paleta.completado_y_proyectos') }}</p></article>
+      <article class="tarjeta-color tono-ambar"><p class="eyebrow">{{ t('paleta.tono_ambar') }}</p>
         <p class="mt-1 font-display text-lg" data-hex-tono></p>
-        <p class="text-[12px] text-muted">Próximos vencimientos.</p></article>
-      <article class="tarjeta-color tono-rosa"><p class="eyebrow">tono-rosa</p>
+        <p class="text-[12px] text-muted">{{ t('paleta.proximos_vencimientos') }}</p></article>
+      <article class="tarjeta-color tono-rosa"><p class="eyebrow">{{ t('paleta.tono_rosa') }}</p>
         <p class="mt-1 font-display text-lg" data-hex-tono></p>
-        <p class="text-[12px] text-muted">Acciones y recordatorios.</p></article>
+        <p class="text-[12px] text-muted">{{ t('paleta.acciones_y_recordatorios') }}</p></article>
     </div>
   </section>
 
@@ -127,62 +124,62 @@
   <section class="panel mb-5" aria-labelledby="superficies-title">
     <div class="section-head flex-wrap">
       <div>
-        <p class="eyebrow">Escritos directamente en tailwind.css</p>
-        <h2 id="superficies-title">Superficies y bordes</h2>
+        <p class="eyebrow">{{ t('paleta.escritos_directamente_en_tailwind_css') }}</p>
+        <h2 id="superficies-title">{{ t('paleta.superficies_y_bordes') }}</h2>
         <p class="max-w-[70ch]">
-          Cada una es un rol, no un color: «el fondo de la barra», «el borde de una tarjeta». Están declaradas dos veces —claro y oscuro— y las reglas usan la variable, así que el tema se cambia volcando ese bloque.
+          {{ t('paleta.cada_una_es_un_rol_no_un_color') }}
         </p>
       </div>
     </div>
 
     <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--fondo)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Fondo de página</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Papel cálido; sin velos de color.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.fondo_de_pagina') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.papel_calido_sin_velos_de_color') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--barra)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Barra superior</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Lavanda muy claro sobre el papel.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.barra_superior') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.lavanda_muy_claro_sobre_el_papel') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--superficie)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Panel</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Paneles, tarjetas de lista y campos.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.panel') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.paneles_tarjetas_de_lista_y_campos') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--superficie-suave)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Zona embebida</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Bloques dentro de un panel.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.zona_embebida') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.bloques_dentro_de_un_panel') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--linea-tarjeta)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Contorno de toda superficie.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.borde') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.contorno_de_toda_superficie') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--linea-tarjeta-fuerte)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde al pasar</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Se oscurece con el ratón encima.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.borde_al_pasar') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.se_oscurece_con_el_raton_encima') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--campo-borde)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Borde de campo</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Lo que define un campo blanco.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.borde_de_campo') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.lo_que_define_un_campo_blanco') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--cal-cabecera)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Cabecera de calendario</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Franja de días y barra de semana.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.cabecera_de_calendario') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.franja_de_dias_y_barra_de_semana') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--cal-rejilla)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Rejilla horaria</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Líneas de hora del calendario.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.rejilla_horaria') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.lineas_de_hora_del_calendario') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--boton-dos)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Botón secundario</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Blanco con borde propio.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.boton_secundario') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.blanco_con_borde_propio') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--chip-neutro)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Etiqueta neutra</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Estados sin color asignado.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.etiqueta_neutra') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.estados_sin_color_asignado') }}</small></figcaption></figure>
 
       <figure class="grid gap-2"><div class="h-14 rounded-sm border border-line bg-[var(--realce)]" data-muestra></div>
-        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">Realce</b><code class="text-[11px] text-muted" data-hex></code>
-        <small class="text-[11px] leading-snug text-muted-light">Hover de enlaces y elementos suaves.</small></figcaption></figure>
+        <figcaption class="grid gap-0.5"><b class="font-display text-[13px]">{{ t('paleta.realce') }}</b><code class="text-[11px] text-muted" data-hex></code>
+        <small class="text-[11px] leading-snug text-muted-light">{{ t('paleta.hover_de_enlaces_y_elementos_suaves') }}</small></figcaption></figure>
     </div>
   </section>
 
@@ -190,34 +187,33 @@
   <section class="panel mb-5" aria-labelledby="sombras-title">
     <div class="section-head flex-wrap">
       <div>
-        <p class="eyebrow">boxShadow</p>
-        <h2 id="sombras-title">Niveles de elevación</h2>
+        <p class="eyebrow">{{ t('paleta.boxshadow') }}</p>
+        <h2 id="sombras-title">{{ t('paleta.niveles_de_elevacion') }}</h2>
         <p class="max-w-[70ch]">
-          Cada nivel suma un contacto corto, que dibuja el borde, y una sombra larga muy
-          suave, que separa del fondo. Por eso da profundidad sin ensuciar.
+          {{ t('paleta.cada_nivel_suma_un_contacto_corto_que_dibuja') }}
         </p>
       </div>
     </div>
 
     <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 p-2">
       <figure class="grid gap-2.5"><div class="h-20 rounded border border-[var(--linea-tarjeta)] bg-[var(--superficie)] shadow-tarjeta" data-sombra></div>
-        <figcaption><b class="font-display text-[13px]">shadow-tarjeta</b>
-        <small class="block text-[11px] leading-snug text-muted">Todas las tarjetas: proyecto, tarea, lista y color.</small></figcaption></figure>
+        <figcaption><b class="font-display text-[13px]">{{ t('paleta.shadow_tarjeta') }}</b>
+        <small class="block text-[11px] leading-snug text-muted">{{ t('paleta.todas_las_tarjetas_proyecto_tarea_lista_y_color') }}</small></figcaption></figure>
       <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-sm" data-sombra></div>
-        <figcaption><b class="font-display text-[13px]">shadow-sm</b>
-        <small class="block text-[11px] leading-snug text-muted">Detalles pequeños; ya no la usan las tarjetas.</small></figcaption></figure>
+        <figcaption><b class="font-display text-[13px]">{{ t('paleta.shadow_sm') }}</b>
+        <small class="block text-[11px] leading-snug text-muted">{{ t('paleta.detalles_pequenos_ya_no_la_usan_las_tarjetas') }}</small></figcaption></figure>
       <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow" data-sombra></div>
-        <figcaption><b class="font-display text-[13px]">shadow</b>
-        <small class="block text-[11px] leading-snug text-muted">Tarjeta de lista con el ratón encima.</small></figcaption></figure>
+        <figcaption><b class="font-display text-[13px]">{{ t('paleta.shadow') }}</b>
+        <small class="block text-[11px] leading-snug text-muted">{{ t('paleta.tarjeta_de_lista_con_el_raton_encima') }}</small></figcaption></figure>
       <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-alta" data-sombra></div>
-        <figcaption><b class="font-display text-[13px]">shadow-alta</b>
-        <small class="block text-[11px] leading-snug text-muted">Tarjeta de color al levantarse.</small></figcaption></figure>
+        <figcaption><b class="font-display text-[13px]">{{ t('paleta.shadow_alta') }}</b>
+        <small class="block text-[11px] leading-snug text-muted">{{ t('paleta.tarjeta_de_color_al_levantarse') }}</small></figcaption></figure>
       <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-barra" data-sombra></div>
-        <figcaption><b class="font-display text-[13px]">shadow-barra</b>
-        <small class="block text-[11px] leading-snug text-muted">Barra superior fija.</small></figcaption></figure>
+        <figcaption><b class="font-display text-[13px]">{{ t('paleta.shadow_barra') }}</b>
+        <small class="block text-[11px] leading-snug text-muted">{{ t('paleta.barra_superior_fija') }}</small></figcaption></figure>
       <figure class="grid gap-2.5"><div class="h-20 rounded border border-line bg-[var(--superficie)] shadow-pop" data-sombra></div>
-        <figcaption><b class="font-display text-[13px]">shadow-pop</b>
-        <small class="block text-[11px] leading-snug text-muted">Diálogos y ventanas emergentes.</small></figcaption></figure>
+        <figcaption><b class="font-display text-[13px]">{{ t('paleta.shadow_pop') }}</b>
+        <small class="block text-[11px] leading-snug text-muted">{{ t('paleta.dialogos_y_ventanas_emergentes') }}</small></figcaption></figure>
     </div>
   </section>
 
@@ -225,45 +221,44 @@
   <div class="grid items-start gap-5 lg:grid-cols-2">
     <section class="panel" aria-labelledby="radios-title">
       <div class="section-head"><div>
-        <p class="eyebrow">borderRadius</p><h2 id="radios-title">Redondeos</h2>
-        <p>Tres niveles; cuanto más grande el elemento, más redondeado.</p>
+        <p class="eyebrow">{{ t('paleta.borderradius') }}</p><h2 id="radios-title">{{ t('paleta.redondeos') }}</h2>
+        <p>{{ t('paleta.tres_niveles_cuanto_mas_grande_el_elemento_mas') }}</p>
       </div></div>
       <div class="grid grid-cols-3 gap-4">
         <figure class="grid gap-2"><div class="h-20 rounded-sm border border-line bg-primary-soft" data-radio></div>
-          <figcaption class="text-center"><b class="font-display text-[13px]">rounded-sm</b>
+          <figcaption class="text-center"><b class="font-display text-[13px]">{{ t('paleta.rounded_sm') }}</b>
           <code class="block text-[11px] text-muted" data-radio-valor></code></figcaption></figure>
         <figure class="grid gap-2"><div class="h-20 rounded border border-line bg-primary-soft" data-radio></div>
-          <figcaption class="text-center"><b class="font-display text-[13px]">rounded</b>
+          <figcaption class="text-center"><b class="font-display text-[13px]">{{ t('paleta.rounded') }}</b>
           <code class="block text-[11px] text-muted" data-radio-valor></code></figcaption></figure>
         <figure class="grid gap-2"><div class="h-20 rounded-lg border border-line bg-primary-soft" data-radio></div>
-          <figcaption class="text-center"><b class="font-display text-[13px]">rounded-lg</b>
+          <figcaption class="text-center"><b class="font-display text-[13px]">{{ t('paleta.rounded_lg') }}</b>
           <code class="block text-[11px] text-muted" data-radio-valor></code></figcaption></figure>
       </div>
     </section>
 
     <section class="panel" aria-labelledby="tipo-title">
       <div class="section-head"><div>
-        <p class="eyebrow">fontFamily</p><h2 id="tipo-title">Tipografías</h2>
-        <p>Dos familias: una para titular y otra para leer.</p>
+        <p class="eyebrow">{{ t('paleta.fontfamily') }}</p><h2 id="tipo-title">{{ t('paleta.tipografias') }}</h2>
+        <p>{{ t('paleta.dos_familias_una_para_titular_y_otra_para') }}</p>
       </div></div>
       <div class="grid gap-4">
         <div class="tarjeta-lista">
-          <p class="eyebrow">font-display · Plus Jakarta Sans</p>
-          <p class="font-display text-2xl font-extrabold text-ink">Organiza tu semestre</p>
-          <p class="mt-1 text-[12px] text-muted">Títulos, nombres de tarjeta y el logotipo.</p>
+          <p class="eyebrow">{{ t('paleta.font_display_plus_jakarta_sans') }}</p>
+          <p class="font-display text-2xl font-extrabold text-ink">{{ t('paleta.organiza_tu_semestre') }}</p>
+          <p class="mt-1 text-[12px] text-muted">{{ t('paleta.titulos_nombres_de_tarjeta_y_el_logotipo') }}</p>
         </div>
         <div class="tarjeta-lista">
-          <p class="eyebrow">font-sans · DM Sans</p>
-          <p class="text-[15px] text-ink">Anota lo que anunciaron en clase; si tiene fecha, se convierte en recordatorio.</p>
-          <p class="mt-1 text-[12px] text-muted">Todo el texto corrido de la interfaz.</p>
+          <p class="eyebrow">{{ t('paleta.font_sans_dm_sans') }}</p>
+          <p class="text-[15px] text-ink">{{ t('paleta.anota_lo_que_anunciaron_en_clase_si_tiene') }}</p>
+          <p class="mt-1 text-[12px] text-muted">{{ t('paleta.todo_el_texto_corrido_de_la_interfaz') }}</p>
         </div>
       </div>
     </section>
   </div>
 
   <p class="mt-6 text-center text-[12px] text-muted-light">
-    Los colores con nombre salen de <code>tailwind.config.js</code>;
-    las superficies, de las variables de rol de <code>src/main/frontend/tailwind.css</code>.
+    {{ t('paleta.los_colores_con_nombre_salen_de') }} <code>{{ t('paleta.tailwind_config_js') }}</code>{{ t('paleta.las_superficies_de_las_variables_de_rol_de') }} <code>{{ t('paleta.src_main_frontend_tailwind_css') }}</code>.
   </p>
 </main>
 

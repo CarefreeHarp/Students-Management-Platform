@@ -1,4 +1,5 @@
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, request, navigate } = scope;
   const token = location.hash.slice(1);
   const feedback = document.getElementById('invitation-feedback');
@@ -8,7 +9,7 @@ export function mount(scope) {
   if (!/^[A-Za-z0-9_-]{43}$/.test(token)) {
     join.hidden = true;
     create.hidden = true;
-    feedback.textContent = 'Este enlace de invitación no es válido.';
+    feedback.textContent = uiText("invitacion.este_enlace_de_invitacion_no_es_valido");
     return;
   }
 
@@ -25,7 +26,7 @@ export function mount(scope) {
         return;
       }
       const result = await response.json();
-      if (!response.ok) throw new Error(result.detail || 'No fue posible aceptar la invitación.');
+      if (!response.ok) throw new Error(result.detail || uiText("invitacion.no_fue_posible_aceptar_la_invitacion"));
       navigate('/proyectos/' + encodeURIComponent(result.codigo));
     } catch (error) {
       feedback.textContent = error.message;

@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom, fromEvent, takeUntil } from 'rxjs';
+import { traducirError } from './idioma';
 import { Auth, Usuario } from './auth';
 
 @Injectable({ providedIn: 'root' })
@@ -30,7 +31,16 @@ export class Transporte {
     const { status } = respuesta;
     const outputHeaders = new Headers();
     respuesta.headers.keys().forEach(name => outputHeaders.set(name, respuesta.headers.get(name) ?? ''));
-    const body = respuesta instanceof HttpResponse ? respuesta.body : respuesta.error as Blob | null;
+    let body = respuesta instanceof HttpResponse ? respuesta.body : respuesta.error as Blob | null;
+    if (respuesta instanceof HttpErrorResponse && body instanceof Blob && body.type.includes('json')) {
+      try {
+        const problem = JSON.parse(await body.text());
+        for (const field of ['mensaje', 'detail', 'message']) {
+          if (typeof problem?.[field] === 'string') problem[field] = traducirError(problem[field]);
+        }
+        body = new Blob([JSON.stringify(problem)], { type: body.type });
+      } catch { /* Keep the original response when the body is not JSON. */ }
+    }
     const result = new Response([204, 205, 304].includes(status) ? null : body, {
       status,
       headers: outputHeaders

@@ -1,5 +1,6 @@
 /* StudyFlow: capa temporal de datos. Sustituible por servicios/API en una futura etapa. */
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const KEYS = {
@@ -41,7 +42,7 @@ export function mount(scope) {
         const icono = boton.querySelector('i');
         if (icono) icono.className = oscuro ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
         boton.setAttribute('aria-pressed', String(oscuro));
-        boton.title = oscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+        boton.title = oscuro ? uiText("sandbox.cambiar_a_modo_claro") : uiText("main.cambiar_a_modo_oscuro");
       });
     },
 
@@ -108,12 +109,12 @@ export function mount(scope) {
       headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
       ...options
     });
-    if (!response.ok) throw new Error(`Error ${response.status} al llamar a ${path}`);
+    if (!response.ok) throw new Error((uiText("main.error_0_al_llamar_a_1", {0: response.status, 1: path})));
     return response.status === 204 ? null : response.json();
   }
 
   const defaultUser = {
-    firstName: 'Estudiante', lastName: '', name: 'Estudiante', email: '', age: '',
+    firstName: uiText("index.estudiante"), lastName: '', name: uiText("index.estudiante"), email: '', age: '',
     university: '', career: '', semester: '', description: '', avatar: ''
   };
 
@@ -159,20 +160,20 @@ export function mount(scope) {
     return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
   }
   function formatDate(date, options = { day: 'numeric', month: 'short' }) {
-    if (!date) return 'Sin fecha';
+    if (!date) return uiText("fases.sin_fecha");
     const parsed = new Date(`${date}T12:00:00`);
     if (Number.isNaN(parsed.getTime())) return date;
-    return new Intl.DateTimeFormat('es-CO', options).format(parsed).replace('.', '');
+    return new Intl.DateTimeFormat(StudyFlowLanguage.locale(), options).format(parsed).replace('.', '');
   }
   /* Etiquetas de estado. Se admiten los cuatro estados actuales y los nombres
      antiguos, porque las pantallas que aún leen localStorage guardan los viejos. */
   function statusLabel(status) {
     return ({
-      'sin-empezar': 'Sin empezar', 'en-proceso': 'En proceso',
-      'en-revision': 'En revisión', 'terminada': 'Terminada',
-      pending: 'Sin empezar', progress: 'En proceso', 'in-progress': 'En proceso',
-      done: 'Terminada', completed: 'Terminada', late: 'Atrasada'
-    })[status] || 'Sin empezar';
+      'sin-empezar': uiText("fases.sin_empezar"), 'en-proceso': uiText("fases.en_proceso"),
+      'en-revision': uiText("entregables.en_revision_2"), 'terminada': uiText("fases.terminada"),
+      pending: uiText("fases.sin_empezar"), progress: uiText("fases.en_proceso"), 'in-progress': uiText("fases.en_proceso"),
+      done: uiText("fases.terminada"), completed: uiText("fases.terminada"), late: uiText("main.atrasada")
+    })[status] || uiText("fases.sin_empezar");
   }
   function statusClass(status) { return `status-${status || 'sin-empezar'}`; }
   function initials(name) { return String(name || '?').trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase(); }
@@ -189,36 +190,36 @@ export function mount(scope) {
     const user = getUser();
     const active = value => page === value ? 'active' : '';
     holder.className = 'app-nav';
-    holder.innerHTML = `
+    holder.innerHTML = (`
       <div class="nav-inner">
-        <a class="brand" href="/panel" aria-label="StudyFlow, ir al inicio"><img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="40" height="40" alt="">StudyFlow</a>
-        <button class="mobile-nav-toggle" type="button" aria-label="Abrir navegación" aria-expanded="false"><i class="bi bi-list"></i></button>
+        <a class="brand" href="/panel" aria-label="${uiText("main.studyflow_ir_al_inicio")}"><img class="brand-logo" src="/assets/img/studyflow-isotipo.png" width="40" height="40" alt="">StudyFlow</a>
+        <button class="mobile-nav-toggle" type="button" aria-label="${uiText("main.abrir_navegacion")}" aria-expanded="false"><i class="bi bi-list"></i></button>
         <span class="nav-separador" aria-hidden="true"></span>
-        <nav class="nav-links" aria-label="Navegación principal">
-          <a class="nav-link ${active('dashboard')}" href="/panel"><i class="bi bi-grid-1x2"></i> <span>Inicio</span></a>
-          <a class="nav-link ${['projects', 'project', 'canales', 'fases', 'entregables', 'crear-proyecto'].includes(page) ? 'active' : ''}" href="/proyectos"><i class="bi bi-kanban"></i> <span>Proyectos</span></a>
-          <a class="nav-link ${active('schedule')}" href="/horarios"><i class="bi bi-calendar3"></i> <span>Horarios</span></a>
-          <a class="nav-link ${active('recordatorios')}" href="/recordatorios"><i class="bi bi-bell"></i> <span>Recordatorios</span></a>
+        <nav class="nav-links" aria-label="${uiText("catalogo_planes.navegacion_principal")}">
+          <a class="nav-link ${active('dashboard')}" href="/panel"><i class="bi bi-grid-1x2"></i> <span>${uiText("main.inicio")}</span></a>
+          <a class="nav-link ${['projects', 'project', "canales", 'fases', 'entregables', 'crear-proyecto'].includes(page) ? 'active' : ''}" href="/proyectos"><i class="bi bi-kanban"></i> <span>${uiText("perfil.proyectos")}</span></a>
+          <a class="nav-link ${active('schedule')}" href="/horarios"><i class="bi bi-calendar3"></i> <span>${uiText("main.horarios")}</span></a>
+          <a class="nav-link ${active('recordatorios')}" href="/recordatorios"><i class="bi bi-bell"></i> <span>${uiText("recordatorios.recordatorios")}</span></a>
         </nav>
         <span class="nav-separador" aria-hidden="true"></span>
         <div class="nav-actions">
-          <button class="tema-boton" type="button" data-action="tema" aria-label="Cambiar entre modo claro y oscuro">
+          <button class="tema-boton" type="button" data-action="tema" aria-label="${uiText("login.cambiar_entre_modo_claro_y_oscuro")}">
             <i class="bi" aria-hidden="true"></i>
           </button>
-          <a class="btn btn-primary btn-sm" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> <span>Proyecto</span></a>
+          <a class="btn btn-primary btn-sm" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> <span>${uiText("landing.proyecto")}</span></a>
           <div class="profile-menu">
-            <button class="profile-trigger" type="button" aria-label="Abrir menú de perfil" aria-expanded="false">${avatarMarkup(user, 'nav-avatar')}<i class="bi bi-chevron-down"></i></button>
+            <button class="profile-trigger" type="button" aria-label="${uiText("main.abrir_menu_de_perfil")}" aria-expanded="false">${avatarMarkup(user, 'nav-avatar')}<i class="bi bi-chevron-down"></i></button>
             <div class="profile-dropdown">
-              <a href="/perfil"><i class="bi bi-person-circle"></i> Ver mi perfil</a>
-              <a href="/perfil/editar"><i class="bi bi-sliders"></i> Editar perfil</a>
-              <a href="/planes"><i class="bi bi-stars"></i> Planes y precios</a>
-              <a href="/mi-plan"><i class="bi bi-card-checklist"></i> Mi plan</a>
-              <a href="/panel?recorrido=1"><i class="bi bi-question-circle"></i> Recorrido guiado</a>
-              <a href="/login" data-action="sign-out"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+              <a href="/perfil"><i class="bi bi-person-circle"></i>${" " + uiText("main.ver_mi_perfil")}</a>
+              <a href="/perfil/editar"><i class="bi bi-sliders"></i>${" " + uiText("perfil.editar_perfil")}</a>
+              <a href="/planes"><i class="bi bi-stars"></i>${" " + uiText("perfil.planes_y_precios")}</a>
+              <a href="/mi-plan"><i class="bi bi-card-checklist"></i>${" " + uiText("main.mi_plan")}</a>
+              <a href="/panel?recorrido=1"><i class="bi bi-question-circle"></i>${" " + uiText("main.recorrido_guiado")}</a>
+              <a href="/login" data-action="sign-out"><i class="bi bi-box-arrow-right"></i>${" " + uiText("admin.cerrar_sesion")}</a>
             </div>
           </div>
         </div>
-      </div>`;
+      </div>`);
     const menuButton = holder.querySelector('.mobile-nav-toggle');
     const links = holder.querySelector('.nav-links');
     holder.querySelectorAll('.nav-link').forEach(link => {
@@ -255,7 +256,7 @@ export function mount(scope) {
         await scope.logout();
         navigate(ROUTES.login);
       } catch (_) {
-        showToast('No se pudo cerrar sesión. Inténtalo de nuevo.', 'error');
+        showToast(uiText("main.no_se_pudo_cerrar_sesion_intentalo_de_nuevo"), 'error');
       }
     });
     Tema.pintarBotones();
@@ -331,7 +332,7 @@ export function mount(scope) {
         trigger?.setAttribute('aria-expanded', 'false'); trigger?.focus();
       });
     });
-    listen(scope.root, 'studyflow:download-error', () => showToast('No se pudo descargar el archivo.', 'error'));
+    listen(scope.root, 'studyflow:download-error', () => showToast(uiText("main.no_se_pudo_descargar_el_archivo"), 'error'));
     habilitarCierreAlPulsarFuera();
   }
 }

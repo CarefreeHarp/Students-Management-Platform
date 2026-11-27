@@ -11,6 +11,7 @@ const runnable = bridge.replace(/^import .*;$/gm, '')
   .replace('iniciar().catch(() => window.location.replace(\'/sandbox\'));', '');
 
 function fixture(parent, ruta = '/panel') {
+  if (parent.StudyFlowSandbox) parent.StudyFlowSandbox.language = require('./idioma.cjs');
   const redirects = [], calls = [];
   const document = {
     documentElement: { classList: { toggle() {} } }, body: { dataset: {} },

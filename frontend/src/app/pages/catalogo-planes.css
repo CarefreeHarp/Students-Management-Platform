@@ -72,3 +72,27 @@ nav a { font-size: 13px; }
   .top-link { padding: 9px 11px; }
   .description { min-height: 0; }
 }
+
+/* Two layers of starlight sit behind the catalog and never intercept a click. */
+.plans-page { position: relative; isolation: isolate; }
+.plans-page::before, .plans-page::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(circle at 12% 29%, #d9d5ff 1px, transparent 1.6px),
+    radial-gradient(circle at 72% 62%, #a6ddeb .9px, transparent 1.5px),
+    radial-gradient(circle at 43% 84%, #e3ddff .7px, transparent 1.4px);
+  background-size: 217px 167px, 283px 203px, 143px 191px; opacity: .45;
+}
+.plans-page::after { background-position: 71px 43px, 52px 18px, 84px 19px; opacity: .22; }
+@media (prefers-reduced-motion: no-preference) {
+  .plans-page::after { animation: starlight 5s ease-in-out infinite alternate; }
+  .plan { animation: plan-drift 5s ease-in-out infinite alternate; transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease; }
+  .plan:nth-child(2) { animation-delay: -2s; }
+  .plan:nth-child(3) { animation-delay: -4s; }
+  .plan:nth-child(4) { animation-delay: -1s; }
+  .plan:focus-within { animation-play-state: paused; transform: translateY(-5px); border-color: var(--accent); }
+  @media (hover: hover) {
+    .plan:hover { animation-play-state: paused; transform: translateY(-7px); border-color: var(--accent); box-shadow: 0 18px 35px #10172f80, 0 0 23px color-mix(in srgb, var(--accent) 17%, transparent); }
+  }
+}
+@keyframes starlight { to { opacity: .64; } }
+@keyframes plan-drift { from { translate: 0 1px; } to { translate: 0 -3px; } }

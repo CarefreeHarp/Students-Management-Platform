@@ -1,3 +1,4 @@
+import { t } from '../idioma';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -29,6 +30,7 @@ interface Tabla {
   styleUrl: './admin.css'
 })
 export class Admin implements OnInit {
+  readonly t = t;
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly sesion = inject(SesionAdmin);
@@ -69,7 +71,7 @@ export class Admin implements OnInit {
       this.vista.set('panel');
     } catch {
       this.vista.set('error');
-      this.error.set('No se pudo conectar con el panel de administración. Vuelve a intentarlo.');
+      this.error.set(t("admin.no_se_pudo_conectar_con_el_panel_de"));
     }
   }
 
@@ -85,7 +87,7 @@ export class Admin implements OnInit {
       await firstValueFrom(acceso);
       await this.cargar();
     } catch (error) {
-      this.error.set(error instanceof Error ? error.message : 'No se pudo iniciar sesión.');
+      this.error.set(error instanceof Error ? error.message : t("admin.no_se_pudo_iniciar_sesion"));
     } finally {
       this.ocupado.set(false);
     }
@@ -103,7 +105,7 @@ export class Admin implements OnInit {
       }));
       this.tabla.set(datos);
     } catch (error) {
-      await this.errorPanel(error, 'No se pudo cargar la tabla.');
+      await this.errorPanel(error, t("admin.no_se_pudo_cargar_la_tabla"));
     } finally {
       this.ocupado.set(false);
     }
@@ -118,7 +120,7 @@ export class Admin implements OnInit {
       this.mostrarAcceso();
       await this.cargar();
     } catch (error) {
-      await this.errorPanel(error, 'No se pudo cerrar la sesión.');
+      await this.errorPanel(error, t("admin.no_se_pudo_cerrar_la_sesion"));
     } finally {
       this.ocupado.set(false);
     }
@@ -135,7 +137,7 @@ export class Admin implements OnInit {
     } catch (error) {
       // Durante el apagado, el proxy puede cerrar la conexión antes del 202.
       if (!(error instanceof HttpErrorResponse) || ![0, 502, 503, 504].includes(error.status)) {
-        await this.errorPanel(error, 'No se pudo solicitar el reinicio.');
+        await this.errorPanel(error, t("admin.no_se_pudo_solicitar_el_reinicio"));
         this.ocupado.set(false);
         return;
       }
@@ -150,11 +152,11 @@ export class Admin implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       ));
       this.mostrarAcceso();
-      this.aviso.set('El backend volvió a arrancar. Inicia sesión para continuar.');
+      this.aviso.set(t("admin.el_backend_volvio_a_arrancar_inicia_sesion_para"));
     } catch {
       if (!this.destroyRef.destroyed) {
         this.vista.set('error');
-        this.error.set('No se pudo confirmar el reinicio. Comprueba la terminal y vuelve a conectar.');
+        this.error.set(t("admin.no_se_pudo_confirmar_el_reinicio_comprueba_la"));
       }
     } finally {
       this.ocupado.set(false);
@@ -180,7 +182,7 @@ export class Admin implements OnInit {
     if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
       await this.cargar();
       if (this.vista() === 'acceso') {
-        this.aviso.set('La sesión de administrador caducó. Inicia sesión de nuevo.');
+        this.aviso.set(t("admin.la_sesion_de_administrador_caduco_inicia_sesion_de"));
         return;
       }
     }

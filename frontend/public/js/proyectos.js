@@ -3,6 +3,7 @@
  * proyectos coinciden con los de la base y los enlaces abren el proyecto real.
  */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const app = scope.app || {};
@@ -19,25 +20,25 @@ export function mount(scope) {
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
       app.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.json();
   }
 
   function entregaRelativa(iso) {
-    if (!iso) return "Entrega sin definir";
+    if (!iso) return uiText("proyectos.entrega_sin_definir");
     const fecha = new Date(`${iso}T00:00:00`);
-    if (Number.isNaN(fecha.getTime())) return "Entrega sin definir";
+    if (Number.isNaN(fecha.getTime())) return uiText("proyectos.entrega_sin_definir");
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const dias = Math.round((fecha - hoy) / 86400000);
-    if (dias < 0) return `Entrega vencida hace ${Math.abs(dias)} día${dias === -1 ? "" : "s"}`;
-    if (dias === 0) return "La entrega es hoy";
-    return `Entrega: ${dias === 1 ? "falta 1 día" : `faltan ${dias} días`}`;
+    if (dias < 0) return (uiText("proyectos.entrega_vencida_hace_0_dia_1", {0: Math.abs(dias), 1: dias === -1 ? "" : "s"}));
+    if (dias === 0) return uiText("proyectos.la_entrega_es_hoy");
+    return (uiText("proyectos.entrega_0", {0: dias === 1 ? uiText("proyectos.falta_1_dia") : (uiText("proyectos.faltan_0_dias", {0: dias}))}));
   }
 
   function coincide(proyecto) {
@@ -53,7 +54,7 @@ export function mount(scope) {
   function pintarResumen() {
     const activos = proyectos.filter((proyecto) => proyecto.progreso < 100);
     $("#total-projects").textContent =
-      `${activos.length} proyecto${activos.length === 1 ? " activo" : "s activos"}`;
+      (uiText(activos.length === 1 ? "proyectos.un_activo" : "proyectos.varios_activos", {0: activos.length}));
   }
 
   function pintarProyectos() {
@@ -61,7 +62,7 @@ export function mount(scope) {
     const rejilla = $("#projects-grid");
 
     $("#project-count-label").textContent =
-      `${visibles.length} proyecto${visibles.length === 1 ? "" : "s"}`;
+      (uiText("proyectos.0_proyecto_1", {0: visibles.length, 1: visibles.length === 1 ? "" : "s"}));
 
     if (!visibles.length) {
       // Se distingue "no hay nada" de "el filtro no encuentra nada": una cuenta
@@ -69,22 +70,21 @@ export function mount(scope) {
       // explica.
       const cuentaVacia = !proyectos.length && !busqueda && filtro === "all";
       rejilla.innerHTML = cuentaVacia
-        ? `<div class="empty-projects"><div>
+        ? (`<div class="empty-projects"><div>
              <i class="bi bi-folder2-open text-2xl text-primary"></i>
-             <h3>Tu cuenta todavía no tiene proyectos</h3>
-             <p>Crea tu primer proyecto o descubre cómo funciona StudyFlow con un recorrido guiado.</p>
+             <h3>${uiText("proyectos.tu_cuenta_todavia_no_tiene_proyectos")}</h3>
+             <p>${uiText("proyectos.crea_tu_primer_proyecto_o_descubre_como_funciona")}</p>
              <div class="mt-3 flex flex-wrap justify-center gap-2.5">
-               <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> Crear proyecto</a>
+               <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i>${" " + uiText("proyectos.crear_proyecto")}</a>
                <a class="btn btn-secondary" href="/sandbox">
-                 <i class="bi bi-play-circle"></i> Iniciar recorrido guiado
-               </a>
+                 <i class="bi bi-play-circle"></i>${" " + uiText("proyectos.iniciar_recorrido_guiado") + "\n               "}</a>
              </div>
-           </div></div>`
-        : `<div class="empty-projects"><div>
+           </div></div>`)
+        : (`<div class="empty-projects"><div>
              <i class="bi bi-search text-2xl text-primary"></i>
-             <h3>Ningún proyecto coincide</h3>
-             <p>Ajusta la búsqueda o cambia el filtro.</p>
-           </div></div>`;
+             <h3>${uiText("proyectos.ningun_proyecto_coincide")}</h3>
+             <p>${uiText("proyectos.ajusta_la_busqueda_o_cambia_el_filtro")}</p>
+           </div></div>`);
 
       return;
     }
@@ -99,22 +99,22 @@ export function mount(scope) {
 
       tarjeta.style.setProperty("--card-color", proyecto.color || "#5b5ce2");
       enlace.href = `/proyectos/${encodeURIComponent(proyecto.codigo)}`;
-      enlace.setAttribute("aria-label", `Abrir proyecto ${proyecto.nombre}`);
+      enlace.setAttribute("aria-label", (uiText("proyectos.abrir_proyecto_0", {0: proyecto.nombre})));
 
       fragmento.querySelector(".project-name").textContent = proyecto.nombre;
       fragmento.querySelector(".project-description").textContent =
-        proyecto.descripcion || "Sin descripción todavía.";
+        proyecto.descripcion || uiText("proyecto.sin_descripcion_todavia");
       fragmento.querySelector(".project-state").textContent =
-        proyecto.progreso >= 100 ? "Finalizado" : proyecto.etapaActual || "En curso";
+        proyecto.progreso >= 100 ? uiText("proyectos.finalizado") : proyecto.etapaActual || uiText("proyectos.en_curso");
       const entrega = fragmento.querySelector(".project-deadline");
       entrega.textContent = entregaRelativa(proyecto.fechaEntrega);
       if (proyecto.fechaEntrega) {
         entrega.dateTime = proyecto.fechaEntrega;
-        entrega.title = `Fecha de entrega: ${proyecto.fechaEntrega}`;
+        entrega.title = (uiText("proyectos.fecha_de_entrega_0", {0: proyecto.fechaEntrega}));
       }
       const pendientes = proyecto.tareas.filter((tarea) => tarea.estado !== "terminada").length;
       fragmento.querySelector(".project-task-count").textContent =
-        `${pendientes} pendiente${pendientes === 1 ? "" : "s"}`;
+        (uiText("proyectos.0_pendiente_1", {0: pendientes, 1: pendientes === 1 ? "" : "s"}));
       fragmento.querySelector(".project-progress-value").textContent = `${proyecto.progreso}%`;
       fragmento.querySelector(".progress-fill").style.setProperty("--progress", `${proyecto.progreso}%`);
 
@@ -151,9 +151,9 @@ export function mount(scope) {
       pintarResumen();
       pintarProyectos();
     } catch (error) {
-      $("#total-projects").textContent = "No se pudo cargar el resumen.";
+      $("#total-projects").textContent = uiText("proyectos.no_se_pudo_cargar_el_resumen");
       $("#projects-grid").innerHTML =
-        `<div class="empty-projects"><div><p class="text-danger">No se pudieron cargar los proyectos.</p><p>${esc(error.message)}</p></div></div>`;
+        (`<div class="empty-projects"><div><p class="text-danger">${uiText("proyectos.no_se_pudieron_cargar_los_proyectos")}</p><p>${esc(error.message)}</p></div></div>`);
     }
   }
 

@@ -1,7 +1,8 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { default: createSandboxStore } = require('../public/js/sandbox-store.js');
+const { default: sandboxStore } = require('../public/js/sandbox-store.js');
 
+const createSandboxStore = theme => sandboxStore(theme, require('./idioma.cjs').t);
 const call = (store, path, method = 'GET', body) => store.request(path, { method, body: body === undefined ? undefined : JSON.stringify(body) });
 const complete = (store, taskId, resultado) => {
   const body = new FormData();

@@ -1,16 +1,16 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell">
   <section class="page-heading" aria-labelledby="recordatorios-title">
     <div>
-      <p class="eyebrow">A tu tiempo</p>
-      <h1 id="recordatorios-title">Recordatorios</h1>
-      <p class="mt-2 text-muted">Tus pendientes, con un aviso por WhatsApp cuando lo necesites.</p>
+      <p class="eyebrow">{{ t('recordatorios.a_tu_tiempo') }}</p>
+      <h1 id="recordatorios-title">{{ t('recordatorios.recordatorios') }}</h1>
+      <p class="mt-2 text-muted">{{ t('recordatorios.tus_pendientes_con_un_aviso_por_whatsapp_cuando') }}</p>
     </div>
     <div class="flex flex-wrap gap-2.5">
-      <button id="open-preferences" class="btn btn-secondary" type="button"><i class="bi bi-sliders" aria-hidden="true"></i> Configurar recordatorios</button>
-      <button id="open-reminder" class="btn btn-primary" type="button"><i class="bi bi-plus-lg" aria-hidden="true"></i> Añadir recordatorio</button>
+      <button id="open-preferences" class="btn btn-secondary" type="button"><i class="bi bi-sliders" aria-hidden="true"></i> {{ t('recordatorios.configurar_recordatorios') }}</button>
+      <button id="open-reminder" class="btn btn-primary" type="button"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ t('recordatorios.anadir_recordatorio') }}</button>
     </div>
   </section>
 
@@ -18,19 +18,19 @@
 
   <section class="panel" aria-labelledby="scheduled-title">
     <div class="section-head flex-wrap">
-      <div><h2 id="scheduled-title">Tus avisos</h2><p id="scheduled-count">Cargando recordatorios…</p></div>
-      <button id="reprogram" class="btn btn-ghost" type="button"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Actualizar desde mis pendientes</button>
+      <div><h2 id="scheduled-title">{{ t('recordatorios.tus_avisos') }}</h2><p id="scheduled-count">{{ t('recordatorios.cargando_recordatorios') }}</p></div>
+      <button id="reprogram" class="btn btn-ghost" type="button"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> {{ t('recordatorios.actualizar_desde_mis_pendientes') }}</button>
     </div>
     <div id="reminders-list" class="grid gap-2.5" aria-live="polite"></div>
   </section>
 
   <details id="reminder-history" class="panel mt-5" hidden>
-    <summary class="text-sm font-semibold">Historial de avisos</summary>
+    <summary class="text-sm font-semibold">{{ t('recordatorios.historial_de_avisos') }}</summary>
     <div id="reminders-history-list" class="mt-4 grid gap-2.5"></div>
   </details>
   <details id="class-notes" class="panel mt-5" hidden>
-    <summary class="text-sm font-semibold">Pendientes de clase guardados</summary>
-    <p class="mt-2 mb-4 text-[13px] text-muted">Marca como resueltos los pendientes que ya terminaste.</p>
+    <summary class="text-sm font-semibold">{{ t('recordatorios.pendientes_de_clase_guardados') }}</summary>
+    <p class="mt-2 mb-4 text-[13px] text-muted">{{ t('recordatorios.marca_como_resueltos_los_pendientes_que_ya_terminaste') }}</p>
     <div id="notes-list" class="grid gap-2.5" aria-live="polite"></div>
   </details>
 </main>
@@ -38,31 +38,31 @@
 <dialog id="reminder-dialog" class="app-dialog" aria-labelledby="new-reminder-title">
   <form id="reminder-form" class="dialog-form" novalidate>
     <div class="dialog-header">
-      <div><p class="eyebrow">Aviso por WhatsApp</p><h2 id="new-reminder-title">Añadir recordatorio</h2></div>
-      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+      <div><p class="eyebrow">{{ t('recordatorios.aviso_por_whatsapp') }}</p><h2 id="new-reminder-title">{{ t('recordatorios.anadir_recordatorio') }}</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="{{ t('canales.cerrar') }}"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
     </div>
-    <label class="form-field" for="reminder-title">¿Qué necesitas recordar?
-      <input id="reminder-title" name="titulo" type="text" maxlength="150" placeholder="Ej. Preparar la exposición de psicología" required autofocus>
+    <label class="form-field" for="reminder-title">{{ t('recordatorios.que_necesitas_recordar') }}
+      <input id="reminder-title" name="titulo" type="text" maxlength="150" placeholder="{{ t('recordatorios.ej_preparar_la_exposicion_de_psicologia') }}" required autofocus>
     </label>
     <div class="form-grid-two">
-      <label class="form-field" for="reminder-date">Fecha del pendiente<input id="reminder-date" name="fecha" type="date" required></label>
-      <label class="form-field" for="reminder-time">Hora del pendiente<input id="reminder-time" name="hora" type="time" value="09:00" required></label>
+      <label class="form-field" for="reminder-date">{{ t('recordatorios.fecha_del_pendiente') }}<input id="reminder-date" name="fecha" type="date" required></label>
+      <label class="form-field" for="reminder-time">{{ t('recordatorios.hora_del_pendiente') }}<input id="reminder-time" name="hora" type="time" value="09:00" required></label>
     </div>
     <div class="form-grid-two">
-      <label class="form-field" for="reminder-advance">Avisarme con antelación<input id="reminder-advance" name="antelacion" type="number" min="0" max="43200" step="1" value="1" required></label>
-      <label class="form-field" for="reminder-unit">Unidad
-        <select id="reminder-unit" name="unidad"><option value="1">Minutos</option><option value="60" selected>Horas</option><option value="1440">Días</option></select>
+      <label class="form-field" for="reminder-advance">{{ t('recordatorios.avisarme_con_antelacion') }}<input id="reminder-advance" name="antelacion" type="number" min="0" max="43200" step="1" value="1" required></label>
+      <label class="form-field" for="reminder-unit">{{ t('recordatorios.unidad') }}
+        <select id="reminder-unit" name="unidad"><option value="1">{{ t('recordatorios.minutos') }}</option><option value="60" selected>{{ t('recordatorios.horas') }}</option><option value="1440">{{ t('recordatorios.dias') }}</option></select>
       </label>
     </div>
-    <p id="reminder-preview" class="field-hint" aria-live="polite">Elige fecha y hora para ver cuándo recibirás el aviso.</p>
-    <label class="form-field" for="reminder-message">Detalle <span class="font-normal text-muted">(opcional)</span>
-      <textarea id="reminder-message" name="mensaje" rows="3" maxlength="400" placeholder="Lugar, materiales o algo que no quieras olvidar."></textarea>
+    <p id="reminder-preview" class="field-hint" aria-live="polite">{{ t('recordatorios.elige_fecha_y_hora_para_ver_cuando_recibiras') }}</p>
+    <label class="form-field" for="reminder-message">{{ t('recordatorios.detalle') }} <span class="font-normal text-muted">{{ t('canales.opcional') }}</span>
+      <textarea id="reminder-message" name="mensaje" rows="3" maxlength="400" placeholder="{{ t('recordatorios.lugar_materiales_o_algo_que_no_quieras_olvidar') }}"></textarea>
     </label>
     <p id="reminder-destination" class="field-hint"></p>
     <p id="reminder-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
-      <button class="btn btn-primary" type="submit">Guardar recordatorio</button>
+      <button class="btn btn-ghost" type="button" data-close-dialog>{{ t('admin.cancelar') }}</button>
+      <button class="btn btn-primary" type="submit">{{ t('recordatorios.guardar_recordatorio') }}</button>
     </div>
   </form>
 </dialog>
@@ -70,37 +70,37 @@
 <dialog id="preferences-dialog" class="app-dialog" aria-labelledby="config-title">
   <form id="preferences-form" class="dialog-form" novalidate>
     <div class="dialog-header">
-      <div><p class="eyebrow">Tus valores por defecto</p><h2 id="config-title">Configurar recordatorios</h2></div>
-      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+      <div><p class="eyebrow">{{ t('recordatorios.tus_valores_por_defecto') }}</p><h2 id="config-title">{{ t('recordatorios.configurar_recordatorios') }}</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="{{ t('canales.cerrar') }}"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
     </div>
-    <p class="dialog-intro">Esta antelación se aplica a tus tareas, entregas y pendientes de clase. Cada aviso personal conserva la que elegiste al crearlo.</p>
-    <label class="check-label" for="reminders-active"><input id="reminders-active" name="activo" type="checkbox" checked><span>Recibir recordatorios</span></label>
-    <label class="form-field" for="whatsapp-phone">Número de WhatsApp
+    <p class="dialog-intro">{{ t('recordatorios.esta_antelacion_se_aplica_a_tus_tareas_entregas') }}</p>
+    <label class="check-label" for="reminders-active"><input id="reminders-active" name="activo" type="checkbox" checked><span>{{ t('recordatorios.recibir_recordatorios') }}</span></label>
+    <label class="form-field" for="whatsapp-phone">{{ t('recordatorios.numero_de_whatsapp') }}
       <input id="whatsapp-phone" name="telefonoWhatsapp" type="tel" inputmode="numeric" pattern="[0-9]{8,15}" placeholder="573001112233" maxlength="15">
-      <span class="field-hint">Indicativo del país y número, sin espacios. Ejemplo: 573001112233.</span>
+      <span class="field-hint">{{ t('recordatorios.indicativo_del_pais_y_numero_sin_espacios_ejemplo') }}</span>
     </label>
-    <label class="form-field" for="advance-task">Tareas · avisar con
+    <label class="form-field" for="advance-task">{{ t('recordatorios.tareas_avisar_con') }}
       <select id="advance-task" name="minutosAntesTarea">
-        <option value="60">1 hora antes</option><option value="180">3 horas antes</option><option value="720">12 horas antes</option>
-        <option value="1440" selected>1 día antes</option><option value="2880">2 días antes</option><option value="4320">3 días antes</option>
+        <option value="60">{{ t('recordatorios.1_hora_antes') }}</option><option value="180">{{ t('recordatorios.3_horas_antes') }}</option><option value="720">{{ t('recordatorios.12_horas_antes') }}</option>
+        <option value="1440" selected>{{ t('recordatorios.1_dia_antes') }}</option><option value="2880">{{ t('recordatorios.2_dias_antes') }}</option><option value="4320">{{ t('recordatorios.3_dias_antes') }}</option>
       </select>
     </label>
-    <label class="form-field" for="advance-delivery">Entregas de proyecto · avisar con
+    <label class="form-field" for="advance-delivery">{{ t('recordatorios.entregas_de_proyecto_avisar_con') }}
       <select id="advance-delivery" name="minutosAntesEntrega">
-        <option value="1440">1 día antes</option><option value="2880">2 días antes</option><option value="4320" selected>3 días antes</option>
-        <option value="10080">1 semana antes</option><option value="20160">2 semanas antes</option>
+        <option value="1440">{{ t('recordatorios.1_dia_antes') }}</option><option value="2880">{{ t('recordatorios.2_dias_antes') }}</option><option value="4320" selected>{{ t('recordatorios.3_dias_antes') }}</option>
+        <option value="10080">{{ t('recordatorios.1_semana_antes') }}</option><option value="20160">{{ t('recordatorios.2_semanas_antes') }}</option>
       </select>
     </label>
-    <label class="form-field" for="advance-note">Pendientes de clase · avisar con
+    <label class="form-field" for="advance-note">{{ t('recordatorios.pendientes_de_clase_avisar_con') }}
       <select id="advance-note" name="minutosAntesApunte">
-        <option value="60">1 hora antes</option><option value="120" selected>2 horas antes</option><option value="720">12 horas antes</option><option value="1440">1 día antes</option>
+        <option value="60">{{ t('recordatorios.1_hora_antes') }}</option><option value="120" selected>{{ t('recordatorios.2_horas_antes') }}</option><option value="720">{{ t('recordatorios.12_horas_antes') }}</option><option value="1440">{{ t('recordatorios.1_dia_antes') }}</option>
       </select>
     </label>
     <p id="preferences-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
     <div class="dialog-actions flex-wrap">
-      <button id="test-message" class="btn btn-ghost" type="button">Enviar prueba</button>
-      <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
-      <button class="btn btn-primary" type="submit">Guardar configuración</button>
+      <button id="test-message" class="btn btn-ghost" type="button">{{ t('recordatorios.enviar_prueba') }}</button>
+      <button class="btn btn-ghost" type="button" data-close-dialog>{{ t('admin.cancelar') }}</button>
+      <button class="btn btn-primary" type="submit">{{ t('recordatorios.guardar_configuracion') }}</button>
     </div>
   </form>
 </dialog>

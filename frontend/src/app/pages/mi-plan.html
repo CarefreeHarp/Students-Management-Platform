@@ -1,0 +1,9 @@
+<div class="plans-page"><header class="topbar"><a class="brand" href="/"><img src="/assets/img/studyflow-isotipo.png" alt=""> StudyFlow</a><a class="top-link" href="/perfil">{{ t('confirmar_plan.mi_perfil') }}</a></header>
+      <main class="content confirm"><a class="back" href="/panel">{{ t('mi_plan.volver_a_mi_espacio') }}</a>
+        <section class="confirm-card"><span class="eyebrow">{{ t('mi_plan.tu_cuenta') }}</span><h1>{{ t('mi_plan.tu_plan_en_un_solo') }} <em>{{ t('mi_plan.lugar') }}</em></h1>
+          <div class="notice compact"><span aria-hidden="true">✦</span><div><strong>{{ t('mi_plan.pagos_de_prueba') }}</strong><p>{{ t('mi_plan.esta_informacion_se_borra_cuando_se_reinicia_el') }}</p></div></div>
+          @if (loading) { <p>{{ t('mi_plan.cargando_pagos') }}</p> } @else if (error) { <p role="alert">{{ error }}</p> } @else if (!pagos.length) { <p>{{ t('mi_plan.aun_no_tienes_pagos_de_prueba') }}</p> } @else { @for (pago of pagos; track pago.referencia) { <div class="summary"><div><span>{{ t('mi_plan.plan') }} {{ pago.plan }}</span><strong>{{ etiqueta(pago.estado) }}</strong></div><div class="summary-price"><span>{{ pago.vence ? t('mi_plan.vigente_hasta') + ' ' + pago.vence.slice(0,10) : pago.plan === "vitalicio" && pago.estado === "APPROVED" ? t('mi_plan.acceso_de_prueba_sin_fecha_de_vencimiento') : t('mi_plan.pago_de_prueba') }}</span></div></div> } }
+          <a class="action secondary" href="/planes">{{ t('mi_plan.conocer_los_planes') }} <span>↗</span></a>
+        </section>
+      </main>
+    </div>

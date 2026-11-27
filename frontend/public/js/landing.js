@@ -3,19 +3,20 @@
  * reunites the same particles into two bolts flanking the closing message.
  */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
   const menuButton = document.querySelector('.landing-menu-toggle');
   const menuLinks = document.querySelector('#landing-links');
   const narrowNavigation = matchMedia('(max-width: 900px)');
   function closeMenu() {
     menuButton?.setAttribute('aria-expanded', 'false');
-    menuButton?.setAttribute('aria-label', 'Abrir menú de navegación');
+    menuButton?.setAttribute('aria-label', uiText("landing.abrir_menu_de_navegacion"));
     menuLinks?.classList.remove('is-open');
   }
   menuButton?.addEventListener('click', () => {
     const open = menuButton.getAttribute('aria-expanded') !== 'true';
     menuButton.setAttribute('aria-expanded', String(open));
-    menuButton.setAttribute('aria-label', open ? 'Cerrar menú de navegación' : 'Abrir menú de navegación');
+    menuButton.setAttribute('aria-label', open ? uiText("landing.cerrar_menu_de_navegacion") : uiText("landing.abrir_menu_de_navegacion"));
     menuLinks?.classList.toggle('is-open', open);
   });
   menuLinks?.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
@@ -238,8 +239,8 @@ export function mount(scope) {
   function wake() { if (!frame && !document.hidden) frame = animate(draw); }
   function updateToggle() {
     toggle.setAttribute('aria-pressed', String(paused));
-    toggle.setAttribute('aria-label', paused ? 'Activar animación' : 'Pausar animación');
-    toggle.querySelector('.motion-label').textContent = paused ? 'Activar movimiento' : 'Pausar movimiento';
+    toggle.setAttribute('aria-label', paused ? uiText("landing.activar_animacion") : uiText("landing.pausar_animacion"));
+    toggle.querySelector('.motion-label').textContent = paused ? uiText("landing.activar_movimiento") : uiText("landing.pausar_movimiento");
     toggle.firstElementChild.textContent = paused ? '▷' : 'Ⅱ';
     previous = 0; wake();
   }

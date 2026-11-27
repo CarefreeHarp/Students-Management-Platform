@@ -1,61 +1,61 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell max-w-[880px]">
-  <a class="back-link" href="/perfil"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mi perfil</a>
+  <a class="back-link" href="/perfil"><i class="bi bi-arrow-left" aria-hidden="true"></i> {{ t('editar_perfil.volver_a_mi_perfil') }}</a>
 
   <section class="panel" aria-labelledby="edit-profile-title">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">Configuración personal</p>
-        <h1 id="edit-profile-title">Edita tu perfil</h1>
-        <p>Mantén actualizada tu información para que tu espacio se sienta más tuyo.</p>
+        <p class="eyebrow">{{ t('editar_perfil.configuracion_personal') }}</p>
+        <h1 id="edit-profile-title">{{ t('editar_perfil.edita_tu_perfil') }}</h1>
+        <p>{{ t('editar_perfil.manten_actualizada_tu_informacion_para_que_tu_espacio') }}</p>
       </div>
       <span class="edit-header-icon" aria-hidden="true"><i class="bi bi-person-gear"></i></span>
     </div>
 
     <form id="edit-profile-form" class="grid gap-5" novalidate>
       <section class="flex flex-wrap items-center gap-5 rounded border border-line bg-canvas/60 p-4" aria-labelledby="photo-title">
-        <div class="avatar-frame"><img id="edit-profile-avatar" src="" alt="Vista previa de la foto de perfil"></div>
+        <div class="avatar-frame"><img id="edit-profile-avatar" src="" alt="{{ t('editar_perfil.vista_previa_de_la_foto_de_perfil') }}"></div>
         <div class="grid gap-1.5">
-          <h2 id="photo-title">Foto de perfil</h2>
-          <p class="text-[13px] text-muted">Usa una imagen clara para que tu equipo te reconozca más fácil.</p>
-          <label class="upload-button w-fit" for="avatar-file"><i class="bi bi-image" aria-hidden="true"></i> Cambiar foto</label>
+          <h2 id="photo-title">{{ t('editar_perfil.foto_de_perfil') }}</h2>
+          <p class="text-[13px] text-muted">{{ t('editar_perfil.usa_una_imagen_clara_para_que_tu_equipo') }}</p>
+          <label class="upload-button w-fit" for="avatar-file"><i class="bi bi-image" aria-hidden="true"></i> {{ t('editar_perfil.cambiar_foto') }}</label>
           <input id="avatar-file" name="avatar" type="file" accept="image/png,image/jpeg,image/webp">
-          <small>PNG, JPG o WEBP · máximo 2 MB</small>
+          <small>{{ t('editar_perfil.png_jpg_o_webp_maximo_2_mb') }}</small>
         </div>
       </section>
 
       <div>
-        <h2>Datos personales</h2>
-        <p class="text-[13px] text-muted">Esta información aparecerá en tu perfil.</p>
+        <h2>{{ t('editar_perfil.datos_personales') }}</h2>
+        <p class="text-[13px] text-muted">{{ t('editar_perfil.esta_informacion_aparecera_en_tu_perfil') }}</p>
       </div>
       <div class="cuadro-formulario form-grid">
-        <div class="edit-field"><label for="edit-first-name">Nombre</label><input id="edit-first-name" name="firstName" type="text" autocomplete="given-name" required></div>
-        <div class="edit-field"><label for="edit-last-name">Apellido</label><input id="edit-last-name" name="lastName" type="text" autocomplete="family-name" required></div>
-        <div class="edit-field full-width"><label for="edit-email">Correo institucional</label><input id="edit-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="edit-field"><label for="edit-first-name">{{ t('editar_perfil.nombre') }}</label><input id="edit-first-name" name="firstName" type="text" autocomplete="given-name" required></div>
+        <div class="edit-field"><label for="edit-last-name">{{ t('editar_perfil.apellido') }}</label><input id="edit-last-name" name="lastName" type="text" autocomplete="family-name" required></div>
+        <div class="edit-field full-width"><label for="edit-email">{{ t('editar_perfil.correo_institucional') }}</label><input id="edit-email" name="email" type="email" autocomplete="email" required></div>
         <div class="edit-field full-width">
-          <label for="edit-description">Descripción</label>
-          <textarea id="edit-description" name="description" rows="3" maxlength="180" placeholder="Cuéntale a tu equipo qué te interesa o en qué estás trabajando."></textarea>
-          <span class="field-hint"><span id="description-count">0</span>/180 caracteres</span>
+          <label for="edit-description">{{ t('canales.descripcion') }}</label>
+          <textarea id="edit-description" name="description" rows="3" maxlength="180" placeholder="{{ t('editar_perfil.cuentale_a_tu_equipo_que_te_interesa_o') }}"></textarea>
+          <span class="field-hint"><span id="description-count">0</span>{{ t('editar_perfil.180_caracteres') }}</span>
         </div>
       </div>
 
       <div>
-        <h2>Información académica</h2>
-        <p class="text-[13px] text-muted">Nos ayuda a contextualizar tus horarios y proyectos.</p>
+        <h2>{{ t('editar_perfil.informacion_academica') }}</h2>
+        <p class="text-[13px] text-muted">{{ t('editar_perfil.nos_ayuda_a_contextualizar_tus_horarios_y_proyectos') }}</p>
       </div>
       <div class="cuadro-formulario form-grid">
-        <div class="edit-field full-width"><label for="edit-university">Universidad</label><input id="edit-university" name="university" type="text" autocomplete="organization" required></div>
-        <div class="edit-field"><label for="edit-career">Programa</label><input id="edit-career" name="career" type="text" required></div>
-        <div class="edit-field"><label for="edit-semester">Semestre</label><input id="edit-semester" name="semester" type="number" min="1" max="20" required></div>
-        <div class="edit-field"><label for="edit-age">Edad</label><input id="edit-age" name="age" type="number" min="15" max="99" required></div>
+        <div class="edit-field full-width"><label for="edit-university">{{ t('editar_perfil.universidad') }}</label><input id="edit-university" name="university" type="text" autocomplete="organization" required></div>
+        <div class="edit-field"><label for="edit-career">{{ t('editar_perfil.programa') }}</label><input id="edit-career" name="career" type="text" required></div>
+        <div class="edit-field"><label for="edit-semester">{{ t('editar_perfil.semestre') }}</label><input id="edit-semester" name="semester" type="number" min="1" max="20" required></div>
+        <div class="edit-field"><label for="edit-age">{{ t('editar_perfil.edad') }}</label><input id="edit-age" name="age" type="number" min="15" max="99" required></div>
       </div>
 
       <p id="edit-profile-feedback" class="form-feedback" role="alert" aria-live="polite"></p>
       <div class="form-actions">
-        <a href="/perfil" class="btn btn-ghost">Cancelar</a>
-        <button class="btn btn-primary" type="submit">Guardar cambios <i class="bi bi-check2" aria-hidden="true"></i></button>
+        <a href="/perfil" class="btn btn-ghost">{{ t('admin.cancelar') }}</a>
+        <button class="btn btn-primary" type="submit">{{ t('editar_perfil.guardar_cambios') }} <i class="bi bi-check2" aria-hidden="true"></i></button>
       </div>
     </form>
   </section>

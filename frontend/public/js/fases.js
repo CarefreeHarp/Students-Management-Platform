@@ -59,6 +59,7 @@ export function construirRamas(fases) {
 
 
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
   const app = scope.app || {};
   const esc = app.escapeHTML || ((valor) => String(valor ?? ""));
@@ -89,11 +90,11 @@ export function mount(scope) {
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
       app.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || detalle.message || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || detalle.message || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.status === 204 ? null : respuesta.json();
   }
@@ -182,39 +183,39 @@ export function mount(scope) {
     const bloqueada = tarea.bloqueantes.length > 0;
     const responsable = tarea.responsable
       ? tarea.responsable
-      : (estado.diagrama.modoReparto === "libre" && !bloqueada ? "Disponible para tomar" : "Sin responsable");
+      : (estado.diagrama.modoReparto === "libre" && !bloqueada ? uiText("fases.disponible_para_tomar") : uiText("entregables.sin_responsable"));
     const dependencias = tarea.dependencias
       .map((id) => estado.ramas.tareas.find((item) => item.id === id)?.titulo)
       .filter(Boolean);
-    const dependenciaTexto = dependencias.length ? dependencias.join(", ") : "Sin dependencias";
-    const bloqueo = bloqueada ? `<span class="branch-node-detail-blocked"><i class="bi bi-lock" aria-hidden="true"></i> Espera: ${esc(tarea.bloqueantes.join(", "))}</span>` : "";
+    const dependenciaTexto = dependencias.length ? dependencias.join(", ") : uiText("fases.sin_dependencias");
+    const bloqueo = bloqueada ? (`<span class="branch-node-detail-blocked"><i class="bi bi-lock" aria-hidden="true"></i>${" " + uiText("fases.espera_0", {0: esc(tarea.bloqueantes.join(", "))})}</span>`) : "";
 
-    return `
+    return (`
       <span class="branch-node-detail" id="branch-node-detail-${tarea.id}" role="tooltip">
         <span class="branch-node-detail-phase" style="--branch-color:${COLOR_FASE[tarea.faseIndice % COLOR_FASE.length]}">${esc(tarea.faseNombre)}</span>
         <strong>${esc(tarea.titulo)}</strong>
         <span class="branch-node-detail-grid">
-          <span><b>Estado</b>${esc(tarea.estadoEtiqueta)}</span>
-          <span><b>Responsable</b>${esc(responsable)}</span>
-          <span><b>Fecha límite</b>${esc(tarea.fechaLimite || "Sin fecha")}</span>
-          <span><b>Depende de</b>${esc(dependenciaTexto)}</span>
+          <span><b>${uiText("entregables.estado")}</b>${esc(app.statusLabel(tarea.estado))}</span>
+          <span><b>${uiText("proyecto.responsable")}</b>${esc(responsable)}</span>
+          <span><b>${uiText("fases.fecha_limite")}</b>${esc(tarea.fechaLimite || uiText("fases.sin_fecha"))}</span>
+          <span><b>${uiText("fases.depende_de")}</b>${esc(dependenciaTexto)}</span>
         </span>
         ${bloqueo}
-        <span class="branch-node-detail-action">Haz clic para editar esta tarea y sus dependencias.</span>
-      </span>`;
+        <span class="branch-node-detail-action">${uiText("fases.haz_clic_para_editar_esta_tarea_y_sus")}</span>
+      </span>`);
   }
 
   function tarjetaTarea(tarea) {
     const color = COLOR_FASE[tarea.faseIndice % COLOR_FASE.length];
-    return `
+    return (`
       <button class="branch-task branch-node${tarea.estado === "terminada" ? " is-complete" : ""}"
               style="--branch-color:${color}" type="button" data-task="${tarea.id}"
               data-state="${esc(tarea.estado)}" aria-describedby="branch-node-detail-${tarea.id}"
-              aria-label="Abrir tarea: ${esc(tarea.titulo)}">
+              aria-label="${uiText("fases.abrir_tarea_5", {5: esc(tarea.titulo)})}">
         <span class="branch-node-status" aria-hidden="true"></span>
         <span class="branch-node-name">${esc(tarea.titulo)}</span>
         ${detalleTarea(tarea)}
-      </button>`;
+      </button>`);
   }
 
   function pintarNivel(nivel) {
@@ -229,14 +230,14 @@ export function mount(scope) {
   function pintarFase({ fase, faseIndice, niveles }) {
     const color = COLOR_FASE[faseIndice % COLOR_FASE.length];
     const cantidad = (fase.tareas || []).length;
-    return `<section class="branch-phase-group${cantidad ? "" : " is-empty"}" data-phase="${faseIndice}" style="--branch-color:${color}">
+    return (`<section class="branch-phase-group${cantidad ? "" : " is-empty"}" data-phase="${faseIndice}" style="--branch-color:${color}">
       <header class="branch-phase-divider">
-        <span class="branch-phase-number">Fase ${String(faseIndice + 1).padStart(2, "0")}</span>
+        <span class="branch-phase-number">${uiText("fases.fase_3", {3: String(faseIndice + 1).padStart(2, "0")})}</span>
         <strong>${esc(fase.nombre)}</strong>
-        <small>${cantidad ? `${cantidad} ${cantidad === 1 ? "tarea" : "tareas"}` : "Sin tareas"}</small>
+        <small>${cantidad ? `${cantidad} ${cantidad === 1 ? uiText("fases.tarea_2") : uiText("fases.tareas")}` : uiText("fases.sin_tareas")}</small>
       </header>
       ${niveles.length ? `<div class="branch-phase-levels">${niveles.map(pintarNivel).join("")}</div>` : ""}
-    </section>`;
+    </section>`);
   }
 
   function pintarDiagrama(diagrama) {
@@ -246,8 +247,8 @@ export function mount(scope) {
     $("#phase-legend").innerHTML = fases.map((fase, indice) => `<span style="--branch-color:${COLOR_FASE[indice % COLOR_FASE.length]}"><i></i>${esc(fase.nombre)}<small>${(fase.tareas || []).length}</small></span>`).join("");
     const contenedor = $("#diagram");
     contenedor.innerHTML = estado.ramas.tareas.length
-      ? `${estado.ramas.ciclo ? '<p class="branch-cycle-warning">Hay dependencias circulares que revisar. Abre las tareas para corregirlas.</p>' : ""}<svg class="branch-svg" aria-hidden="true"></svg><div class="branch-tree" aria-label="Diagrama de fases y tareas">${estado.distribucion.fasesConNiveles.map(pintarFase).join("")}</div>`
-      : '<p class="branch-empty">Todavía no hay tareas. Añade la primera desde el proyecto para empezar sus ramas.</p>';
+      ? (`${estado.ramas.ciclo ? (`<p class="branch-cycle-warning">${uiText("fases.hay_dependencias_circulares_que_revisar_abre_las_tareas")}</p>`) : ""}<svg class="branch-svg" aria-hidden="true"></svg><div class="branch-tree" aria-label="${uiText("fases.diagrama_de_fases_y_tareas")}">${estado.distribucion.fasesConNiveles.map(pintarFase).join("")}</div>`)
+      : (`<p class="branch-empty">${uiText("fases.todavia_no_hay_tareas_anade_la_primera_desde")}</p>`);
 
     contenedor.querySelectorAll("[data-task]").forEach((boton) => {
       boton.addEventListener("click", () => abrirTarea(Number(boton.dataset.task)));
@@ -456,8 +457,8 @@ export function mount(scope) {
     const libre = diagrama.modoReparto === "libre";
     $("#available-section").hidden = !libre;
     $("#reparto-description").textContent = libre
-      ? "Elección libre: cada integrante toma una tarea cuando está disponible."
-      : "Tareas asignadas: cada tarea tiene el responsable que el equipo define.";
+      ? uiText("fases.eleccion_libre_cada_integrante_toma_una_tarea_cuando")
+      : uiText("fases.tareas_asignadas_cada_tarea_tiene_el_responsable_que");
     $("#configure-reparto").hidden = diagrama.puedeConfigurarReparto === false;
     const opcion = document.querySelector(`#reparto-settings [value="${libre ? "libre" : "asignado"}"]`);
     if (opcion) opcion.checked = true;
@@ -466,17 +467,16 @@ export function mount(scope) {
   function pintarDisponibles(tareas) {
     $("#available-count").textContent = String(tareas.length);
     $("#available-list").innerHTML = tareas.length
-      ? tareas.map((tarea) => `
+      ? tareas.map((tarea) => (`
           <article class="tarjeta-lista flex items-center gap-3">
             <div class="min-w-0 flex-1">
               <h3 class="text-sm">${esc(tarea.titulo)}</h3>
-              <p class="mt-0.5 text-[11px] text-muted">${esc(tarea.etapa)}${tarea.fechaLimite ? ` · vence ${esc(tarea.fechaLimite)}` : ""}</p>
+              <p class="mt-0.5 text-[11px] text-muted">${esc(tarea.etapa)}${tarea.fechaLimite ? (" " + uiText("fases.vence_0", {0: esc(tarea.fechaLimite)})) : ""}</p>
             </div>
             <button class="btn btn-sm btn-primary" type="button" data-claim="${tarea.id}">
-              <i class="bi bi-hand-index"></i> Tomarla
-            </button>
-          </article>`).join("")
-      : '<p class="text-[13px] text-muted">No hay tareas libres: o están todas asignadas, o esperan a que terminen sus dependencias.</p>';
+              <i class="bi bi-hand-index"></i>${" " + uiText("fases.tomarla") + "\n            "}</button>
+          </article>`)).join("")
+      : (`<p class="text-[13px] text-muted">${uiText("fases.no_hay_tareas_libres_o_estan_todas_asignadas")}</p>`);
 
     $("#available-list").querySelectorAll("[data-claim]").forEach((boton) => {
       boton.addEventListener("click", () => reclamar(Number(boton.dataset.claim)));
@@ -488,7 +488,7 @@ export function mount(scope) {
   function abrirGestorFases() {
     const fases = (estado.diagrama?.fases || []).filter((fase) => fase.id != null);
     if (!fases.length) {
-      avisar("El proyecto necesita al menos una fase antes de poder gestionarlas.", "error");
+      avisar(uiText("fases.el_proyecto_necesita_al_menos_una_fase_antes"), "error");
       return;
     }
     estado.fasesEditor = fases.map((fase) => ({
@@ -515,19 +515,19 @@ export function mount(scope) {
   function pintarEditorFases() {
     const lista = $("#phase-editor-list");
     const selector = $("#default-phase");
-    lista.innerHTML = estado.fasesEditor.map((fase, indice) => `
+    lista.innerHTML = estado.fasesEditor.map((fase, indice) => (`
       <div class="flex items-center gap-2 rounded-[10px] border border-[var(--borde)] p-2" data-phase-key="${esc(fase.clave)}">
         <span class="tag bg-primary-soft text-[var(--estado-primary)]" aria-hidden="true">${String(indice + 1).padStart(2, "0")}</span>
-        <label class="form-field min-w-0 flex-1"><span class="sr-only">Nombre de la fase ${indice + 1}</span>
-          <input data-phase-name="${esc(fase.clave)}" value="${esc(fase.nombre)}" placeholder="Nombre de la fase">
+        <label class="form-field min-w-0 flex-1"><span class="sr-only">${uiText("fases.nombre_de_la_fase_2", {2: indice + 1})}</span>
+          <input data-phase-name="${esc(fase.clave)}" value="${esc(fase.nombre)}" placeholder="${uiText("crear_proyecto.nombre_de_la_fase")}">
         </label>
-        <span class="text-[11px] text-muted">${fase.tareas} ${fase.tareas === 1 ? "tarea" : "tareas"}</span>
-        <button class="icon-button" type="button" data-phase-up="${esc(fase.clave)}" aria-label="Subir fase" ${indice === 0 ? "disabled" : ""}><i class="bi bi-arrow-up"></i></button>
-        <button class="icon-button" type="button" data-phase-down="${esc(fase.clave)}" aria-label="Bajar fase" ${indice === estado.fasesEditor.length - 1 ? "disabled" : ""}><i class="bi bi-arrow-down"></i></button>
-        <button class="icon-button" type="button" data-phase-remove="${esc(fase.clave)}" aria-label="Eliminar fase"><i class="bi bi-x-lg"></i></button>
-      </div>`).join("");
+        <span class="text-[11px] text-muted">${fase.tareas} ${fase.tareas === 1 ? uiText("fases.tarea_2") : uiText("fases.tareas")}</span>
+        <button class="icon-button" type="button" data-phase-up="${esc(fase.clave)}" aria-label="${uiText("fases.subir_fase")}" ${indice === 0 ? "disabled" : ""}><i class="bi bi-arrow-up"></i></button>
+        <button class="icon-button" type="button" data-phase-down="${esc(fase.clave)}" aria-label="${uiText("fases.bajar_fase")}" ${indice === estado.fasesEditor.length - 1 ? "disabled" : ""}><i class="bi bi-arrow-down"></i></button>
+        <button class="icon-button" type="button" data-phase-remove="${esc(fase.clave)}" aria-label="${uiText("crear_proyecto.eliminar_fase")}"><i class="bi bi-x-lg"></i></button>
+      </div>`)).join("");
     selector.innerHTML = estado.fasesEditor.map((fase) =>
-      `<option value="${esc(fase.clave)}">${esc(fase.nombre || "Fase sin nombre")}</option>`
+      `<option value="${esc(fase.clave)}">${esc(fase.nombre || uiText("fases.fase_sin_nombre"))}</option>`
     ).join("");
     if (!estado.fasesEditor.some((fase) => fase.clave === estado.fasePredeterminada)) {
       estado.fasePredeterminada = estado.fasesEditor[0]?.clave || null;
@@ -540,7 +540,7 @@ export function mount(scope) {
         if (!fase) return;
         fase.nombre = evento.currentTarget.value;
         const opcion = selector.querySelector(`option[value="${CSS.escape(fase.clave)}"]`);
-        if (opcion) opcion.textContent = fase.nombre || "Fase sin nombre";
+        if (opcion) opcion.textContent = fase.nombre || uiText("fases.fase_sin_nombre");
       });
     });
     lista.querySelectorAll("[data-phase-up], [data-phase-down]").forEach((boton) => {
@@ -559,11 +559,11 @@ export function mount(scope) {
         const fase = estado.fasesEditor[indice];
         if (!fase) return;
         if (estado.fasesEditor.length === 1) {
-          errorFases("El proyecto debe conservar al menos una fase.");
+          errorFases(uiText("fases.el_proyecto_debe_conservar_al_menos_una_fase"));
           return;
         }
         if (fase.tareas > 0) {
-          errorFases(`No puedes eliminar «${fase.nombre}» porque todavía tiene ${fase.tareas} ${fase.tareas === 1 ? "tarea" : "tareas"}. Muévelas desde el diagrama primero.`);
+          errorFases((uiText("fases.no_puedes_eliminar_0_porque_todavia_tiene_1", {0: fase.nombre, 1: fase.tareas, 2: fase.tareas === 1 ? uiText("fases.tarea_2") : uiText("fases.tareas")})));
           return;
         }
         estado.fasesEditor.splice(indice, 1);
@@ -578,7 +578,7 @@ export function mount(scope) {
     evento.preventDefault();
     const indiceActual = estado.fasesEditor.findIndex((fase) => fase.clave === estado.fasePredeterminada);
     if (indiceActual < 0) {
-      errorFases("Elige una fase predeterminada válida.");
+      errorFases(uiText("fases.elige_una_fase_predeterminada_valida"));
       return;
     }
     const boton = evento.currentTarget.querySelector('[type="submit"]');
@@ -594,7 +594,7 @@ export function mount(scope) {
       });
       await cargar();
       $("#phase-dialog").close();
-      avisar("Fases actualizadas.", "success");
+      avisar(uiText("fases.fases_actualizadas"), "success");
     } catch (error) {
       errorFases(error.message);
     } finally {
@@ -626,7 +626,7 @@ export function mount(scope) {
   async function reclamar(tareaId) {
     try {
       await pedir(`/api/tareas/${tareaId}/reclamar`, { method: "POST" });
-      avisar("Tarea asignada. ¡A por ella!", "success");
+      avisar(uiText("fases.tarea_asignada_a_por_ella"), "success");
       await cargar();
     } catch (error) {
       avisar(error.message, "error");
@@ -640,7 +640,7 @@ export function mount(scope) {
 
   function opcionesResponsable(seleccionado) {
     const integrantes = estado.proyecto?.integrantes || [];
-    $("#task-assignee-input").innerHTML = '<option value="">Sin asignar</option>'
+    $("#task-assignee-input").innerHTML = (`<option value="">${uiText("fases.sin_asignar")}</option>`)
       + integrantes.map((integrante) =>
         `<option value="${esc(integrante.nombre)}"${integrante.nombre === seleccionado ? " selected" : ""}>${esc(integrante.nombre)}</option>`
       ).join("");
@@ -660,7 +660,7 @@ export function mount(scope) {
     enlace.hidden = !vaATerminar || !tarea?.archivoResultadoUrl;
     if (vaATerminar && tarea?.archivoResultadoUrl) {
       enlace.href = tarea.archivoResultadoUrl;
-      enlace.querySelector("span").textContent = tarea.archivoResultadoNombre || "Archivo de resultado";
+      enlace.querySelector("span").textContent = tarea.archivoResultadoNombre || uiText("fases.archivo_de_resultado");
     }
   }
 
@@ -676,7 +676,7 @@ export function mount(scope) {
     if (!tarea) return;
     estado.tareaActiva = tarea;
 
-    $("#task-dialog-kicker").textContent = "Editar tarea";
+    $("#task-dialog-kicker").textContent = uiText("fases.editar_tarea");
     $("#task-dialog-title").textContent = tarea.titulo;
     $("#editing-task-id").value = tarea.id;
     $("#task-title-input").value = tarea.titulo;
@@ -702,15 +702,15 @@ export function mount(scope) {
     tomar.hidden = !libre || Boolean(tarea.responsable);
     tomar.disabled = bloqueada;
     tomar.innerHTML = bloqueada
-      ? '<i class="bi bi-lock-fill"></i> Bloqueada'
-      : '<i class="bi bi-hand-index"></i> Tomar esta tarea';
+      ? (`<i class="bi bi-lock-fill"></i>${" " + uiText("fases.bloqueada")}`)
+      : (`<i class="bi bi-hand-index"></i>${" " + uiText("fases.tomar_esta_tarea")}`);
 
     const aviso = $("#task-blocked");
     if (bloqueada) {
       aviso.hidden = false;
       aviso.textContent = tarea.responsable
-        ? `Depende de: ${tarea.bloqueantes.join(", ")}.`
-        : `No se puede tomar todavía. Antes hay que terminar: ${tarea.bloqueantes.join(", ")}.`;
+        ? (uiText("fases.depende_de_0", {0: tarea.bloqueantes.join(", ")}))
+        : (uiText("fases.no_se_puede_tomar_todavia_antes_hay_que", {0: tarea.bloqueantes.join(", ")}));
     } else {
       aviso.hidden = true;
     }
@@ -719,19 +719,19 @@ export function mount(scope) {
     const candidatas = todasLasTareas()
       .filter((item) => item.id !== tarea.id && !tarea.dependencias.includes(item.id));
     $("#task-dependency").innerHTML = candidatas.length
-      ? '<option value="">Elige una tarea</option>' + candidatas.map((item) => `<option value="${item.id}">${esc(item.titulo)}</option>`).join("")
-      : '<option value="">No hay tareas disponibles</option>';
+      ? (`<option value="">${uiText("fases.elige_una_tarea")}</option>`) + candidatas.map((item) => `<option value="${item.id}">${esc(item.titulo)}</option>`).join("")
+      : (`<option value="">${uiText("fases.no_hay_tareas_disponibles")}</option>`);
 
     const dependencias = tarea.dependencias
       .map((id) => todasLasTareas().find((item) => item.id === id))
       .filter(Boolean);
     $("#dependency-list").innerHTML = dependencias.length
-      ? dependencias.map((dependencia) => `
+      ? dependencias.map((dependencia) => (`
           <span class="tag bg-[var(--chip-neutro)] text-muted">
             ${esc(dependencia.titulo)}
-            <button type="button" data-remove-dep="${dependencia.id}" aria-label="Quitar dependencia"><i class="bi bi-x"></i></button>
-          </span>`).join("")
-      : '<span class="text-[11px] text-muted-light">Sin dependencias.</span>';
+            <button type="button" data-remove-dep="${dependencia.id}" aria-label="${uiText("fases.quitar_dependencia")}"><i class="bi bi-x"></i></button>
+          </span>`)).join("")
+      : (`<span class="text-[11px] text-muted-light">${uiText("fases.sin_dependencias_2")}</span>`);
 
     $("#dependency-list").querySelectorAll("[data-remove-dep]").forEach((boton) => {
       boton.addEventListener("click", async () => {
@@ -783,7 +783,7 @@ export function mount(scope) {
         await cargar();
         $("#reparto-settings").hidden = true;
         $("#configure-reparto").setAttribute("aria-expanded", "false");
-        avisar("Modo de reparto actualizado.", "success");
+        avisar(uiText("fases.modo_de_reparto_actualizado"), "success");
       } catch (error) {
         mensaje.textContent = error.message;
         mensaje.classList.add("is-visible");
@@ -814,7 +814,7 @@ export function mount(scope) {
       const resultado = $("#task-result-input").value.trim();
       const archivo = $("#task-result-file").files[0];
       if (quiereTerminar && !resultado && !archivo && !tarea.tieneResultado) {
-        errorTarea("Para terminar la tarea debes escribir un resultado o adjuntar un archivo.");
+        errorTarea(uiText("fases.para_terminar_la_tarea_debes_escribir_un_resultado"));
         return;
       }
       try {
@@ -835,7 +835,7 @@ export function mount(scope) {
         }
         await cargar();
         dialogo.close();
-        avisar("Tarea actualizada.", "success");
+        avisar(uiText("fases.tarea_actualizada"), "success");
       } catch (error) {
         errorTarea(error.message);
       }
@@ -864,7 +864,7 @@ export function mount(scope) {
         await pedir(`/api/tareas/${estado.tareaActiva.id}/reclamar`, { method: "POST" });
         await cargar();
         dialogo.close();
-        avisar("Tarea asignada.", "success");
+        avisar(uiText("fases.tarea_asignada"), "success");
       } catch (error) {
         errorTarea(error.message);
       }
@@ -875,14 +875,14 @@ export function mount(scope) {
         await pedir(`/api/tareas/${estado.tareaActiva.id}/liberar`, { method: "POST" });
         await cargar();
         dialogo.close();
-        avisar("Tarea liberada: vuelve a estar disponible.", "success");
+        avisar(uiText("fases.tarea_liberada_vuelve_a_estar_disponible"), "success");
       } catch (error) { errorTarea(error.message); }
     });
 
     try {
       await cargar();
     } catch (error) {
-      avisar("No se pudo cargar el diagrama: " + error.message, "error");
+      avisar((uiText("fases.no_se_pudo_cargar_el_diagrama") + " ") + error.message, "error");
     }
   }
 

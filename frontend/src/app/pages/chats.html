@@ -1,22 +1,22 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell">
   <section class="page-heading" aria-labelledby="chats-title">
     <div>
-      <p class="eyebrow"><i class="bi bi-chat-dots"></i> Trabajo en equipo</p>
-      <h1 id="chats-title">Canales</h1>
+      <p class="eyebrow"><i class="bi bi-chat-dots"></i> {{ t('chats.trabajo_en_equipo') }}</p>
+      <h1 id="chats-title">{{ t('canales.canales') }}</h1>
       <p class="mt-2 max-w-[62ch] text-muted">
-        Cada proyecto se divide en canales: uno general y uno por cada tarea o tema.
+        {{ t('chats.cada_proyecto_se_divide_en_canales_uno_general') }}
       </p>
     </div>
-    <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> Nuevo proyecto</a>
+    <a class="btn btn-primary" href="/proyectos/nuevo"><i class="bi bi-plus-lg"></i> {{ t('chats.nuevo_proyecto') }}</a>
   </section>
 
   <section aria-labelledby="chat-list-title">
     <div class="section-heading">
-      <h2 id="chat-list-title">Tus espacios de equipo</h2>
-      <span id="chat-count" class="text-[13px] text-muted">0 canales</span>
+      <h2 id="chat-list-title">{{ t('chats.tus_espacios_de_equipo') }}</h2>
+      <span id="chat-count" class="text-[13px] text-muted">{{ t('chats.0_canales') }}</span>
     </div>
     <div id="chats-grid" class="projects-grid" aria-live="polite"></div>
   </section>

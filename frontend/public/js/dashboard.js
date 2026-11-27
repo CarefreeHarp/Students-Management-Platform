@@ -1,12 +1,13 @@
 export function mount(scope) {
+  const { t: uiText, StudyFlowLanguage } = scope;
   const { document, listen, request, later, animate } = scope;
 
   const app = scope.app || {};
   const esc = app.escapeHTML || ((valor) => String(valor ?? "").replace(/[&<>"']/g, caracter => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[caracter]));
   const DIAS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
-  const DIAS_CORTOS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const DIAS_CORTOS = [uiText("crear_horario.lun"), uiText("crear_horario.mar"), uiText("crear_horario.mie"), uiText("crear_horario.jue"), uiText("crear_horario.vie"), uiText("crear_horario.sab"), uiText("crear_horario.dom")];
   const CLASE = "#6956b8";
-  const TIPOS = { clase: "Clase", tarea: "Tarea", entregable: "Entregable", proyecto: "Entrega de proyecto" };
+  const TIPOS = { clase: uiText("dashboard.clase"), tarea: uiText("fases.tarea"), entregable: uiText("dashboard.entregable"), proyecto: uiText("dashboard.entrega_de_proyecto") };
 
   let proyectos = [];
   let agenda = { horario: null, entregables: [] };
@@ -19,19 +20,19 @@ export function mount(scope) {
     // Sesión perdida o caducada: se vuelve al acceso en lugar de fallar a medias.
     if (respuesta.status === 401) {
       scope.navigate("/login");
-      throw new Error("Tu sesión terminó. Vuelve a entrar.");
+      throw new Error(uiText("canales.tu_sesion_termino_vuelve_a_entrar"));
     }
     if (!respuesta.ok) {
       const detalle = await respuesta.json().catch(() => ({}));
-      throw new Error(detalle.detail || `Error ${respuesta.status}`);
+      throw new Error(detalle.detail || (uiText("canales.error_0", {0: respuesta.status})));
     }
     return respuesta.status === 204 ? null : respuesta.json();
   }
 
   const iso = (fecha) => [fecha.getFullYear(), ...[fecha.getMonth() + 1, fecha.getDate()]
     .map((valor) => String(valor).padStart(2, "0"))].join("-");
-  const fechaLarga = new Intl.DateTimeFormat("es-CO", { weekday: "long", day: "numeric", month: "short" });
-  const fechaSemana = new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", year: "numeric" });
+  const fechaLarga = new Intl.DateTimeFormat(StudyFlowLanguage.locale(), { weekday: "long", day: "numeric", month: "short" });
+  const fechaSemana = new Intl.DateTimeFormat(StudyFlowLanguage.locale(), { day: "numeric", month: "short", year: "numeric" });
   const horaCorta = (hora) => hora ? hora.slice(0, 5) : "";
   const urlProyecto = (proyecto) => `/proyectos/${encodeURIComponent(proyecto.codigo)}`;
 
@@ -73,7 +74,7 @@ export function mount(scope) {
     const tareas = todasLasTareas().filter(t => t.fechaLimite).map(t => ({
       tipo: "tarea", titulo: t.titulo, fecha: t.fechaLimite, hora: horaCorta(t.horaLimite),
       href: urlProyecto(t.proyecto), proyecto: t.proyecto.nombre, color: t.proyecto.color,
-      detalle: t.responsable, estado: t.estadoEtiqueta, terminada: t.estado === "terminada",
+      detalle: t.responsable, estado: app.statusLabel(t.estado), terminada: t.estado === "terminada",
     }));
     const entregas = agenda.entregables.filter(e => porCodigo.has(e.proyectoCodigo)).map(e => {
       const proyecto = porCodigo.get(e.proyectoCodigo);
@@ -90,7 +91,7 @@ export function mount(scope) {
   }
 
   function pintarEvento(evento, movil = false) {
-    const horario = evento.hora ? [evento.hora, evento.fin].filter(Boolean).join("–") : "Todo el día";
+    const horario = evento.hora ? [evento.hora, evento.fin].filter(Boolean).join("–") : uiText("dashboard.todo_el_dia");
     const descripcion = [TIPOS[evento.tipo], horario, evento.proyecto, evento.detalle, evento.estado].filter(Boolean).join(" · ");
     const etiqueta = evento.tipo === "proyecto" ? TIPOS.proyecto : [TIPOS[evento.tipo], horario].join(" · ");
     const color = /^#[a-f0-9]{6}$/i.test(evento.color || "") ? evento.color : "#5b5ce2";
@@ -134,14 +135,14 @@ export function mount(scope) {
     porDia.forEach(eventos => eventos.sort((a, b) => (a.hora || "").localeCompare(b.hora || "")
       || a.titulo.localeCompare(b.titulo, "es")));
 
-    const encabezado = `<div class="calendar-toolbar">
+    const encabezado = (`<div class="calendar-toolbar">
         <h3>${fechaSemana.formatRange(dias[0], dias.at(-1))}</h3>
         <div class="calendar-actions">
-          <button class="calendar-button" type="button" data-semana="-1" aria-label="Semana anterior"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
-          <button class="calendar-button w-auto px-2 text-[11px] font-bold" type="button" data-semana="0">Hoy</button>
-          <button class="calendar-button" type="button" data-semana="1" aria-label="Semana siguiente"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+          <button class="calendar-button" type="button" data-semana="-1" aria-label="${uiText("dashboard.semana_anterior")}"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+          <button class="calendar-button w-auto px-2 text-[11px] font-bold" type="button" data-semana="0">${uiText("landing.hoy")}</button>
+          <button class="calendar-button" type="button" data-semana="1" aria-label="${uiText("dashboard.semana_siguiente")}"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
         </div>
-      </div>`;
+      </div>`);
 
     let rejilla = '<div class="calendar-grid agenda-unificada-grid"><div class="calendar-corner"></div>';
     dias.forEach((fecha, i) => {
@@ -155,7 +156,7 @@ export function mount(scope) {
       (_, i) => `${String(primera + i * 2).padStart(2, "0")}:00`);
     ["", ...bandas].forEach((banda, indice) => {
       const siguiente = bandas[indice] || "24:00";
-      rejilla += `<div class="calendar-hour">${banda || "Todo el día"}</div>`;
+      rejilla += `<div class="calendar-hour">${banda || uiText("dashboard.todo_el_dia")}</div>`;
       porDia.forEach(eventos => {
         const enBanda = eventos.filter(e => banda ? e.hora >= banda && e.hora < siguiente : !e.hora);
         rejilla += `<div class="calendar-slot">${enBanda.map(e => pintarEvento(e)).join("")}</div>`;
@@ -168,17 +169,17 @@ export function mount(scope) {
       const eventos = porDia.get(dia);
       const titulo = fechaLarga.format(fecha);
       return `<section class="dashboard-agenda-day${dia === hoy ? " is-today" : ""}" aria-label="${esc(titulo)}">
-        <h3>${esc(titulo)}${dia === hoy ? " · Hoy" : ""}</h3>
+        <h3>${esc(titulo)}${dia === hoy ? (" " + uiText("dashboard.hoy")) : ""}</h3>
         ${eventos.length ? `<ul>${eventos.map(e => `<li>${pintarEvento(e, true)}</li>`).join("")}</ul>`
-          : '<p class="dashboard-agenda-empty">Sin eventos.</p>'}
+          : (`<p class="dashboard-agenda-empty">${uiText("dashboard.sin_eventos")}</p>`)}
       </section>`;
     }).join("");
 
     const calendario = $("#dashboard-calendar");
     document.querySelectorAll(".calendar-popover").forEach(detalle => detalle.remove());
-    calendario.innerHTML = `<div class="calendar-shell">${encabezado}
-      <div class="week-calendar" tabindex="0" role="region" aria-label="Calendario semanal desplazable">${rejilla}</div>
-      <div class="dashboard-agenda" aria-label="Agenda de la semana">${lista}</div></div>`;
+    calendario.innerHTML = (`<div class="calendar-shell">${encabezado}
+      <div class="week-calendar" tabindex="0" role="region" aria-label="${uiText("dashboard.calendario_semanal_desplazable")}">${rejilla}</div>
+      <div class="dashboard-agenda" aria-label="${uiText("dashboard.agenda_de_la_semana")}">${lista}</div></div>`);
     calendario.querySelectorAll(".calendar-event").forEach(enlazarDetalle);
     calendario.querySelectorAll("[data-semana]").forEach(boton => {
       boton.addEventListener("click", () => {
@@ -193,7 +194,7 @@ export function mount(scope) {
   function pintarResumen(tareas) {
     const pendientes = tareas.filter((tarea) => tarea.estado !== "terminada");
     $("#pending-count").textContent =
-      `${pendientes.length} tarea${pendientes.length === 1 ? " pendiente" : "s pendientes"}`;
+      (uiText(pendientes.length === 1 ? "dashboard.una_tarea" : "dashboard.varias_tareas", {0: pendientes.length}));
 
     $("#project-legend").innerHTML = proyectos.slice(0, 4).map((proyecto) =>
       `<span class="legend-item"><i class="legend-dot" style="--legend-color:${esc(proyecto.color)}"></i>${esc(proyecto.nombre)}</span>`
@@ -205,19 +206,19 @@ export function mount(scope) {
         .sort((a, b) => (a.fechaLimite || "9999").localeCompare(b.fechaLimite || "9999"));
       const progreso = Math.max(0, Math.min(100, Number(proyecto.progreso) || 0));
       const url = `/proyectos/${encodeURIComponent(proyecto.codigo)}`;
-      return `<article class="overview-project">
+      return (`<article class="overview-project">
         <div class="overview-project-heading">
           <a href="${url}">${esc(proyecto.nombre)}</a>
           <strong>${progreso}%</strong>
         </div>
-        <div class="progress-track" role="progressbar" aria-label="Avance de ${esc(proyecto.nombre)}" aria-valuenow="${progreso}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill" style="--progress:${progreso}%"></span></div>
-        <p class="overview-pending-label">${porHacer.length ? `${porHacer.length} tarea${porHacer.length === 1 ? " pendiente" : "s pendientes"}` : "Aún no hay tareas pendientes"}</p>
+        <div class="progress-track" role="progressbar" aria-label="${uiText("dashboard.avance_de_3", {3: esc(proyecto.nombre)})}" aria-valuenow="${progreso}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill" style="--progress:${progreso}%"></span></div>
+        <p class="overview-pending-label">${porHacer.length ? (uiText(porHacer.length === 1 ? "dashboard.una_tarea" : "dashboard.varias_tareas", {0: porHacer.length})) : uiText("dashboard.aun_no_hay_tareas_pendientes")}</p>
         ${porHacer.length ? `<ul class="overview-pending-tasks">${porHacer.slice(0, 2).map((tarea) => `<li><a href="${url}">${esc(tarea.titulo)}</a></li>`).join("")}</ul>` : ""}
-        ${porHacer.length > 2 ? `<a class="overview-more" href="${url}">Ver ${porHacer.length - 2} pendiente${porHacer.length - 2 === 1 ? " más" : "s más"} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>` : ""}
-      </article>`;
+        ${porHacer.length > 2 ? (`<a class="overview-more" href="${url}">${uiText("dashboard.ver_1_pendiente_2", {1: porHacer.length - 2, 2: porHacer.length - 2 === 1 ? (" " + uiText("dashboard.mas")) : uiText("dashboard.s_mas")}) + " "}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>`) : ""}
+      </article>`);
     }).join("") || (proyectos.length
-      ? '<p class="text-muted">Tus proyectos están al día.</p><a class="text-action" href="/proyectos">Ver proyectos finalizados <i class="bi bi-arrow-right" aria-hidden="true"></i></a>'
-      : '<p class="text-muted">Todavía no tienes proyectos. Crea uno para organizar tus tareas.</p><a class="text-action" href="/proyectos/nuevo">Crear proyecto <i class="bi bi-arrow-right" aria-hidden="true"></i></a>');
+      ? (`<p class="text-muted">${uiText("dashboard.tus_proyectos_estan_al_dia")}</p><a class="text-action" href="/proyectos">${uiText("dashboard.ver_proyectos_finalizados") + " "}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>`)
+      : (`<p class="text-muted">${uiText("dashboard.todavia_no_tienes_proyectos_crea_uno_para_organizar")}</p><a class="text-action" href="/proyectos/nuevo">${uiText("proyectos.crear_proyecto") + " "}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>`));
   }
 
   async function cargar() {
@@ -226,7 +227,7 @@ export function mount(scope) {
     proyectos = proyectosCargados.value;
     if (agendaCargada.status === "fulfilled") agenda = agendaCargada.value;
     const estado = $("#dashboard-agenda-status");
-    if (agendaCargada.status === "rejected") estado.textContent = "Por ahora se muestran las tareas y las fechas de proyecto.";
+    if (agendaCargada.status === "rejected") estado.textContent = uiText("dashboard.por_ahora_se_muestran_las_tareas_y_las");
     pintarResumen(todasLasTareas());
     pintarCalendario();
   }
@@ -237,7 +238,7 @@ export function mount(scope) {
       document.querySelectorAll(".calendar-popover").forEach((ventana) => ventana.remove());
     }, { passive: true });
 
-    $("#dashboard-date").textContent = new Intl.DateTimeFormat("es-CO",
+    $("#dashboard-date").textContent = new Intl.DateTimeFormat(StudyFlowLanguage.locale(),
       { weekday: "long", day: "numeric", month: "long" }).format(new Date());
 
     try {
@@ -247,9 +248,9 @@ export function mount(scope) {
       });
       await cargar();
     } catch (error) {
-      $("#pending-count").textContent = "No se pudieron cargar los pendientes.";
+      $("#pending-count").textContent = uiText("dashboard.no_se_pudieron_cargar_los_pendientes");
       $("#dashboard-calendar").innerHTML =
-        `<p class="text-[13px] text-danger">No se pudo cargar la agenda. ${esc(error.message)}</p>`;
+        (`<p class="text-[13px] text-danger">${uiText("dashboard.no_se_pudo_cargar_la_agenda_0", {0: esc(error.message)})}</p>`);
     }
   }
 

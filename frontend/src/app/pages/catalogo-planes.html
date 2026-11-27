@@ -1,27 +1,27 @@
 <div class="plans-page">
   <header class="topbar">
-    <a class="brand" routerLink="/" aria-label="StudyFlow, inicio">
+    <a class="brand" routerLink="/" aria-label="{{ t('catalogo_planes.studyflow_inicio') }}">
       <img src="/assets/img/studyflow-isotipo.png" alt="">
       <span>Study<span class="brand-accent">Flow</span></span>
     </a>
-    <nav aria-label="Navegación principal">
-      <a class="back" routerLink="/">Volver al inicio</a>
-      <a class="top-link" routerLink="/login" [queryParams]="{acceso: 'cuenta'}">Mi cuenta <span aria-hidden="true">↗</span></a>
+    <nav aria-label="{{ t('catalogo_planes.navegacion_principal') }}">
+      <a class="back" routerLink="/">{{ t('catalogo_planes.volver_al_inicio') }}</a>
+      <a class="top-link" routerLink="/login" [queryParams]="{acceso: 'cuenta'}">{{ t('catalogo_planes.mi_cuenta') }} <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
   <main class="content">
     <section class="catalog-hero" aria-labelledby="plans-title">
       <div class="hero-copy">
-        <p class="eyebrow">Planes de StudyFlow</p>
-        <h1 id="plans-title">Hazle espacio<br>a lo que <em>importa.</em></h1>
-        <p class="lead">Tu horario, tus proyectos y tu equipo en un solo lugar. Elige por cuánto tiempo quieres acompañar tu semestre con StudyFlow.</p>
+        <p class="eyebrow">{{ t('catalogo_planes.planes_de_studyflow') }}</p>
+        <h1 id="plans-title">{{ t('catalogo_planes.hazle_espacio') }}<br>{{ t('catalogo_planes.a_lo_que') }} <em>{{ t('catalogo_planes.importa') }}</em></h1>
+        <p class="lead">{{ t('catalogo_planes.tu_horario_tus_proyectos_y_tu_equipo_en') }}</p>
       </div>
       <div class="universe" aria-hidden="true">
         <div class="orbit outer"></div><div class="planet"></div><div class="orbit inner"></div><div class="moon"></div>
       </div>
     </section>
 
-    <section class="plans-grid" aria-label="Comparar planes">
+    <section class="plans-grid" aria-label="{{ t('catalogo_planes.comparar_planes') }}">
       @for (plan of plans; track plan.id) {
         <article class="plan" [attr.data-plan]="plan.id" [class.featured]="plan.id === 'semestral'">
           <div class="plan-top">
@@ -35,27 +35,27 @@
                 }
               </svg>
             </span>
-            @if (plan.id === 'basico') { <span class="badge neutral">Actual</span> }
-            @if (plan.id === 'semestral') { <span class="badge">Recomendado</span> }
+            @if (plan.id === 'basico') { <span class="badge neutral">{{ t('catalogo_planes.actual') }}</span> }
+            @if (plan.id === 'semestral') { <span class="badge">{{ t('catalogo_planes.recomendado') }}</span> }
           </div>
           <h2>{{ plan.name }}</h2>
           <p class="description">{{ plan.description }}</p>
           <div class="price">{{ plan.price }}</div>
           <p class="period">{{ plan.period }}</p>
-          <ul class="benefits" [attr.aria-label]="'Qué incluye el plan ' + plan.name">
+          <ul class="benefits" [attr.aria-label]="t('planes.incluye', {'0': plan.name})">
             @for (feature of features; track feature) { <li>{{ feature }}</li> }
           </ul>
           @if (plan.id === 'basico') {
-            <a class="action secondary" routerLink="/registro">Crear mi cuenta <span aria-hidden="true">↗</span></a>
+            <a class="action secondary" routerLink="/registro">{{ t('catalogo_planes.crear_mi_cuenta') }} <span aria-hidden="true">↗</span></a>
           } @else {
-            <a class="action" [class.secondary]="plan.id !== 'semestral'" [routerLink]="['/planes/confirmar', plan.id]">Ver plan {{ plan.name.toLowerCase() }} <span aria-hidden="true">↗</span></a>
+            <a class="action" [class.secondary]="plan.id !== 'semestral'" [routerLink]="['/planes/confirmar', plan.id]">{{ t('planes.ver_plan', {'0': plan.name.toLowerCase()}) }} <span aria-hidden="true">↗</span></a>
           }
         </article>
       }
     </section>
 
     <aside class="note">
-      <div><span class="eyebrow">Próximamente</span><h2>30 días para descubrir Premium.</h2><p>La prueba gratuita estará disponible más adelante.</p></div>
+      <div><span class="eyebrow">{{ t('catalogo_planes.proximamente') }}</span><h2>{{ t('catalogo_planes.30_dias_para_descubrir_premium') }}</h2><p>{{ t('catalogo_planes.la_prueba_gratuita_estara_disponible_mas_adelante') }}</p></div>
       <span class="note-star" aria-hidden="true">✧</span>
     </aside>
   </main>

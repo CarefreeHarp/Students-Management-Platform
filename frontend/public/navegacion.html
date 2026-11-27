@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>StudyFlow · Mapa de navegación</title>
+  <title data-i18n="mapa.studyflow_mapa_de_navegacion">StudyFlow · Mapa de navegación</title>
   <meta name="description" content="Mapa de pantallas, botones, diálogos y rutas de StudyFlow.">
   <style>
     :root { color-scheme: light; --ink:#242431; --muted:#686879; --line:#e2e2ea; --accent:#5653ce; --soft:#eeedff; --paper:#fff; --canvas:#f7f7fa; }
@@ -141,281 +141,301 @@
 </head>
 <body>
   <header>
-    <p class="eyebrow">StudyFlow / Producto</p>
-    <h1>Mapa de navegación</h1>
-    <p class="intro">Cada pantalla y el control que te lleva a la siguiente. Selecciona una pantalla para ver sus conexiones, formularios y acciones. Las flechas muestran navegación entre páginas; los diálogos y cambios dentro de una pantalla se detallan debajo.</p>
-    <div class="toolbar">
-      <label class="search"><span class="visually-hidden">Buscar pantalla, botón o ruta</span><input id="search" type="search" placeholder="Buscar pantalla, botón o ruta…" autocomplete="off"></label>
-      <button class="button" id="catalog-toggle" type="button" aria-pressed="false">Todos los controles</button>
-      <button class="button" id="print" type="button">Imprimir mapa</button>
-      <a class="button" id="open-app" href="/" target="_blank" rel="noopener">Abrir StudyFlow</a>
+    <p class="eyebrow"><span data-i18n="mapa.studyflow_producto">StudyFlow / Producto</span></p>
+    <h1><span data-i18n="mapa.mapa_de_navegacion">Mapa de navegación</span></h1>
+    <p class="intro"><span data-i18n="mapa.cada_pantalla_y_el_control_que_te_lleva">Cada pantalla y el control que te lleva a la siguiente. Selecciona una pantalla para ver sus conexiones, formularios y acciones. Las flechas muestran navegación entre páginas; los diálogos y cambios dentro de una pantalla se detallan debajo.</span></p>
+    <div class="toolbar"><button class="button" type="button" id="language"></button>
+      <label class="search"><span class="visually-hidden"><span data-i18n="mapa.buscar_pantalla_boton_o_ruta">Buscar pantalla, botón o ruta</span></span><input id="search" type="search" placeholder="Buscar pantalla, botón o ruta…" data-i18n-placeholder="mapa.buscar_pantalla_boton_o_ruta_2" autocomplete="off"></label>
+      <button class="button" id="catalog-toggle" type="button" aria-pressed="false"><span data-i18n="mapa.todos_los_controles">Todos los controles</span></button>
+      <button class="button" id="print" type="button"><span data-i18n="mapa.imprimir_mapa">Imprimir mapa</span></button>
+      <a class="button" id="open-app" href="/" target="_blank" rel="noopener"><span data-i18n="mapa.abrir_studyflow">Abrir StudyFlow</span></a>
     </div>
   </header>
   <main>
     <section class="panel map-panel" aria-labelledby="map-title">
       <div class="section-heading">
-        <div><h2 id="map-title" tabindex="-1">Las pantallas</h2><p class="small muted" id="screen-count"></p><a class="map-shortcut" href="#inspector">Ver controles de la selección</a></div>
-        <div class="legend"><span><i></i> Sale de la seleccionada</span><span><i class="inbound"></i> Llega a ella</span><span><i class="public"></i> Acceso público</span></div>
+        <div><h2 id="map-title" tabindex="-1"><span data-i18n="mapa.las_pantallas">Las pantallas</span></h2><p class="small muted" id="screen-count"></p><a class="map-shortcut" href="#inspector"><span data-i18n="mapa.ver_controles_de_la_seleccion">Ver controles de la selección</span></a></div>
+        <div class="legend"><span><i></i> <span data-i18n="mapa.sale_de_la_seleccionada">Sale de la seleccionada</span></span><span><i class="inbound"></i> <span data-i18n="mapa.llega_a_ella">Llega a ella</span></span><span><i class="public"></i> <span data-i18n="mapa.acceso_publico">Acceso público</span></span></div>
       </div>
       <div class="graph" id="graph"><svg id="connections" aria-hidden="true"></svg><div id="map-columns" class="graph-columns"></div></div>
-      <p class="graph-caption">La barra superior conecta todas las pantallas privadas con Inicio, Proyectos, Horarios y Recordatorios. Se muestra por separado para mantener legible el mapa. Canales pertenece a un proyecto.</p>
+      <p class="graph-caption"><span data-i18n="mapa.la_barra_superior_conecta_todas_las_pantallas_privadas">La barra superior conecta todas las pantallas privadas con Inicio, Proyectos, Horarios y Recordatorios. Se muestra por separado para mantener legible el mapa. Canales pertenece a un proyecto.</span></p>
     </section>
     <div class="inspect-layout">
       <section class="panel inspector" id="inspector" aria-live="polite" aria-labelledby="screen-title"></section>
       <aside class="sidebar">
         <section class="panel side-panel">
-          <h2>Navegación compartida</h2>
+          <h2><span data-i18n="mapa.navegacion_compartida">Navegación compartida</span></h2>
           <div class="global-links" id="global-links"></div>
-          <p>El logo también abre Inicio. El menú de perfil incluye Ver mi perfil, Editar perfil, Recorrido guiado y Cerrar sesión. En móvil, el botón de menú despliega los mismos enlaces.</p>
-          <p>Cambiar tema modifica claro/oscuro sin salir de la pantalla. Cerrar sesión finaliza el acceso y abre <a href="#login" data-select="login">/login</a>.</p>
+          <p><span data-i18n="mapa.el_logo_tambien_abre_inicio_el_menu_de">El logo también abre Inicio. El menú de perfil incluye Ver mi perfil, Editar perfil, Recorrido guiado y Cerrar sesión. En móvil, el botón de menú despliega los mismos enlaces.</span></p>
+          <p><span data-i18n="mapa.cambiar_tema_modifica_claro_oscuro_sin_salir_de">Cambiar tema modifica claro/oscuro sin salir de la pantalla. Cerrar sesión finaliza el acceso y abre</span> <a href="#login" data-select="login">/login</a>.</p>
         </section>
         <section class="panel side-panel">
-          <h2>Rutas y acceso</h2>
-          <p>Una ruta privada sin sesión redirige a <a href="#login" data-select="login">/login</a>. Después del acceso se abre Inicio; la aplicación no conserva automáticamente el destino anterior.</p>
-          <p><code>{codigo}</code> representa el identificador de un proyecto. Las tres secciones de ese proyecto conservan el mismo código.</p>
-          <label class="field-label" for="project-code">Código para «Abrir pantalla»</label>
-          <input id="project-code" value="cognitiva" placeholder="Código del proyecto" autocomplete="off">
-          <p>Los botones del mapa solo cambian la selección. «Abrir pantalla» abre la aplicación en otra pestaña.</p>
+          <h2><span data-i18n="mapa.rutas_y_acceso">Rutas y acceso</span></h2>
+          <p><span data-i18n="mapa.una_ruta_privada_sin_sesion_redirige_a">Una ruta privada sin sesión redirige a</span> <a href="#login" data-select="login">/login</a><span data-i18n="mapa.despues_del_acceso_se_abre_inicio_la_aplicacion">. Después del acceso se abre Inicio; la aplicación no conserva automáticamente el destino anterior.</span></p>
+          <p><code>{codigo}</code> <span data-i18n="mapa.representa_el_identificador_de_un_proyecto_las_tres">representa el identificador de un proyecto. Las tres secciones de ese proyecto conservan el mismo código.</span></p>
+          <label class="field-label" for="project-code"><span data-i18n="mapa.codigo_para_abrir_pantalla">Código para «Abrir pantalla»</span></label>
+          <input id="project-code" value="cognitiva" placeholder="Código del proyecto" data-i18n-placeholder="mapa.codigo_del_proyecto" autocomplete="off">
+          <p><span data-i18n="mapa.los_botones_del_mapa_solo_cambian_la_seleccion">Los botones del mapa solo cambian la selección. «Abrir pantalla» abre la aplicación en otra pestaña.</span></p>
         </section>
         <section class="panel side-panel">
-          <h2>Tour de prueba: un espacio temporal</h2>
+          <h2><span data-i18n="mapa.tour_de_prueba_un_espacio_temporal">Tour de prueba: un espacio temporal</span></h2>
           <div class="tour-path" id="tour-path"></div>
-          <p>Desde «Tour por la app» se abre <code>/sandbox</code>: un espacio vacío, sin cuentas de ejemplo. Los cambios solo viven en memoria mientras se prueba la app. No se guardan ni se envían mensajes.</p>
+          <p><span data-i18n="mapa.desde_tour_por_la_app_se_abre">Desde «Tour por la app» se abre</span> <code>/sandbox</code><span data-i18n="mapa.un_espacio_vacio_sin_cuentas_de_ejemplo_los">: un espacio vacío, sin cuentas de ejemplo. Los cambios solo viven en memoria mientras se prueba la app. No se guardan ni se envían mensajes.</span></p>
           <ol>
-            <li><strong>Inicio:</strong> tu espacio, todavía vacío.</li>
-            <li><strong>Crear proyecto:</strong> nombre, equipo, tareas y modo de reparto.</li>
-            <li><strong>Tu proyecto:</strong> tareas y accesos a las secciones.</li>
-            <li><strong>Fases:</strong> ramas verticales y dependencias.</li>
-            <li><strong>Canales:</strong> una conversación de prueba.</li>
-            <li><strong>Documentos:</strong> registrar un entregable.</li>
-            <li><strong>Horarios:</strong> Añadir materia y preferencias de organización.</li>
-            <li><strong>Recordatorios:</strong> Añadir recordatorio y Configurar recordatorios.</li>
-            <li><strong>Todo listo:</strong> crear una cuenta real o seguir probando.</li>
+            <li><strong><span data-i18n="mapa.inicio">Inicio:</span></strong> <span data-i18n="mapa.tu_espacio_todavia_vacio">tu espacio, todavía vacío.</span></li>
+            <li><strong><span data-i18n="mapa.crear_proyecto">Crear proyecto:</span></strong> <span data-i18n="mapa.nombre_equipo_tareas_y_modo_de_reparto">nombre, equipo, tareas y modo de reparto.</span></li>
+            <li><strong><span data-i18n="mapa.tu_proyecto">Tu proyecto:</span></strong> <span data-i18n="mapa.tareas_y_accesos_a_las_secciones">tareas y accesos a las secciones.</span></li>
+            <li><strong><span data-i18n="mapa.fases">Fases:</span></strong> <span data-i18n="mapa.ramas_verticales_y_dependencias">ramas verticales y dependencias.</span></li>
+            <li><strong><span data-i18n="mapa.canales">Canales:</span></strong> <span data-i18n="mapa.una_conversacion_de_prueba">una conversación de prueba.</span></li>
+            <li><strong><span data-i18n="mapa.documentos">Documentos:</span></strong> <span data-i18n="mapa.registrar_un_entregable">registrar un entregable.</span></li>
+            <li><strong><span data-i18n="mapa.horarios">Horarios:</span></strong> <span data-i18n="mapa.anadir_materia_y_preferencias_de_organizacion">Añadir materia y preferencias de organización.</span></li>
+            <li><strong><span data-i18n="mapa.recordatorios">Recordatorios:</span></strong> <span data-i18n="mapa.anadir_recordatorio_y_configurar_recordatorios">Añadir recordatorio y Configurar recordatorios.</span></li>
+            <li><strong><span data-i18n="mapa.todo_listo">Todo listo:</span></strong> <span data-i18n="mapa.crear_una_cuenta_real_o_seguir_probando">crear una cuenta real o seguir probando.</span></li>
           </ol>
-          <p><strong>Siguiente / Anterior</strong> desplazan suavemente el foco de luz y la tarjeta. Solo se muestran título, descripción breve, cerrar y los dos controles de navegación.</p>
-          <p>La interfaz iluminada sigue siendo interactiva. Crear el primer proyecto continúa automáticamente en sus tareas. Si se prefiere no crearlo, Siguiente permite pasar a Horarios sin quedar atrapado.</p>
-          <p><strong>Cerrar</strong> pausa la guía; puedes seguir explorando. <strong>Terminar</strong> ofrece crear tu cuenta, sin trasladar los datos de prueba. <strong>Escape</strong> respeta los diálogos nativos abiertos.</p>
-          <p>La cuenta real conserva su recorrido breve desde el perfil, aplicado a sus propios datos. La prueba pública nunca abre una sesión de demostración.</p>
+          <p><strong><span data-i18n="mapa.siguiente_anterior">Siguiente / Anterior</span></strong> <span data-i18n="mapa.desplazan_suavemente_el_foco_de_luz_y_la">desplazan suavemente el foco de luz y la tarjeta. Solo se muestran título, descripción breve, cerrar y los dos controles de navegación.</span></p>
+          <p><span data-i18n="mapa.la_interfaz_iluminada_sigue_siendo_interactiva_crear_el">La interfaz iluminada sigue siendo interactiva. Crear el primer proyecto continúa automáticamente en sus tareas. Si se prefiere no crearlo, Siguiente permite pasar a Horarios sin quedar atrapado.</span></p>
+          <p><strong><span data-i18n="canales.cerrar">Cerrar</span></strong> <span data-i18n="mapa.pausa_la_guia_puedes_seguir_explorando">pausa la guía; puedes seguir explorando.</span> <strong><span data-i18n="recorrido.terminar">Terminar</span></strong> <span data-i18n="mapa.ofrece_crear_tu_cuenta_sin_trasladar_los_datos">ofrece crear tu cuenta, sin trasladar los datos de prueba.</span> <strong><span data-i18n="mapa.escape">Escape</span></strong> <span data-i18n="mapa.respeta_los_dialogos_nativos_abiertos">respeta los diálogos nativos abiertos.</span></p>
+          <p><span data-i18n="mapa.la_cuenta_real_conserva_su_recorrido_breve_desde">La cuenta real conserva su recorrido breve desde el perfil, aplicado a sus propios datos. La prueba pública nunca abre una sesión de demostración.</span></p>
         </section>
       </aside>
     </div>
-    <section id="catalog" hidden aria-label="Catálogo completo de controles"></section>
-    <noscript><p class="no-results">Activa JavaScript para explorar el mapa interactivo y el catálogo de controles.</p></noscript>
+    <section id="catalog" hidden aria-label="Catálogo completo de controles" data-i18n-aria-label="mapa.catalogo_completo_de_controles"></section>
+    <noscript><p class="no-results"><span data-i18n="mapa.activa_javascript_para_explorar_el_mapa_interactivo_y">Activa JavaScript para explorar el mapa interactivo y el catálogo de controles.</span></p></noscript>
   </main>
-  <footer>Mapa de la interfaz revisada en esta entrega. Describe rutas y controles implementados; una etiqueta «Pendiente» indica un botón sin integración activa. No ejecuta acciones ni modifica datos de la aplicación.</footer>
+  <footer><span data-i18n="mapa.mapa_de_la_interfaz_revisada_en_esta_entrega">Mapa de la interfaz revisada en esta entrega. Describe rutas y controles implementados; una etiqueta «Pendiente» indica un botón sin integración activa. No ejecuta acciones ni modifica datos de la aplicación.</span></footer>
   <script>
-  (() => {
+  (async () => {
     'use strict';
+
+    const idioma = localStorage.getItem('studyflow.idioma') === 'en' ? 'en' : 'es';
+    const catalogo = await (await fetch('/i18n/' + idioma + '.json')).json();
+    const t = key => catalogo[key];
+    document.documentElement.lang = idioma;
+    for (const attr of ['textContent', 'aria-label', 'placeholder']) {
+      const marker = attr === 'textContent' ? 'data-i18n' : 'data-i18n-' + attr;
+      for (const el of document.querySelectorAll('[' + marker + ']')) {
+        const value = t(el.getAttribute(marker));
+        if (attr === 'textContent') el.textContent = value;
+        else el.setAttribute(attr, value);
+      }
+    }
+    const language = document.querySelector('#language');
+    language.textContent = idioma === 'es' ? 'English' : 'Español';
+    language.onclick = () => {
+      localStorage.setItem('studyflow.idioma', idioma === 'es' ? 'en' : 'es');
+      location.reload();
+    };
+
     const action = (label, type, destination, description, target) => ({label,type,destination,description,target});
     const screens = [
-      {id:'landing',name:'Landing page',route:'/',group:'public',public:true,description:'Presentación pública del producto. Las secciones de la landing se recorren por anclas, sin abrir otra pantalla.',actions:[
-        action('Logo StudyFlow','page','Landing page','Vuelve al comienzo de la página pública.','landing'),
-        action('Ingresa','page','Acceso · /login','Abre las opciones Tour por la app, Crear mi cuenta y Ya tengo mi cuenta.','login'),
-        action('Ya tengo mi cuenta / Entra a tu espacio','page','Acceso con contraseña','Abre /login?acceso=cuenta con el formulario desplegado.','login'),
-        action('Encuentra tu flow','page','Tour por la app','Abre el espacio temporal vacío.','sandbox'),
-        action('Empieza a organizarte / Crea tu cuenta','page','Registro completo','Abre el formulario de registro.','registro'),
-        action('Así funciona / Descubre cómo / Explora a tu ritmo / Tu organización','local','#tu-semana','Desplaza a la sección de organización personal.'),
-        action('Por qué StudyFlow','local','#por-que','Desplaza a los motivos y preguntas frecuentes.'),
-        action('Tus proyectos / Tus recordatorios','local','#tus-proyectos / #tus-recordatorios','Enlaces del pie a secciones de esta misma página.'),
-        action('Organiza tu horario','page','Horarios','Ruta privada: requiere sesión.','horarios'),
-        action('Dale forma a tu proyecto','page','Mis proyectos','Ruta privada: requiere sesión.','proyectos'),
-        action('Prepara tus recordatorios','page','Recordatorios','Ruta privada: requiere sesión.','recordatorios'),
-        action('Ir al acceso','page','Acceso','Enlace dentro de las preguntas frecuentes.','login'),
-        action('Preguntas frecuentes','local','Respuesta desplegada','Cada pregunta expande o contrae su respuesta.'),
-        action('YouTube / Instagram','external','Sitios externos','Abre los enlaces sociales del pie.'),
-        action('Volver arriba / Saltar al contenido','local','#contenido','Desplaza al contenido principal.'),
-        action('Control de movimiento','local','Animación de la landing','Activa o pausa el movimiento visual.')
+      {id:'landing',name:t('mapa.landing_page'),route:'/',group:'public',public:true,description:t('mapa.presentacion_publica_del_producto_las_secciones_de_la'),actions:[
+        action(t('mapa.logo_studyflow'),'page',t('mapa.landing_page'),t('mapa.vuelve_al_comienzo_de_la_pagina_publica'),'landing'),
+        action(t('landing.ingresa'),'page',t('mapa.acceso_login'),t('mapa.abre_las_opciones_tour_por_la_app_crear'),'login'),
+        action(t('mapa.ya_tengo_mi_cuenta_entra_a_tu_espacio'),'page',t('mapa.acceso_con_contrasena'),t('mapa.abre_login_acceso_cuenta_con_el_formulario_desplegado'),'login'),
+        action(t('landing.encuentra_tu_flow'),'page',t('login.tour_por_la_app'),t('mapa.abre_el_espacio_temporal_vacio'),'sandbox'),
+        action(t('mapa.empieza_a_organizarte_crea_tu_cuenta'),'page',t('mapa.registro_completo'),t('mapa.abre_el_formulario_de_registro'),'registro'),
+        action(t('mapa.asi_funciona_descubre_como_explora_a_tu_ritmo'),'local',"#tu-semana",t('mapa.desplaza_a_la_seccion_de_organizacion_personal')),
+        action(t('landing.por_que_studyflow'),'local',"#por-que",t('mapa.desplaza_a_los_motivos_y_preguntas_frecuentes')),
+        action(t('mapa.tus_proyectos_tus_recordatorios'),'local',"#tus-proyectos / #tus-recordatorios",t('mapa.enlaces_del_pie_a_secciones_de_esta_misma')),
+        action(t('landing.organiza_tu_horario'),'page',t('main.horarios'),t('mapa.ruta_privada_requiere_sesion'),'horarios'),
+        action(t('landing.dale_forma_a_tu_proyecto'),'page',t('proyectos.mis_proyectos'),t('mapa.ruta_privada_requiere_sesion'),'proyectos'),
+        action(t('landing.prepara_tus_recordatorios'),'page',t('recordatorios.recordatorios'),t('mapa.ruta_privada_requiere_sesion'),'recordatorios'),
+        action(t('landing.ir_al_acceso'),'page',t('mapa.acceso'),t('mapa.enlace_dentro_de_las_preguntas_frecuentes'),'login'),
+        action(t('mapa.preguntas_frecuentes'),'local',t('mapa.respuesta_desplegada'),t('mapa.cada_pregunta_expande_o_contrae_su_respuesta')),
+        action(t('mapa.youtube_instagram'),'external',t('mapa.sitios_externos'),t('mapa.abre_los_enlaces_sociales_del_pie')),
+        action(t('mapa.volver_arriba_saltar_al_contenido'),'local',"#contenido",t('mapa.desplaza_al_contenido_principal')),
+        action(t('mapa.control_de_movimiento'),'local',t('mapa.animacion_de_la_landing'),t('mapa.activa_o_pausa_el_movimiento_visual'))
       ]},
-      {id:'login',name:'Ingresa',route:'/login',group:'public',public:true,description:'Elige una prueba temporal sin cuenta, crea tu cuenta o inicia sesión con correo y contraseña.',actions:[
-        action('Comenzar tour','page','Tour por la app','Abre /sandbox sin iniciar sesión ni crear una cuenta.','sandbox'),
-        action('Ingresar','page','Inicio','Envía correo y contraseña. Solo abre Inicio si las credenciales son válidas.','panel'),
-        action('Crear mi cuenta','page','Registro completo','Abre el formulario de creación de cuenta.','registro'),
-        action('Ya tengo mi cuenta','local','Formulario de acceso','Sustituye las opciones por el formulario de correo y contraseña.'),
-        action('Volver','local','Opciones de acceso','Regresa a las dos tarjetas sin enviar el formulario.'),
-        action('Mostrar contraseña','local','Contraseña visible u oculta','Alterna la visibilidad del campo.'),
-        action('Logo StudyFlow / Volver al inicio','page','Landing page','Regresa a la presentación pública.','landing'),
-        action('Cambiar tema','local','Claro / oscuro','No abandona la pantalla.')
+      {id:'login',name:t('landing.ingresa'),route:'/login',group:'public',public:true,description:t('mapa.elige_una_prueba_temporal_sin_cuenta_crea_tu'),actions:[
+        action(t('login.comenzar_tour'),'page',t('login.tour_por_la_app'),t('mapa.abre_sandbox_sin_iniciar_sesion_ni_crear_una'),'sandbox'),
+        action(t('admin.ingresar'),'page',t('main.inicio'),t('mapa.envia_correo_y_contrasena_solo_abre_inicio_si'),'panel'),
+        action(t('catalogo_planes.crear_mi_cuenta'),'page',t('mapa.registro_completo'),t('mapa.abre_el_formulario_de_creacion_de_cuenta'),'registro'),
+        action(t('login.ya_tengo_mi_cuenta'),'local',t('mapa.formulario_de_acceso'),t('mapa.sustituye_las_opciones_por_el_formulario_de_correo')),
+        action(t('login.volver'),'local',t('mapa.opciones_de_acceso'),t('mapa.regresa_a_las_dos_tarjetas_sin_enviar_el')),
+        action(t('login.mostrar_contrasena'),'local',t('mapa.contrasena_visible_u_oculta'),t('mapa.alterna_la_visibilidad_del_campo')),
+        action(t('mapa.logo_studyflow_volver_al_inicio'),'page',t('mapa.landing_page'),t('mapa.regresa_a_la_presentacion_publica'),'landing'),
+        action(t('mapa.cambiar_tema'),'local',t('mapa.claro_oscuro'),t('mapa.no_abandona_la_pantalla'))
       ]},
-      {id:'sandbox',name:'Tour por la app',route:'/sandbox',group:'public',public:true,description:'Espacio de prueba vacío y aislado en memoria. Permite crear proyectos, tareas, canales, entregables, horarios y recordatorios sin persistencia ni mensajes reales.',actions:[
-        action('Siguiente / Anterior','local','Siguiente enfoque o pantalla de prueba','El foco y la tarjeta se desplazan con una transición suave entre nueve etapas.'),
-        action('Cerrar guía','local','Exploración libre','Oculta la guía y mantiene el espacio temporal utilizable.'),
-        action('Recorrido','local','Última etapa','Reabre la guía en la etapa actual.'),
-        action('Crear y ver planificación','local','Proyecto temporal creado','Continúa en el detalle del proyecto de prueba, sin escribir en el servidor.'),
-        action('Crear cuenta / Terminar','dialog','Fin del recorrido','Ofrece crear una cuenta real o seguir probando.'),
-        action('Crear mi cuenta, al terminar','page','Registro','Descarta el espacio temporal antes de abrir el registro.','registro'),
-        action('Seguir probando','local','Exploración libre','Cierra la invitación a registrarse y conserva los datos solo en memoria.'),
-        action('Reiniciar','dialog','Confirmación de reinicio','Tras confirmar, descarta la memoria y vuelve al espacio vacío.'),
-        action('Salir','page','Ingresa','Descarta lo probado y regresa al acceso.','login')
+      {id:'sandbox',name:t('login.tour_por_la_app'),route:'/sandbox',group:'public',public:true,description:t('mapa.espacio_de_prueba_vacio_y_aislado_en_memoria'),actions:[
+        action(t('mapa.siguiente_anterior'),'local',t('mapa.siguiente_enfoque_o_pantalla_de_prueba'),t('mapa.el_foco_y_la_tarjeta_se_desplazan_con')),
+        action(t('mapa.cerrar_guia'),'local',t('mapa.exploracion_libre'),t('mapa.oculta_la_guia_y_mantiene_el_espacio_temporal')),
+        action(t('mapa.recorrido'),'local',t('mapa.ultima_etapa'),t('mapa.reabre_la_guia_en_la_etapa_actual')),
+        action(t('crear_proyecto.crear_y_ver_planificacion'),'local',t('mapa.proyecto_temporal_creado'),t('mapa.continua_en_el_detalle_del_proyecto_de_prueba')),
+        action(t('mapa.crear_cuenta_terminar'),'dialog',t('mapa.fin_del_recorrido'),t('mapa.ofrece_crear_una_cuenta_real_o_seguir_probando')),
+        action(t('mapa.crear_mi_cuenta_al_terminar'),'page',t('entregables.registro'),t('mapa.descarta_el_espacio_temporal_antes_de_abrir_el'),'registro'),
+        action(t('sandbox.seguir_probando'),'local',t('mapa.exploracion_libre'),t('mapa.cierra_la_invitacion_a_registrarse_y_conserva_los')),
+        action(t('sandbox.reiniciar'),'dialog',t('mapa.confirmacion_de_reinicio'),t('mapa.tras_confirmar_descarta_la_memoria_y_vuelve_al')),
+        action(t('mapa.salir'),'page',t('landing.ingresa'),t('mapa.descarta_lo_probado_y_regresa_al_acceso'),'login')
       ]},
-      {id:'registro',name:'Registro completo',route:'/registro',group:'public',public:true,description:'Crea la cuenta con los datos personales y académicos.',actions:[
-        action('Crear mi cuenta','page','Inicio','Valida los campos, crea la cuenta y abre sesión. Un error mantiene el formulario visible.','panel'),
-        action('Ingresa a tu espacio / logo StudyFlow','page','Acceso','El enlace de cuenta existente abre el formulario con contraseña.','login'),
-        action('Mostrar contraseña','local','Contraseña visible u oculta','Alterna la visibilidad del campo.'),
-        action('Cambiar tema','local','Claro / oscuro','No abandona la pantalla.')
+      {id:'registro',name:t('mapa.registro_completo'),route:'/registro',group:'public',public:true,description:t('mapa.crea_la_cuenta_con_los_datos_personales_y'),actions:[
+        action(t('catalogo_planes.crear_mi_cuenta'),'page',t('main.inicio'),t('mapa.valida_los_campos_crea_la_cuenta_y_abre'),'panel'),
+        action(t('mapa.ingresa_a_tu_espacio_logo_studyflow'),'page',t('mapa.acceso'),t('mapa.el_enlace_de_cuenta_existente_abre_el_formulario'),'login'),
+        action(t('login.mostrar_contrasena'),'local',t('mapa.contrasena_visible_u_oculta'),t('mapa.alterna_la_visibilidad_del_campo')),
+        action(t('mapa.cambiar_tema'),'local',t('mapa.claro_oscuro'),t('mapa.no_abandona_la_pantalla'))
       ]},
-      {id:'panel',name:'Inicio',route:'/panel',group:'main',description:'Agenda académica y un único Estado general con pendientes y progreso de los proyectos.',actions:[
-        action('Mi horario','page','Horarios','Abre el registro de materias y sus opciones.','horarios'),
-        action('Nuevo proyecto / Crear proyecto (estado vacío)','page','Crear proyecto','Abre el formulario de un nuevo trabajo.','nuevo'),
-        action('Evento de la agenda','page','Proyecto correspondiente','Cada evento conserva el código del proyecto al que pertenece.','proyecto'),
-        action('Nombre de proyecto / tarea pendiente / Ver más pendientes','page','Proyecto correspondiente','Desde Estado general se abre el detalle con calendario y tareas.','proyecto'),
-        action('Ver todos los proyectos / Ver proyectos finalizados','page','Mis proyectos','Abre el listado completo.','proyectos'),
-        action('Semana anterior / siguiente / Hoy','local','Agenda de otra semana','Actualiza la cuadrícula sin cambiar la página.'),
-        action('Pasar sobre una tarea / enfocarla','local','Detalle flotante del evento','Muestra proyecto, responsable, fecha y estado; no abre un diálogo de edición.')
+      {id:'panel',name:t('main.inicio'),route:'/panel',group:'main',description:t('mapa.agenda_academica_y_un_unico_estado_general_con'),actions:[
+        action(t('index.mi_horario'),'page',t('main.horarios'),t('mapa.abre_el_registro_de_materias_y_sus_opciones'),'horarios'),
+        action(t('mapa.nuevo_proyecto_crear_proyecto_estado_vacio'),'page',t('proyectos.crear_proyecto'),t('mapa.abre_el_formulario_de_un_nuevo_trabajo'),'nuevo'),
+        action(t('mapa.evento_de_la_agenda'),'page',t('mapa.proyecto_correspondiente'),t('mapa.cada_evento_conserva_el_codigo_del_proyecto_al'),'proyecto'),
+        action(t('mapa.nombre_de_proyecto_tarea_pendiente_ver_mas_pendientes'),'page',t('mapa.proyecto_correspondiente'),t('mapa.desde_estado_general_se_abre_el_detalle_con'),'proyecto'),
+        action(t('mapa.ver_todos_los_proyectos_ver_proyectos_finalizados'),'page',t('proyectos.mis_proyectos'),t('mapa.abre_el_listado_completo'),'proyectos'),
+        action(t('mapa.semana_anterior_siguiente_hoy'),'local',t('mapa.agenda_de_otra_semana'),t('mapa.actualiza_la_cuadricula_sin_cambiar_la_pagina')),
+        action(t('mapa.pasar_sobre_una_tarea_enfocarla'),'local',t('mapa.detalle_flotante_del_evento'),t('mapa.muestra_proyecto_responsable_fecha_y_estado_no_abre'))
       ]},
-      {id:'proyectos',name:'Mis proyectos',route:'/proyectos',group:'main',description:'Cuenta de proyectos activos y tarjetas con progreso, pendientes y días que faltan para cada entrega.',actions:[
-        action('Crear proyecto','page','Crear proyecto','Abre el formulario.','nuevo'),
-        action('Tarjeta / Ver proyecto','page','Proyecto seleccionado','Toda la tarjeta es un enlace a /proyectos/{codigo}.','proyecto'),
-        action('Buscar por nombre o integrante','local','Listado filtrado','Filtra por nombre, descripción e integrantes.'),
-        action('Todos / En curso / Finalizados','local','Listado filtrado','Cambia qué proyectos aparecen sin cambiar de pantalla.'),
-        action('Iniciar recorrido guiado (cuenta vacía)','page','Tour por la app','Abre un espacio vacío de prueba sin utilizar datos de una cuenta ajena.','sandbox')
+      {id:'proyectos',name:t('proyectos.mis_proyectos'),route:'/proyectos',group:'main',description:t('mapa.cuenta_de_proyectos_activos_y_tarjetas_con_progreso'),actions:[
+        action(t('proyectos.crear_proyecto'),'page',t('proyectos.crear_proyecto'),t('mapa.abre_el_formulario'),'nuevo'),
+        action(t('mapa.tarjeta_ver_proyecto'),'page',t('mapa.proyecto_seleccionado'),t('mapa.toda_la_tarjeta_es_un_enlace_a_proyectos'),'proyecto'),
+        action(t('proyectos.buscar_por_nombre_o_integrante'),'local',t('mapa.listado_filtrado'),t('mapa.filtra_por_nombre_descripcion_e_integrantes')),
+        action(t('mapa.todos_en_curso_finalizados'),'local',t('mapa.listado_filtrado'),t('mapa.cambia_que_proyectos_aparecen_sin_cambiar_de_pantalla')),
+        action(t('mapa.iniciar_recorrido_guiado_cuenta_vacia'),'page',t('login.tour_por_la_app'),t('mapa.abre_un_espacio_vacio_de_prueba_sin_utilizar'),'sandbox')
       ]},
-      {id:'horarios',name:'Horarios',route:'/horarios',group:'main',description:'Materias con varias opciones de horario; cada opción puede contener sesiones en varios días. Las preferencias preparan una futura generación con IA.',actions:[
-        action('Volver al inicio','page','Inicio','Regresa a la agenda.','panel'),
-        action('Añadir materia / Editar materia','local','Editor desplegado','Abre el formulario en esta pantalla: nombre, créditos y opciones con sus sesiones.'),
-        action('Añadir día o franja','local','Nueva sesión dentro de la opción','Una opción agrupa los días y horas que se cursan juntos.'),
-        action('Añadir otra opción','local','Alternativa de horario','Crea otra opción para cursar la misma materia.'),
-        action('Quitar clase / Quitar opción','local','Formulario actualizado','Retira únicamente la sesión o alternativa seleccionada.'),
-        action('Guardar materia','local','Lista y calendario actualizados','Guarda el borrador en el navegador y cierra el editor.'),
-        action('Cancelar','local','Editor cerrado','Cierra el formulario sin guardar los cambios.'),
-        action('Opción N / No incluir por ahora','local','Vista previa del horario','Selecciona una alternativa por materia o excluye esa materia del horario actual.'),
-        action('Eliminar materia','local','Lista actualizada','Quita la materia y sus sesiones del borrador.'),
-        action('Limpiar','dialog','Confirmación','Vacía el borrador de materias si se confirma.'),
-        action('Añadir ejemplos de otras carreras','local','Materias de ejemplo','Carga seis ejemplos sin duplicar los que ya existen.'),
-        action('Guardar horario','local','Horario guardado en el navegador','Conserva la selección manual. Está deshabilitado cuando hay cruces o no se eligieron materias.'),
-        action('Recuperar horario guardado','local','Horario guardado restaurado','Recupera la selección manual guardada previamente en el navegador.'),
-        action('Preferencias de organización','local','Preferencias seleccionadas','Empezar temprano, más créditos, terminar tarde, sin pausas largas o con pausas largas.'),
-        action('Generación con IA','pending','Próxima integración','La interfaz permite preparar materias y preferencias; la IA no genera horarios en esta entrega.')
+      {id:'horarios',name:t('main.horarios'),route:'/horarios',group:'main',description:t('mapa.materias_con_varias_opciones_de_horario_cada_opcion'),actions:[
+        action(t('catalogo_planes.volver_al_inicio'),'page',t('main.inicio'),t('mapa.regresa_a_la_agenda'),'panel'),
+        action(t('mapa.anadir_materia_editar_materia'),'local',t('mapa.editor_desplegado'),t('mapa.abre_el_formulario_en_esta_pantalla_nombre_creditos')),
+        action(t('mapa.anadir_dia_o_franja'),'local',t('mapa.nueva_sesion_dentro_de_la_opcion'),t('mapa.una_opcion_agrupa_los_dias_y_horas_que')),
+        action(t('crear_horario.anadir_otra_opcion'),'local',t('mapa.alternativa_de_horario'),t('mapa.crea_otra_opcion_para_cursar_la_misma_materia')),
+        action(t('mapa.quitar_clase_quitar_opcion'),'local',t('mapa.formulario_actualizado'),t('mapa.retira_unicamente_la_sesion_o_alternativa_seleccionada')),
+        action(t('crear_horario.guardar_materia'),'local',t('mapa.lista_y_calendario_actualizados'),t('mapa.guarda_el_borrador_en_el_navegador_y_cierra')),
+        action(t('admin.cancelar'),'local',t('mapa.editor_cerrado'),t('mapa.cierra_el_formulario_sin_guardar_los_cambios')),
+        action(t('mapa.opcion_n_no_incluir_por_ahora'),'local',t('mapa.vista_previa_del_horario'),t('mapa.selecciona_una_alternativa_por_materia_o_excluye_esa')),
+        action(t('crear_horario.eliminar_materia'),'local',t('mapa.lista_actualizada'),t('mapa.quita_la_materia_y_sus_sesiones_del_borrador')),
+        action(t('crear_horario.limpiar'),'dialog',t('mapa.confirmacion'),t('mapa.vacia_el_borrador_de_materias_si_se_confirma')),
+        action(t('crear_horario.anadir_ejemplos_de_otras_carreras'),'local',t('mapa.materias_de_ejemplo'),t('mapa.carga_seis_ejemplos_sin_duplicar_los_que_ya')),
+        action(t('crear_horario.guardar_horario'),'local',t('mapa.horario_guardado_en_el_navegador'),t('mapa.conserva_la_seleccion_manual_esta_deshabilitado_cuando_hay')),
+        action(t('mapa.recuperar_horario_guardado'),'local',t('mapa.horario_guardado_restaurado'),t('mapa.recupera_la_seleccion_manual_guardada_previamente_en_el')),
+        action(t('mapa.preferencias_de_organizacion'),'local',t('mapa.preferencias_seleccionadas'),t('mapa.empezar_temprano_mas_creditos_terminar_tarde_sin_pausas')),
+        action(t('mapa.generacion_con_ia'),'pending',t('mapa.proxima_integracion'),t('mapa.la_interfaz_permite_preparar_materias_y_preferencias_la'))
       ]},
-      {id:'recordatorios',name:'Recordatorios',route:'/recordatorios',group:'main',description:'Lista de avisos por WhatsApp y dos formularios separados: aviso personal y configuración de anticipación habitual.',actions:[
-        action('Añadir recordatorio','dialog','Formulario de nuevo recordatorio','Título, fecha y hora, anticipación en minutos/horas/días y detalle opcional.'),
-        action('Guardar recordatorio','local','Lista de recordatorios','Valida y guarda el aviso, cierra el diálogo y actualiza la lista.'),
-        action('Configurar recordatorios','dialog','Configuración de WhatsApp y anticipación','Teléfono, Recibir recordatorios y anticipación estándar para tareas, entregas y pendientes de clase.'),
-        action('Guardar configuración','local','Lista actualizada','Guarda las preferencias, cierra el diálogo y recalcula los avisos automáticos.'),
-        action('Enviar prueba','local','Resultado de la prueba','Solicita un mensaje de prueba y conserva abierto el diálogo de configuración.'),
-        action('Actualizar desde mis pendientes','local','Avisos automáticos recalculados','Actualiza tareas y entregas; conserva los avisos personales.'),
-        action('Ver detalle','local','Detalle del recordatorio','Expande el contenido dentro de la lista.'),
-        action('Cancelar recordatorio','local','Lista actualizada','Retira el aviso seleccionado.'),
-        action('Historial de avisos / Pendientes de clase guardados','local','Sección desplegada','Secciones plegables que aparecen cuando hay datos.'),
-        action('Resolver pendiente de clase','local','Pendiente resuelto','Actualiza el apunte guardado desde la misma pantalla.'),
-        action('Cancelar / Cerrar / Escape','local','Cierra el diálogo','Regresa a la lista sin guardar el formulario.')
+      {id:'recordatorios',name:t('recordatorios.recordatorios'),route:'/recordatorios',group:'main',description:t('mapa.lista_de_avisos_por_whatsapp_y_dos_formularios'),actions:[
+        action(t('recordatorios.anadir_recordatorio'),'dialog',t('mapa.formulario_de_nuevo_recordatorio'),t('mapa.titulo_fecha_y_hora_anticipacion_en_minutos_horas')),
+        action(t('recordatorios.guardar_recordatorio'),'local',t('mapa.lista_de_recordatorios'),t('mapa.valida_y_guarda_el_aviso_cierra_el_dialogo')),
+        action(t('recordatorios.configurar_recordatorios'),'dialog',t('mapa.configuracion_de_whatsapp_y_anticipacion'),t('mapa.telefono_recibir_recordatorios_y_anticipacion_estandar_para_tareas')),
+        action(t('recordatorios.guardar_configuracion'),'local',t('mapa.lista_actualizada'),t('mapa.guarda_las_preferencias_cierra_el_dialogo_y_recalcula')),
+        action(t('recordatorios.enviar_prueba'),'local',t('mapa.resultado_de_la_prueba'),t('mapa.solicita_un_mensaje_de_prueba_y_conserva_abierto')),
+        action(t('recordatorios.actualizar_desde_mis_pendientes'),'local',t('mapa.avisos_automaticos_recalculados'),t('mapa.actualiza_tareas_y_entregas_conserva_los_avisos_personales')),
+        action(t('recordatorios.ver_detalle'),'local',t('mapa.detalle_del_recordatorio'),t('mapa.expande_el_contenido_dentro_de_la_lista')),
+        action(t('recordatorios.cancelar_recordatorio'),'local',t('mapa.lista_actualizada'),t('mapa.retira_el_aviso_seleccionado')),
+        action(t('mapa.historial_de_avisos_pendientes_de_clase_guardados'),'local',t('mapa.seccion_desplegada'),t('mapa.secciones_plegables_que_aparecen_cuando_hay_datos')),
+        action(t('mapa.resolver_pendiente_de_clase'),'local',t('mapa.pendiente_resuelto'),t('mapa.actualiza_el_apunte_guardado_desde_la_misma_pantalla')),
+        action(t('mapa.cancelar_cerrar_escape'),'local',t('mapa.cierra_el_dialogo'),t('mapa.regresa_a_la_lista_sin_guardar_el_formulario'))
       ]},
-      {id:'nuevo',name:'Crear proyecto',route:'/proyectos/nuevo',group:'project',description:'Formulario de nombre, descripción, entrega, integrantes y tareas, con una previsualización de la planificación.',actions:[
-        action('Volver a proyectos / Cancelar','page','Mis proyectos','Abandona el formulario sin crear el proyecto.','proyectos'),
-        action('Crear y ver planificación','page','Nuevo proyecto creado','Guarda el proyecto y navega a su código devuelto por el servidor.','proyecto'),
-        action('Integrante / Tarea','local','Nueva fila en el formulario','Añade una fila editable al equipo o a la planificación.'),
-        action('Eliminar integrante / Eliminar tarea','local','Formulario actualizado','Quita la fila correspondiente; se conserva al menos una fila válida.'),
-        action('Tareas asignadas / Elección libre','local','Modo de reparto','Decide si el equipo recibe tareas asignadas o toma las que estén disponibles.'),
-        action('Organizar con IA','local','Plan de tareas actualizado','Solicita al servicio un plan según el proyecto, plazo y número de tareas.'),
-        action('Rellenar con IA','local','Campos de ejemplo rellenados','Actualmente rellena una propuesta predefinida en el navegador; no llama al servicio de IA.'),
-        action('Mes anterior / Mes siguiente','pending','Previsualización estática','Los botones del calendario previo están deshabilitados.')
+      {id:'nuevo',name:t('proyectos.crear_proyecto'),route:'/proyectos/nuevo',group:'project',description:t('mapa.formulario_de_nombre_descripcion_entrega_integrantes_y_tareas'),actions:[
+        action(t('mapa.volver_a_proyectos_cancelar'),'page',t('proyectos.mis_proyectos'),t('mapa.abandona_el_formulario_sin_crear_el_proyecto'),'proyectos'),
+        action(t('crear_proyecto.crear_y_ver_planificacion'),'page',t('mapa.nuevo_proyecto_creado'),t('mapa.guarda_el_proyecto_y_navega_a_su_codigo'),'proyecto'),
+        action(t('mapa.integrante_tarea'),'local',t('mapa.nueva_fila_en_el_formulario'),t('mapa.anade_una_fila_editable_al_equipo_o_a')),
+        action(t('mapa.eliminar_integrante_eliminar_tarea'),'local',t('mapa.formulario_actualizado'),t('mapa.quita_la_fila_correspondiente_se_conserva_al_menos')),
+        action(t('mapa.tareas_asignadas_eleccion_libre'),'local',t('mapa.modo_de_reparto'),t('mapa.decide_si_el_equipo_recibe_tareas_asignadas_o')),
+        action(t('mapa.organizar_con_ia'),'local',t('mapa.plan_de_tareas_actualizado'),t('mapa.solicita_al_servicio_un_plan_segun_el_proyecto')),
+        action(t('mapa.rellenar_con_ia'),'local',t('mapa.campos_de_ejemplo_rellenados'),t('mapa.actualmente_rellena_una_propuesta_predefinida_en_el_navegador')),
+        action(t('mapa.mes_anterior_mes_siguiente'),'pending',t('mapa.previsualizacion_estatica'),t('mapa.los_botones_del_calendario_previo_estan_deshabilitados'))
       ]},
-      {id:'proyecto',name:'Detalle del proyecto',route:'/proyectos/{codigo}',group:'project',description:'El centro de cada trabajo: tareas, calendario, progreso y equipo. Desde aquí se entra a sus conversaciones y documentos.',actions:[
-        action('Todos los proyectos / Volver a proyectos (error)','page','Mis proyectos','Regresa al listado.','proyectos'),
-        action('Canales del proyecto','page','Canales de este proyecto','Botón principal en la cabecera. Abre la conversación y la lista de canales del mismo código.','canales'),
-        action('Fases y dependencias','page','Fases del proyecto','Abre el diagrama de fases y tareas.','fases'),
-        action('Documentos y entregables','page','Entregables del proyecto','Abre el registro de documentos.','entregables'),
-        action('Archivos, en una tarjeta de tarea','page','Canales del proyecto','Los archivos del equipo se comparten en los canales.','canales'),
-        action('Nueva tarea','dialog','Añadir tarea','Nombre, descripción, responsable, fecha, etapa y estado.'),
-        action('Editar tarea / tarea del calendario','dialog','Editar tarea','Carga los campos de la tarea seleccionada.'),
-        action('Guardar tarea','local','Detalle actualizado','Crea o modifica la tarea, cierra el diálogo y actualiza el proyecto.'),
-        action('Marcar tarea como completada','local','Estado de la tarea actualizado','Alterna Terminada / Sin empezar y recalcula el progreso.'),
-        action('Filtrar por estado','local','Tareas filtradas','Todas, Sin empezar, En proceso, En revisión o Terminadas.'),
-        action('Modificar integrantes','dialog','Equipo del proyecto','Abre la edición de integrantes; el líder no se edita desde este formulario.'),
-        action('Añadir integrante / Eliminar integrante','local','Equipo en edición','Modifica las filas del diálogo.'),
-        action('Guardar equipo','local','Detalle actualizado','Guarda integrantes y actualiza las opciones de responsables.'),
-        action('Cancelar / Cerrar / Escape','local','Cierra el diálogo','Vuelve al detalle sin guardar la edición.')
+      {id:'proyecto',name:t('mapa.detalle_del_proyecto'),route:'/proyectos/{codigo}',group:'project',description:t('mapa.el_centro_de_cada_trabajo_tareas_calendario_progreso'),actions:[
+        action(t('mapa.todos_los_proyectos_volver_a_proyectos_error'),'page',t('proyectos.mis_proyectos'),t('mapa.regresa_al_listado'),'proyectos'),
+        action(t('proyecto.canales_del_proyecto'),'page',t('mapa.canales_de_este_proyecto'),t('mapa.boton_principal_en_la_cabecera_abre_la_conversacion'),'canales'),
+        action(t('proyecto.fases_y_dependencias'),'page',t('crear_proyecto.fases_del_proyecto'),t('mapa.abre_el_diagrama_de_fases_y_tareas'),'fases'),
+        action(t('entregables.documentos_y_entregables'),'page',t('mapa.entregables_del_proyecto'),t('mapa.abre_el_registro_de_documentos'),'entregables'),
+        action(t('mapa.archivos_en_una_tarjeta_de_tarea'),'page',t('proyecto.canales_del_proyecto'),t('mapa.los_archivos_del_equipo_se_comparten_en_los'),'canales'),
+        action(t('proyecto.nueva_tarea'),'dialog',t('proyecto.anadir_tarea'),t('mapa.nombre_descripcion_responsable_fecha_etapa_y_estado')),
+        action(t('mapa.editar_tarea_tarea_del_calendario'),'dialog',t('fases.editar_tarea'),t('mapa.carga_los_campos_de_la_tarea_seleccionada')),
+        action(t('proyecto.guardar_tarea'),'local',t('mapa.detalle_actualizado'),t('mapa.crea_o_modifica_la_tarea_cierra_el_dialogo')),
+        action(t('proyecto.marcar_tarea_como_completada'),'local',t('mapa.estado_de_la_tarea_actualizado'),t('mapa.alterna_terminada_sin_empezar_y_recalcula_el_progreso')),
+        action(t('proyecto.filtrar_por_estado'),'local',t('mapa.tareas_filtradas'),t('mapa.todas_sin_empezar_en_proceso_en_revision_o')),
+        action(t('proyecto.modificar_integrantes'),'dialog',t('proyecto.equipo_del_proyecto'),t('mapa.abre_la_edicion_de_integrantes_el_lider_no')),
+        action(t('mapa.anadir_integrante_eliminar_integrante'),'local',t('mapa.equipo_en_edicion'),t('mapa.modifica_las_filas_del_dialogo')),
+        action(t('proyecto.guardar_equipo'),'local',t('mapa.detalle_actualizado'),t('mapa.guarda_integrantes_y_actualiza_las_opciones_de_responsables')),
+        action(t('mapa.cancelar_cerrar_escape'),'local',t('mapa.cierra_el_dialogo'),t('mapa.vuelve_al_detalle_sin_guardar_la_edicion'))
       ]},
-      {id:'canales',name:'Canales del proyecto',route:'/proyectos/{codigo}/canales',group:'project',description:'Conversaciones agrupadas dentro de un proyecto; incluye mensajes, adjuntos, galería, documentos y resumen.',actions:[
-        action('Volver al proyecto','page','Detalle del mismo proyecto','Conserva el código del proyecto.','proyecto'),
-        action('Nombre de un canal','local','Conversación seleccionada','Cambia mensajes y archivos sin abrir otra página. También admite ?canal=slug.'),
-        action('Nuevo canal / Crear primer canal','dialog','Crear canal','Nombre, descripción y tarea asociada opcional.'),
-        action('Crear canal','local','Nuevo canal seleccionado','Guarda el canal, cierra el diálogo y abre su conversación.'),
-        action('Enviar mensaje / Enter','local','Conversación actualizada','Envía el mensaje y el archivo adjunto si existe; Shift+Enter permite otra línea.'),
-        action('Adjuntar archivo','dialog','Selector de archivos del dispositivo','Selecciona el adjunto que se enviará con el siguiente mensaje.'),
-        action('Quitar adjunto','local','Mensaje sin adjunto pendiente','Retira el archivo seleccionado antes de enviarlo.'),
-        action('Archivo, imagen o documento','external','URL del archivo','Abre el adjunto en otra pestaña desde el mensaje, la galería o la lista de documentos.'),
-        action('Resumir','local','Resumen del canal','Solicita el resumen y lo muestra en el panel de la misma pantalla.'),
-        action('Añadir reacción','local','Selector de reacciones de texto','Permite elegir De acuerdo, Hecho o Gracias.'),
-        action('De acuerdo / Hecho / Gracias','local','Reacciones del mensaje','Añade o retira la reacción elegida; se muestra como texto, sin emojis.'),
-        action('Eliminar canal','dialog','Confirmación de eliminación','Si se confirma, elimina el canal y abre otro disponible o el estado vacío.'),
-        action('Cancelar / Cerrar / Escape','local','Cierra Crear canal','Mantiene la conversación actual.')
+      {id:'canales',name:t('proyecto.canales_del_proyecto'),route:'/proyectos/{codigo}/canales',group:'project',description:t('mapa.conversaciones_agrupadas_dentro_de_un_proyecto_incluye_mensajes'),actions:[
+        action(t('canales.volver_al_proyecto'),'page',t('mapa.detalle_del_mismo_proyecto'),t('mapa.conserva_el_codigo_del_proyecto'),'proyecto'),
+        action(t('mapa.nombre_de_un_canal'),'local',t('mapa.conversacion_seleccionada'),t('mapa.cambia_mensajes_y_archivos_sin_abrir_otra_pagina')),
+        action(t('mapa.nuevo_canal_crear_primer_canal'),'dialog',t('canales.crear_canal'),t('mapa.nombre_descripcion_y_tarea_asociada_opcional')),
+        action(t('canales.crear_canal'),'local',t('mapa.nuevo_canal_seleccionado'),t('mapa.guarda_el_canal_cierra_el_dialogo_y_abre')),
+        action(t('mapa.enviar_mensaje_enter'),'local',t('mapa.conversacion_actualizada'),t('mapa.envia_el_mensaje_y_el_archivo_adjunto_si')),
+        action(t('canales.adjuntar_archivo'),'dialog',t('mapa.selector_de_archivos_del_dispositivo'),t('mapa.selecciona_el_adjunto_que_se_enviara_con_el')),
+        action(t('mapa.quitar_adjunto'),'local',t('mapa.mensaje_sin_adjunto_pendiente'),t('mapa.retira_el_archivo_seleccionado_antes_de_enviarlo')),
+        action(t('mapa.archivo_imagen_o_documento'),'external',t('mapa.url_del_archivo'),t('mapa.abre_el_adjunto_en_otra_pestana_desde_el')),
+        action(t('canales.resumir'),'local',t('mapa.resumen_del_canal'),t('mapa.solicita_el_resumen_y_lo_muestra_en_el')),
+        action(t('canales.anadir_reaccion'),'local',t('mapa.selector_de_reacciones_de_texto'),t('mapa.permite_elegir_de_acuerdo_hecho_o_gracias')),
+        action(t('mapa.de_acuerdo_hecho_gracias'),'local',t('mapa.reacciones_del_mensaje'),t('mapa.anade_o_retira_la_reaccion_elegida_se_muestra')),
+        action(t('canales.eliminar_canal'),'dialog',t('mapa.confirmacion_de_eliminacion'),t('mapa.si_se_confirma_elimina_el_canal_y_abre')),
+        action(t('mapa.cancelar_cerrar_escape'),'local',t('mapa.cierra_crear_canal'),t('mapa.mantiene_la_conversacion_actual'))
       ]},
-      {id:'fases',name:'Fases y dependencias',route:'/proyectos/{codigo}/fases',group:'project',description:'Ramas verticales de tareas y dependencias, inspiradas en un historial Git. Se recorre hacia abajo, sin desplazamiento horizontal.',actions:[
-        action('Volver al proyecto','page','Detalle del mismo proyecto','Regresa al calendario y tablero de tareas.','proyecto'),
-        action('Entregables','page','Entregables del mismo proyecto','Enlace directo entre las dos secciones.','entregables'),
-        action('Tarea del diagrama','dialog','Detalle y dependencias de la tarea','Muestra descripción, estado, tareas previas y asignación.'),
-        action('Configurar / Guardar modo','local','Reparto del trabajo','El líder cambia entre tareas asignadas y elección libre; conserva responsables actuales.'),
-        action('Tomar tarea disponible / Tomar esta tarea','local','Asignación actualizada','En elección libre, asigna al usuario una tarea libre y sin dependencias pendientes.'),
-        action('Liberar tarea','local','Asignación actualizada','Deja disponible la tarea para otra persona.'),
-        action('Estado de la tarea','local','Diagrama actualizado','Guarda el nuevo estado desde el diálogo.'),
-        action('Añadir dependencia / Quitar dependencia','local','Dependencias actualizadas','Modifica la relación entre tareas del proyecto.'),
-        action('Cerrar / Escape','local','Diagrama de fases','Cierra el detalle de tarea.')
+      {id:'fases',name:t('proyecto.fases_y_dependencias'),route:'/proyectos/{codigo}/fases',group:'project',description:t('mapa.ramas_verticales_de_tareas_y_dependencias_inspiradas_en'),actions:[
+        action(t('canales.volver_al_proyecto'),'page',t('mapa.detalle_del_mismo_proyecto'),t('mapa.regresa_al_calendario_y_tablero_de_tareas'),'proyecto'),
+        action(t('fases.entregables'),'page',t('mapa.entregables_del_mismo_proyecto'),t('mapa.enlace_directo_entre_las_dos_secciones'),'entregables'),
+        action(t('mapa.tarea_del_diagrama'),'dialog',t('mapa.detalle_y_dependencias_de_la_tarea'),t('mapa.muestra_descripcion_estado_tareas_previas_y_asignacion')),
+        action(t('mapa.configurar_guardar_modo'),'local',t('fases.reparto_del_trabajo'),t('mapa.el_lider_cambia_entre_tareas_asignadas_y_eleccion')),
+        action(t('mapa.tomar_tarea_disponible_tomar_esta_tarea'),'local',t('mapa.asignacion_actualizada'),t('mapa.en_eleccion_libre_asigna_al_usuario_una_tarea')),
+        action(t('fases.liberar_tarea'),'local',t('mapa.asignacion_actualizada'),t('mapa.deja_disponible_la_tarea_para_otra_persona')),
+        action(t('mapa.estado_de_la_tarea'),'local',t('mapa.diagrama_actualizado'),t('mapa.guarda_el_nuevo_estado_desde_el_dialogo')),
+        action(t('mapa.anadir_dependencia_quitar_dependencia'),'local',t('mapa.dependencias_actualizadas'),t('mapa.modifica_la_relacion_entre_tareas_del_proyecto')),
+        action(t('mapa.cerrar_escape'),'local',t('mapa.diagrama_de_fases'),t('mapa.cierra_el_detalle_de_tarea'))
       ]},
-      {id:'entregables',name:'Documentos y entregables',route:'/proyectos/{codigo}/entregables',group:'project',description:'Registro de enlaces de documentos y entregables con responsable, tipo y estado.',actions:[
-        action('Volver al proyecto','page','Detalle del mismo proyecto','Regresa al calendario y las tareas.','proyecto'),
-        action('Ver fases','page','Fases del mismo proyecto','Enlace directo a fases y dependencias.','fases'),
-        action('Registrar documento / Editar','dialog','Formulario de documento','Enlace, nombre, descripción, tipo, estado y responsable.'),
-        action('Guardar','local','Registro actualizado','Guarda el documento, cierra el diálogo y refresca la lista.'),
-        action('Nombre o enlace de documento','external','Documento externo','Abre su URL en una nueva pestaña: por ejemplo Docs, Canva o GitHub.'),
-        action('Estado: Borrador / En revisión / Final','local','Estado actualizado','Actualiza el documento desde su tarjeta.'),
-        action('Eliminar','dialog','Confirmación','Tras confirmar, retira el documento del registro.'),
-        action('Cancelar / Cerrar / Escape','local','Lista de documentos','Cierra el formulario sin guardar.')
+      {id:'entregables',name:t('entregables.documentos_y_entregables'),route:'/proyectos/{codigo}/entregables',group:'project',description:t('mapa.registro_de_enlaces_de_documentos_y_entregables_con'),actions:[
+        action(t('canales.volver_al_proyecto'),'page',t('mapa.detalle_del_mismo_proyecto'),t('mapa.regresa_al_calendario_y_las_tareas'),'proyecto'),
+        action(t('entregables.ver_fases'),'page',t('mapa.fases_del_mismo_proyecto'),t('mapa.enlace_directo_a_fases_y_dependencias'),'fases'),
+        action(t('mapa.registrar_documento_editar'),'dialog',t('mapa.formulario_de_documento'),t('mapa.enlace_nombre_descripcion_tipo_estado_y_responsable')),
+        action(t('entregables.guardar'),'local',t('mapa.registro_actualizado'),t('mapa.guarda_el_documento_cierra_el_dialogo_y_refresca')),
+        action(t('mapa.nombre_o_enlace_de_documento'),'external',t('mapa.documento_externo'),t('mapa.abre_su_url_en_una_nueva_pestana_por')),
+        action(t('mapa.estado_borrador_en_revision_final'),'local',t('mapa.estado_actualizado'),t('mapa.actualiza_el_documento_desde_su_tarjeta')),
+        action(t('entregables.eliminar'),'dialog',t('mapa.confirmacion'),t('mapa.tras_confirmar_retira_el_documento_del_registro')),
+        action(t('mapa.cancelar_cerrar_escape'),'local',t('mapa.lista_de_documentos'),t('mapa.cierra_el_formulario_sin_guardar'))
       ]},
-      {id:'perfil',name:'Mi perfil',route:'/perfil',group:'account',description:'Datos personales, académicos y tarjetas de proyectos. Accesible desde el menú del avatar.',actions:[
-        action('Volver al inicio','page','Inicio','Regresa a la agenda.','panel'),
-        action('Editar perfil / Actualizar','page','Editar perfil','Abre los datos personales, académicos y la foto.','editar'),
-        action('Ver todos','page','Mis proyectos','Abre el listado completo.','proyectos'),
-        action('Ver proyecto / tarjeta de proyecto','page','Proyecto asociado','Los enlaces utilizan el identificador de la tarjeta; el destacado actual apunta a campus-verde.','proyecto'),
-        action('Crea el primero (estado vacío)','page','Crear proyecto','Aparece cuando no hay proyectos para mostrar.','nuevo')
+      {id:'perfil',name:t('rutas.mi_perfil'),route:'/perfil',group:'account',description:t('mapa.datos_personales_academicos_y_tarjetas_de_proyectos_accesible'),actions:[
+        action(t('catalogo_planes.volver_al_inicio'),'page',t('main.inicio'),t('mapa.regresa_a_la_agenda'),'panel'),
+        action(t('mapa.editar_perfil_actualizar'),'page',t('perfil.editar_perfil'),t('mapa.abre_los_datos_personales_academicos_y_la_foto'),'editar'),
+        action(t('perfil.ver_todos'),'page',t('proyectos.mis_proyectos'),t('mapa.abre_el_listado_completo'),'proyectos'),
+        action(t('mapa.ver_proyecto_tarjeta_de_proyecto'),'page',t('mapa.proyecto_asociado'),t('mapa.los_enlaces_utilizan_el_identificador_de_la_tarjeta'),'proyecto'),
+        action(t('mapa.crea_el_primero_estado_vacio'),'page',t('proyectos.crear_proyecto'),t('mapa.aparece_cuando_no_hay_proyectos_para_mostrar'),'nuevo')
       ]},
-      {id:'editar',name:'Editar perfil',route:'/perfil/editar',group:'account',description:'Edición de foto, nombre, correo, descripción y datos académicos.',actions:[
-        action('Volver a mi perfil / Cancelar','page','Mi perfil','Vuelve sin guardar el formulario.','perfil'),
-        action('Guardar cambios','page','Mi perfil','Valida y guarda los datos antes de navegar. Los errores mantienen el formulario abierto.','perfil'),
-        action('Cambiar foto','dialog','Selector de imagen','Acepta PNG, JPG y WEBP de hasta 2 MB; muestra una previsualización.'),
-        action('Editar descripción','local','Contador de caracteres','Actualiza el contador hasta 180 caracteres.')
+      {id:'editar',name:t('perfil.editar_perfil'),route:'/perfil/editar',group:'account',description:t('mapa.edicion_de_foto_nombre_correo_descripcion_y_datos'),actions:[
+        action(t('mapa.volver_a_mi_perfil_cancelar'),'page',t('rutas.mi_perfil'),t('mapa.vuelve_sin_guardar_el_formulario'),'perfil'),
+        action(t('editar_perfil.guardar_cambios'),'page',t('rutas.mi_perfil'),t('mapa.valida_y_guarda_los_datos_antes_de_navegar'),'perfil'),
+        action(t('editar_perfil.cambiar_foto'),'dialog',t('mapa.selector_de_imagen'),t('mapa.acepta_png_jpg_y_webp_de_hasta_2')),
+        action(t('mapa.editar_descripcion'),'local',t('mapa.contador_de_caracteres'),t('mapa.actualiza_el_contador_hasta_180_caracteres'))
       ]},
-      {id:'paleta',name:'Guía de estilo',route:'/paleta',group:'account',public:true,description:'Página auxiliar de referencia visual; no aparece como sección en la barra principal.',actions:[
-        action('Volver al panel','page','Inicio','Si no hay sesión, se redirige al acceso.','panel'),
-        action('Muestra de color','local','Color copiado','Copia el valor del color al portapapeles.'),
-        action('Cambiar tema','local','Muestras claras u oscuras','Alterna el tema de la guía.')
+      {id:'paleta',name:t('paleta.guia_de_estilo'),route:'/paleta',group:'account',public:true,description:t('mapa.pagina_auxiliar_de_referencia_visual_no_aparece_como'),actions:[
+        action(t('paleta.volver_al_panel'),'page',t('main.inicio'),t('mapa.si_no_hay_sesion_se_redirige_al_acceso'),'panel'),
+        action(t('mapa.muestra_de_color'),'local',t('mapa.color_copiado'),t('mapa.copia_el_valor_del_color_al_portapapeles')),
+        action(t('mapa.cambiar_tema'),'local',t('mapa.muestras_claras_u_oscuras'),t('mapa.alterna_el_tema_de_la_guia'))
       ]},
-      {id:'chats',name:'Canales (ruta anterior)',route:'/chats',group:'account',public:true,description:'Ruta de compatibilidad. Ya no es una pantalla ni un enlace de la barra de navegación.',actions:[
-        action('Visitar /chats','redirect','Mis proyectos','Redirige a /proyectos; sin sesión, esa ruta redirige después a /login.','proyectos')
+      {id:'chats',name:t('mapa.canales_ruta_anterior'),route:'/chats',group:'account',public:true,description:t('mapa.ruta_de_compatibilidad_ya_no_es_una_pantalla'),actions:[
+        action(t('mapa.visitar_chats'),'redirect',t('proyectos.mis_proyectos'),t('mapa.redirige_a_proyectos_sin_sesion_esa_ruta_redirige'),'proyectos')
       ]}
     ];
-    const groups = [{id:'public',label:'01 · Descubrir y entrar'},{id:'main',label:'02 · Navegación principal'},{id:'project',label:'03 · Dentro de un proyecto'},{id:'account',label:'04 · Cuenta y rutas auxiliares'}];
-    const types = {page:'Pantalla',dialog:'Diálogo',local:'En esta pantalla',external:'Enlace externo',pending:'Pendiente',redirect:'Redirección'};
+    const groups = [{id:'public',label:t('mapa.01_descubrir_y_entrar')},{id:'main',label:t('mapa.02_navegacion_principal')},{id:'project',label:t('mapa.03_dentro_de_un_proyecto')},{id:'account',label:t('mapa.04_cuenta_y_rutas_auxiliares')}];
+    const types = {page:t('mapa.pantalla'),dialog:t('mapa.dialogo'),local:t('mapa.en_esta_pantalla'),external:t('mapa.enlace_externo'),pending:t('planes.pendiente'),redirect:t('mapa.redireccion')};
     const byId = Object.fromEntries(screens.map(screen => [screen.id,screen]));
     const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
     let selected = 'proyectos';
     let query = '';
     let showCatalog = false;
     const $ = selector => document.querySelector(selector);
-    function matches(screen) { return !query || [screen.name,screen.route,screen.description,...screen.actions.flatMap(a => [a.label,a.destination,a.description])].join(' ').toLocaleLowerCase('es').includes(query); }
+    function matches(screen) { return !query || [screen.name,screen.route,screen.description,...screen.actions.flatMap(a => [a.label,a.destination,a.description])].join(' ').toLocaleLowerCase(idioma).includes(query); }
     const appOrigin = location.protocol === 'file:' ? 'http://localhost:6767' : location.origin;
     const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
     $('#open-app').href = appOrigin + '/';
     function routeFor(screen) { return appOrigin + screen.route.replace('{codigo}',encodeURIComponent($('#project-code').value.trim() || 'cognitiva')); }
     function actionTable(screen) {
-      return `<table class="actions" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Botón o control</th><th scope="col" role="columnheader">Destino y comportamiento</th></tr></thead><tbody role="rowgroup">${screen.actions.map(a => `<tr role="row"><td role="cell"><strong>${esc(a.label)}</strong><span class="badge ${esc(a.type)}">${types[a.type]}</span></td><td role="cell">${a.target ? `<button class="destination-button" type="button" data-select="${a.target}">${esc(a.destination)}</button>` : `<strong>${esc(a.destination)}</strong>`}<span class="action-description">${esc(a.description)}</span></td></tr>`).join('')}</tbody></table>`;
+      return `<table class="actions" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">${t('mapa.boton_o_control')}</th><th scope="col" role="columnheader">${t('mapa.destino_y_comportamiento')}</th></tr></thead><tbody role="rowgroup">${screen.actions.map(a => `<tr role="row"><td role="cell"><strong>${esc(a.label)}</strong><span class="badge ${esc(a.type)}">${types[a.type]}</span></td><td role="cell">${a.target ? `<button class="destination-button" type="button" data-select="${a.target}">${esc(a.destination)}</button>` : `<strong>${esc(a.destination)}</strong>`}<span class="action-description">${esc(a.description)}</span></td></tr>`).join('')}</tbody></table>`;
     }
     function renderMap() {
       const destinations = new Set(byId[selected].actions.map(a=>a.target).filter(Boolean));
       const origins = new Set(screens.filter(s=>s.actions.some(a=>a.target===selected)).map(s=>s.id));
       $('#map-columns').innerHTML = groups.map(group => `<section class="group" aria-label="${esc(group.label)}"><h3>${esc(group.label)}</h3><div class="nodes">${screens.filter(s=>s.group===group.id).map(screen => `<button type="button" class="node${screen.public?' public':''}${screen.id===selected?' selected':''}${destinations.has(screen.id)?' destination':''}${origins.has(screen.id)?' origin':''}${!matches(screen)?' dimmed':''}" data-select="${screen.id}" id="node-${screen.id}" aria-pressed="${screen.id===selected}"><strong>${esc(screen.name)}</strong><span class="route">${esc(screen.route)}</span><span class="index">${String(screens.indexOf(screen)+1).padStart(2,'0')}</span></button>`).join('')}</div></section>`).join('');
-      $('#screen-count').textContent = `${screens.length - 1} pantallas y 1 redirección · ${screens.filter(matches).length} coincidencias · ${screens.reduce((n,s)=>n+s.actions.length,0)} controles documentados`;
+      $('#screen-count').textContent = `${screens.length - 1} ${t("mapa.pantallas_redireccion")} · ${screens.filter(matches).length} ${t("mapa.coincidencias")} · ${screens.reduce((n,s)=>n+s.actions.length,0)} ${t("mapa.controles_documentados")}`;
       requestAnimationFrame(drawConnections);
     }
     function renderInspector() {
       const screen = byId[selected];
       const origins = screens.filter(s=>s.id!==selected&&s.actions.some(a=>a.target===selected));
-      $('#inspector').innerHTML = `<div class="inspector-head"><div><p class="eyebrow">Pantalla seleccionada</p><h2 id="screen-title" tabindex="-1">${esc(screen.name)}</h2><span class="route-label">${esc(screen.route)}</span><div class="access"><span class="badge">${screen.id==='chats'?'Redirección de compatibilidad':screen.public?'Acceso público':'Requiere sesión'}</span>${!screen.public?'<span class="badge">Incluye navegación compartida</span>':''}</div></div><a class="button primary" href="${esc(routeFor(screen))}" target="_blank" rel="noopener">Abrir pantalla</a></div><p class="screen-description">${esc(screen.description)}</p>${actionTable(screen)}<div class="incoming"><h3>Se puede llegar desde</h3><div class="incoming-list">${origins.map(s=>`<button type="button" data-select="${s.id}">${esc(s.name)}</button>`).join('')}${!screen.public?'<span class="badge">Barra o menú compartido cuando existe su enlace</span>':''}${!origins.length?'<span class="small muted">Acceso directo por URL.</span>':''}</div></div><div class="inspector-links"><a class="button" href="#map-title">Volver a las pantallas</a></div>`;
+      $('#inspector').innerHTML = `<div class="inspector-head"><div><p class="eyebrow">${t('mapa.pantalla_seleccionada')}</p><h2 id="screen-title" tabindex="-1">${esc(screen.name)}</h2><span class="route-label">${esc(screen.route)}</span><div class="access"><span class="badge">${screen.id==='chats'?t('mapa.redireccion_de_compatibilidad'):screen.public?t('mapa.acceso_publico'):t('mapa.requiere_sesion')}</span>${!screen.public?'<span class="badge">'+t('mapa.incluye_navegacion_compartida')+'</span>':''}</div></div><a class="button primary" href="${esc(routeFor(screen))}" target="_blank" rel="noopener">${t('mapa.abrir_pantalla')}</a></div><p class="screen-description">${esc(screen.description)}</p>${actionTable(screen)}<div class="incoming"><h3>${t('mapa.se_puede_llegar_desde')}</h3><div class="incoming-list">${origins.map(s=>`<button type="button" data-select="${s.id}">${esc(s.name)}</button>`).join('')}${!screen.public?'<span class="badge">'+t('mapa.barra_o_menu_compartido_cuando_existe_su_enlace')+'</span>':''}${!origins.length?'<span class="small muted">'+t('mapa.acceso_directo_por_url')+'</span>':''}</div></div><div class="inspector-links"><a class="button" href="#map-title">${t('mapa.volver_a_las_pantallas')}</a></div>`;
     }
     function renderCatalog() {
       $('#catalog').hidden = !showCatalog;
       if (!showCatalog) return;
       const visible = screens.filter(matches);
-      $('#catalog').innerHTML = visible.map(screen=>`<details class="panel"${query?' open':''}><summary>${esc(screen.name)}<small>${esc(screen.route)}</small></summary><p class="screen-description">${esc(screen.description)}</p>${actionTable(screen)}</details>`).join('') || '<p class="no-results">No hay pantallas ni controles que coincidan.</p>';
+      $('#catalog').innerHTML = visible.map(screen=>`<details class="panel"${query?' open':''}><summary>${esc(screen.name)}<small>${esc(screen.route)}</small></summary><p class="screen-description">${esc(screen.description)}</p>${actionTable(screen)}</details>`).join('') || '<p class="no-results">'+t('mapa.no_hay_pantallas_ni_controles_que_coincidan')+'</p>';
     }
     function select(id,scroll) {
       if (!byId[id]) return;
@@ -456,8 +476,8 @@
         svg.append(line);
       });
     }
-    $('#global-links').innerHTML = [['panel','Inicio'],['proyectos','Proyectos'],['horarios','Horarios'],['recordatorios','Recordatorios'],['nuevo','+ Proyecto'],['perfil','Ver mi perfil'],['editar','Editar perfil'],['login','Cerrar sesión']].map(([id,label])=>`<button type="button" data-select="${id}">${esc(label)}</button>`).join('');
-    $('#tour-path').innerHTML = [['panel','Inicio'],['nuevo','Crear proyecto'],['proyecto','Tu proyecto'],['fases','Fases'],['canales','Canales'],['entregables','Documentos'],['horarios','Horarios'],['recordatorios','Recordatorios'],['sandbox','Todo listo']].map(([id,label],index)=>`${index?'<span aria-hidden="true">→</span>':''}<button type="button" data-select="${id}" aria-label="Ver pantalla de la etapa ${index+1}: ${esc(label)}">${index+1}. ${esc(label)}</button>`).join('');
+    $('#global-links').innerHTML = [['panel',t('main.inicio')],['proyectos',t('perfil.proyectos')],['horarios',t('main.horarios')],['recordatorios',t('recordatorios.recordatorios')],['nuevo',t('mapa.proyecto')],['perfil',t('main.ver_mi_perfil')],['editar',t('perfil.editar_perfil')],['login',t('admin.cerrar_sesion')]].map(([id,label])=>`<button type="button" data-select="${id}">${esc(label)}</button>`).join('');
+    $('#tour-path').innerHTML = [['panel',t('main.inicio')],['nuevo',t('proyectos.crear_proyecto')],['proyecto',t('recorrido.tu_proyecto')],['fases',t('recorrido.fases')],['canales',t('canales.canales')],['entregables',t('canales.documentos')],['horarios',t('main.horarios')],['recordatorios',t('recordatorios.recordatorios')],['sandbox',t('recorrido.todo_listo')]].map(([id,label],index)=>`${index?'<span aria-hidden="true">→</span>':''}<button type="button" data-select="${id}" aria-label="${t('mapa.ver_etapa')} ${index+1}: ${esc(label)}">${index+1}. ${esc(label)}</button>`).join('');
     document.addEventListener('click',event=>{
       const control=event.target.closest('[data-select]');
       if(!control) return;
@@ -467,7 +487,7 @@
       if(!shouldScroll)$(`#node-${selected}`).focus({preventScroll:true});
     });
     $('#search').addEventListener('input',event=>{
-      query=event.target.value.trim().toLocaleLowerCase('es');
+      query=event.target.value.trim().toLocaleLowerCase(idioma);
       if(query&&!matches(byId[selected])) {const first=screens.find(matches);if(first)selected=first.id;}
       renderMap();renderInspector();renderCatalog();
     });

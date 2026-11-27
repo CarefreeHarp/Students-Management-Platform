@@ -7,12 +7,13 @@ import {
 } from '@angular/router';
 import { authInterceptor } from './app/auth';
 import { rutas } from './app/rutas';
+import { SelectorIdioma } from './app/selector-idioma';
 import { Transporte } from './app/transporte';
 
 @Component({
   selector: 'studyflow-root',
-  imports: [RouterOutlet],
-  template: '<router-outlet />',
+  imports: [RouterOutlet, SelectorIdioma],
+  template: '<router-outlet /><studyflow-idioma />',
   host: { '(click)': 'follow($event)', style: 'display: contents' }
 })
 class StudyFlow {

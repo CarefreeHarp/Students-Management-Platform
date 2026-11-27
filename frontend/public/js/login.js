@@ -1,5 +1,6 @@
 /* Public entry chooser. Trying the app never opens or creates an account. */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, request } = scope;
   const correo = document.createElement("input");
   correo.type = "email";
@@ -16,8 +17,8 @@ export function mount(scope) {
     document.querySelector("#entry-options").hidden = visible;
     document.querySelector("#signin-panel").hidden = !visible;
     document.querySelector("#show-signin").setAttribute("aria-expanded", String(visible));
-    document.querySelector("#entry-title").textContent = visible ? "Qué bueno verte." : "Encuentra tu flow.";
-    document.querySelector("#entry-description").textContent = visible ? "Entra a tu espacio." : "Conócelo primero. Hazlo tuyo cuando quieras.";
+    document.querySelector("#entry-title").textContent = visible ? uiText("login.que_bueno_verte") : uiText("login.encuentra_tu_flow");
+    document.querySelector("#entry-description").textContent = visible ? uiText("login.entra_a_tu_espacio") : uiText("login.conocelo_primero_hazlo_tuyo_cuando_quieras");
     feedback("");
     if (moveFocus) document.querySelector(visible ? "#login-email" : "#show-signin").focus();
   }
@@ -33,7 +34,7 @@ export function mount(scope) {
     correo.value = usuario;
     const usuarioValido = admin || correo.checkValidity();
     if (!usuarioValido || !passwordInput.value) {
-      feedback("Escribe un correo válido y tu contraseña.", "error");
+      feedback(uiText("login.escribe_un_correo_valido_y_tu_contrasena"), "error");
       (!usuarioValido ? emailInput : passwordInput).focus();
       return;
     }
@@ -54,9 +55,9 @@ export function mount(scope) {
         body: JSON.stringify({ correo: usuario, contrasena: passwordInput.value })
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.detail || result.mensaje || result.message || "No fue posible ingresar. Inténtalo de nuevo.");
-      if (!result.acceso) throw new Error(result.mensaje || "Correo o contraseña incorrectos.");
-      feedback("Sesión iniciada.", "success");
+      if (!response.ok) throw new Error(result.detail || result.mensaje || result.message || uiText("login.no_fue_posible_ingresar_intentalo_de_nuevo"));
+      if (!result.acceso) throw new Error(result.mensaje || uiText("login.correo_o_contrasena_incorrectos"));
+      feedback(uiText("login.sesion_iniciada"), "success");
       const volver = new URLSearchParams(location.search).get("volver") || "/panel";
       scope.navigate(volver === "/invitacion" ? volver + location.hash : volver);
     } catch (error) {
@@ -98,7 +99,7 @@ export function mount(scope) {
         const reveal = field.type === "password";
         field.type = reveal ? "text" : "password";
         button.querySelector("i").className = `bi bi-eye${reveal ? "-slash" : ""}`;
-        button.setAttribute("aria-label", reveal ? "Ocultar contraseña" : "Mostrar contraseña");
+        button.setAttribute("aria-label", reveal ? uiText("login.ocultar_contrasena") : uiText("login.mostrar_contrasena"));
         button.setAttribute("aria-pressed", String(reveal));
       });
     });

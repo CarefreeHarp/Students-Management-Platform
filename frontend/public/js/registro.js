@@ -3,6 +3,7 @@
  * Los datos académicos son opcionales y viajan solo si se rellenan.
  */
 export function mount(scope) {
+  const { t: uiText } = scope;
   const { document, listen, request, later, animate } = scope;
 
   function feedback(mensaje, tipo) {
@@ -22,15 +23,15 @@ export function mount(scope) {
     const contrasena = document.querySelector("#register-password").value;
 
     if (!nombreCompleto) {
-      feedback("Escribe tu nombre.", "error");
+      feedback(uiText("registro.escribe_tu_nombre"), "error");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-      feedback("Ingresa un correo electrónico válido.", "error");
+      feedback(uiText("registro.ingresa_un_correo_electronico_valido"), "error");
       return;
     }
     if ([...contrasena].length < 12 || new TextEncoder().encode(contrasena).length > 72) {
-      feedback("Usa al menos 12 caracteres y como máximo 72 bytes.", "error");
+      feedback(uiText("registro.usa_al_menos_12_caracteres_y_como_maximo"), "error");
       return;
     }
 
@@ -54,7 +55,7 @@ export function mount(scope) {
       });
       if (!respuesta.ok) {
         const detalle = await respuesta.json().catch(() => ({}));
-        throw new Error(detalle.detail || "No fue posible crear la cuenta.");
+        throw new Error(detalle.detail || uiText("registro.no_fue_posible_crear_la_cuenta"));
       }
       const usuario = await respuesta.json();
 
@@ -69,12 +70,12 @@ export function mount(scope) {
         body: JSON.stringify({ correo: usuario.correo, contrasena })
       });
       if (!inicio.ok) {
-        feedback("Cuenta creada. Ya puedes ingresar con tu contraseña.", "success");
+        feedback(uiText("registro.cuenta_creada_ya_puedes_ingresar_con_tu_contrasena"), "success");
         later(() => scope.navigate(linkAcceso), 800);
         return;
       }
 
-      feedback("Cuenta creada. Entrando…", "success");
+      feedback(uiText("registro.cuenta_creada_entrando"), "success");
       later(() => scope.navigate(destino), 400);
     } catch (error) {
       feedback(error.message, "error");

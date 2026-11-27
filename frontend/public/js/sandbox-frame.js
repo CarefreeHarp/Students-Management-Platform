@@ -13,9 +13,9 @@ const paginas = {
   '/recordatorios': ['recordatorios', 'recordatorios', 'recordatorios']
 };
 const secciones = {
-  proyecto: ['proyecto', 'project', 'proyecto'],
+  proyecto: ["proyecto", 'project', "proyecto"],
   fases: ['fases', 'fases', 'fases'],
-  canales: ['canales', 'canales', 'canales'],
+  canales: ["canales", "canales", "canales"],
   entregables: ['entregables', 'entregables', 'entregables']
 };
 
@@ -32,17 +32,21 @@ async function iniciar() {
     return;
   }
 
+  const language = host.language;
+  const { t: uiText } = language;
+  document.documentElement.lang = language.actual();
+  document.title = uiText("sandbox.titulo");
   Object.defineProperty(window, 'localStorage', { value: host.storage });
   Object.defineProperty(window, 'sessionStorage', { value: host.sessionStorage });
   Object.defineProperty(window, 'fetch', {
-    value: async () => { throw new Error('Red deshabilitada en el tour.'); }
+    value: async () => { throw new Error(uiText("sandbox_frame.red_deshabilitada_en_el_tour")); }
   });
   window.SandboxBridge = host;
   document.documentElement.classList.toggle('dark', host.storage.getItem('studyflow-tema') !== 'claro');
 
   const ruta = new URLSearchParams(location.search).get('ruta') || '/panel';
   const project = ruta.match(/^\/proyectos\/([a-zA-Z0-9_-]+)(?:\/(fases|canales|entregables))?$/);
-  const route = paginas[ruta] || (project && secciones[project[2] || 'proyecto']);
+  const route = paginas[ruta] || (project && secciones[project[2] || "proyecto"]);
   if (!route) {
     host.navigate('/panel');
     return;
@@ -50,18 +54,21 @@ async function iniciar() {
   const [plantilla, pagina, script] = route;
   document.body.dataset.page = pagina;
   if (project) document.body.dataset.projectId = project[1];
-  document.body.innerHTML = pantallas[plantilla];
+  const markup = pantallas[plantilla].replace(/{{ t\('([\w.]+)'\) }}/g, (_, key) =>
+    uiText(key).replace(/[&<>"']/g, ch => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[ch])));
+  document.body.innerHTML = markup;
   const status = document.getElementById('schedule-storage-status');
-  if (status) status.textContent = 'El borrador es temporal: se borra al salir o recargar la prueba.';
+  if (status) status.textContent = uiText("sandbox_frame.el_borrador_es_temporal_se_borra_al_salir");
 
   const scope = createPageScope(document.body, {
+    language,
     sandbox: true,
     navigate: host.navigate,
     logout: async () => {},
     request: async (input, options = {}) => {
       const url = new URL(input, location.origin);
       if (url.origin !== location.origin || !url.pathname.startsWith('/api/')) {
-        throw new Error('Red deshabilitada en el tour.');
+        throw new Error(uiText("sandbox_frame.red_deshabilitada_en_el_tour"));
       }
       const reply = await host.request(url.pathname + url.search, options);
       if (reply.status < 400) {

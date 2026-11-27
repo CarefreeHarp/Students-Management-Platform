@@ -1,41 +1,41 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell">
-  <a class="back-link" href="/proyectos"><i class="bi bi-arrow-left"></i> Todos los proyectos</a>
+  <a class="back-link" href="/proyectos"><i class="bi bi-arrow-left"></i> {{ t('proyecto.todos_los_proyectos') }}</a>
 
   <div id="project-content" aria-live="polite">
-    <section class="empty-state"><div><i class="bi bi-arrow-repeat text-2xl text-primary"></i><p>Cargando el proyecto…</p></div></section>
+    <section class="empty-state"><div><i class="bi bi-arrow-repeat text-2xl text-primary"></i><p>{{ t('proyecto.cargando_el_proyecto') }}</p></div></section>
   </div>
 </main>
 
 <dialog id="task-dialog" class="app-dialog">
   <form id="task-form" method="dialog" class="dialog-form" novalidate>
     <div class="dialog-header">
-      <div><p class="eyebrow" id="task-dialog-kicker">Nueva tarea</p><h2 id="task-dialog-title">Añadir tarea</h2></div>
-      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+      <div><p class="eyebrow" id="task-dialog-kicker">{{ t('proyecto.nueva_tarea') }}</p><h2 id="task-dialog-title">{{ t('proyecto.anadir_tarea') }}</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="{{ t('canales.cerrar') }}"><i class="bi bi-x-lg"></i></button>
     </div>
     <input id="editing-task-id" type="hidden">
-    <label class="form-field">Nombre de la tarea<input id="task-title-input" required maxlength="100" placeholder="Ej. Preparar el análisis de usuarios"></label>
-    <label class="form-field">Descripción<textarea id="task-description-input" rows="3" maxlength="400" placeholder="Añade detalles o criterios de entrega."></textarea></label>
+    <label class="form-field">{{ t('fases.nombre_de_la_tarea') }}<input id="task-title-input" required maxlength="100" placeholder="{{ t('proyecto.ej_preparar_el_analisis_de_usuarios') }}"></label>
+    <label class="form-field">{{ t('canales.descripcion') }}<textarea id="task-description-input" rows="3" maxlength="400" placeholder="{{ t('proyecto.anade_detalles_o_criterios_de_entrega') }}"></textarea></label>
     <div class="form-grid-two">
-      <label class="form-field">Responsable<select id="task-assignee-input"></select></label>
-      <label class="form-field">Fase<select id="task-stage-input"></select></label>
+      <label class="form-field">{{ t('proyecto.responsable') }}<select id="task-assignee-input"></select></label>
+      <label class="form-field">{{ t('crear_proyecto.fase') }}<select id="task-stage-input"></select></label>
     </div>
     <div class="form-grid-two">
-      <label class="form-field">Fecha límite<input id="task-date-input" type="date"></label>
-      <label class="form-field">Estado<select id="task-status-input"><option value="sin-empezar">Sin empezar</option><option value="en-proceso">En proceso</option><option value="en-revision">En revisión</option><option value="terminada">Terminada</option></select></label>
+      <label class="form-field">{{ t('fases.fecha_limite') }}<input id="task-date-input" type="date"></label>
+      <label class="form-field">{{ t('entregables.estado') }}<select id="task-status-input"><option value="sin-empezar">{{ t('fases.sin_empezar') }}</option><option value="en-proceso">{{ t('fases.en_proceso') }}</option><option value="en-revision">{{ t('entregables.en_revision_2') }}</option><option value="terminada">{{ t('fases.terminada') }}</option></select></label>
     </div>
     <p id="task-form-error" class="task-form-error" role="alert" aria-live="assertive" hidden></p>
     <section id="task-result-section" class="task-result-form" hidden aria-labelledby="task-result-title">
-      <div><p class="eyebrow">Resultado requerido</p><h3 id="task-result-title">¿Qué entregaste?</h3><p>Para terminar la tarea, escribe el resultado, adjunta un archivo o haz ambas cosas.</p></div>
-      <label class="form-field">Resultado o comentario<textarea id="task-result-input" rows="3" maxlength="2000" placeholder="Explica brevemente qué se completó o comparte el enlace y las conclusiones."></textarea></label>
-      <label class="form-field">Archivo de resultado<input id="task-result-file" type="file"><span class="field-hint">Opcional si ya escribiste un resultado. Máximo 10 MB.</span></label>
+      <div><p class="eyebrow">{{ t('fases.resultado_requerido') }}</p><h3 id="task-result-title">{{ t('fases.que_entregaste') }}</h3><p>{{ t('proyecto.para_terminar_la_tarea_escribe_el_resultado_adjunta') }}</p></div>
+      <label class="form-field">{{ t('fases.resultado_o_comentario') }}<textarea id="task-result-input" rows="3" maxlength="2000" placeholder="{{ t('proyecto.explica_brevemente_que_se_completo_o_comparte_el') }}"></textarea></label>
+      <label class="form-field">{{ t('fases.archivo_de_resultado') }}<input id="task-result-file" type="file"><span class="field-hint">{{ t('fases.opcional_si_ya_escribiste_un_resultado_maximo_10') }}</span></label>
       <a id="task-result-file-link" class="text-link" hidden download><i class="bi bi-paperclip" aria-hidden="true"></i> <span></span></a>
     </section>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
-      <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar tarea</button>
+      <button class="btn btn-ghost" type="button" data-close-dialog>{{ t('admin.cancelar') }}</button>
+      <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> {{ t('proyecto.guardar_tarea') }}</button>
     </div>
   </form>
 </dialog>
@@ -43,15 +43,15 @@
 <dialog id="members-dialog" class="app-dialog">
   <form id="members-form" method="dialog" class="dialog-form" novalidate>
     <div class="dialog-header">
-      <div><p class="eyebrow">Equipo</p><h2>Modificar integrantes</h2></div>
-      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+      <div><p class="eyebrow">{{ t('canales.equipo') }}</p><h2>{{ t('proyecto.modificar_integrantes') }}</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="{{ t('canales.cerrar') }}"><i class="bi bi-x-lg"></i></button>
     </div>
-    <p class="dialog-intro">Los cambios se reflejarán al crear o editar las tareas.</p>
+    <p class="dialog-intro">{{ t('proyecto.los_cambios_se_reflejaran_al_crear_o_editar') }}</p>
     <div id="dialog-members-list" class="dialog-members-list"></div>
-    <button id="dialog-add-member" type="button" class="btn btn-secondary btn-sm w-fit"><i class="bi bi-plus"></i> Añadir integrante</button>
+    <button id="dialog-add-member" type="button" class="btn btn-secondary btn-sm w-fit"><i class="bi bi-plus"></i> {{ t('proyecto.anadir_integrante') }}</button>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button>
-      <button class="btn btn-primary" type="submit">Guardar equipo</button>
+      <button class="btn btn-ghost" type="button" data-close-dialog>{{ t('admin.cancelar') }}</button>
+      <button class="btn btn-primary" type="submit">{{ t('proyecto.guardar_equipo') }}</button>
     </div>
   </form>
 </dialog>
@@ -67,19 +67,19 @@
       <p class="detail-project-description mt-2 max-w-[64ch] text-muted"></p>
     </div>
     <div class="flex flex-wrap gap-2.5">
-      <button class="btn btn-secondary" type="button" data-new-task><i class="bi bi-plus-lg"></i> Nueva tarea</button>
-      <a class="btn btn-primary project-channels-link" data-project-section="canales" href="#"><i class="bi bi-chat-dots" aria-hidden="true"></i> Canales del proyecto <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      <button class="btn btn-secondary" type="button" data-new-task><i class="bi bi-plus-lg"></i> {{ t('proyecto.nueva_tarea') }}</button>
+      <a class="btn btn-primary project-channels-link" data-project-section="canales" href="#"><i class="bi bi-chat-dots" aria-hidden="true"></i> {{ t('proyecto.canales_del_proyecto') }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </div>
   </section>
 
-  <nav class="project-sections" aria-label="Secciones del proyecto">
-    <a class="btn btn-secondary btn-sm" data-project-section="fases" href="#"><i class="bi bi-diagram-3" aria-hidden="true"></i> Fases y dependencias</a>
-    <a class="btn btn-secondary btn-sm" data-project-section="entregables" href="#"><i class="bi bi-folder2-open" aria-hidden="true"></i> Documentos y entregables</a>
+  <nav class="project-sections" aria-label="{{ t('proyecto.secciones_del_proyecto') }}">
+    <a class="btn btn-secondary btn-sm" data-project-section="fases" href="#"><i class="bi bi-diagram-3" aria-hidden="true"></i> {{ t('proyecto.fases_y_dependencias') }}</a>
+    <a class="btn btn-secondary btn-sm" data-project-section="entregables" href="#"><i class="bi bi-folder2-open" aria-hidden="true"></i> {{ t('entregables.documentos_y_entregables') }}</a>
   </nav>
 
-  <section class="mb-6 grid gap-4 md:grid-cols-3" aria-label="Resumen del proyecto">
+  <section class="mb-6 grid gap-4 md:grid-cols-3" aria-label="{{ t('proyecto.resumen_del_proyecto') }}">
     <article class="panel">
-      <span class="overview-label text-xs font-extrabold uppercase text-muted">Avance general</span>
+      <span class="overview-label text-xs font-extrabold uppercase text-muted">{{ t('proyecto.avance_general') }}</span>
       <strong class="detail-progress-value my-1.5 block font-display text-3xl"></strong>
       <div class="progress-track" aria-hidden="true"><span class="progress-fill"></span></div>
       <span class="progress-caption mt-2 block text-xs text-muted"></span>
@@ -87,7 +87,7 @@
     <article class="panel flex items-center gap-3.5">
       <span class="overview-icon"><i class="bi bi-calendar-event"></i></span>
       <div>
-        <span class="overview-label text-xs font-extrabold uppercase text-muted">Entrega final</span>
+        <span class="overview-label text-xs font-extrabold uppercase text-muted">{{ t('proyecto.entrega_final') }}</span>
         <strong class="detail-due-date block font-display text-lg"></strong>
         <span class="detail-days-left text-xs text-muted"></span>
       </div>
@@ -95,7 +95,7 @@
     <article class="panel flex items-center gap-3.5">
       <span class="overview-icon"><i class="bi bi-people"></i></span>
       <div>
-        <span class="overview-label text-xs font-extrabold uppercase text-muted">Equipo</span>
+        <span class="overview-label text-xs font-extrabold uppercase text-muted">{{ t('canales.equipo') }}</span>
         <div class="detail-member-stack member-stack mt-1.5"></div>
       </div>
     </article>
@@ -103,36 +103,36 @@
 
   <section class="mb-6" aria-labelledby="project-calendar-title">
     <div class="section-heading">
-      <div><p class="eyebrow">Planificación</p><h2 id="project-calendar-title">Calendario del proyecto</h2></div>
-      <span class="calendar-helper"><i class="bi bi-cursor"></i> Selecciona una tarea para ver sus detalles</span>
+      <div><p class="eyebrow">{{ t('fases.planificacion') }}</p><h2 id="project-calendar-title">{{ t('proyecto.calendario_del_proyecto') }}</h2></div>
+      <span class="calendar-helper"><i class="bi bi-cursor"></i> {{ t('proyecto.selecciona_una_tarea_para_ver_sus_detalles') }}</span>
     </div>
-    <div class="detail-calendar-wrap" role="region" aria-label="Calendario semanal del proyecto; desplázate horizontalmente para ver todos los días" tabindex="0"><div id="detail-calendar" class="detail-calendar"></div></div>
-    <div class="calendar-legend"><span><i class="legend-dot legend-due"></i> Entrega</span><span id="calendar-member-legend" class="legend-members"></span></div>
+    <div class="detail-calendar-wrap" role="region" aria-label="{{ t('proyecto.calendario_semanal_del_proyecto_desplazate_horizontalmente_para_ver') }}" tabindex="0"><div id="detail-calendar" class="detail-calendar"></div></div>
+    <div class="calendar-legend"><span><i class="legend-dot legend-due"></i> {{ t('proyecto.entrega') }}</span><span id="calendar-member-legend" class="legend-members"></span></div>
   </section>
 
   <section class="mb-6" aria-labelledby="tasks-list-title">
     <div class="section-heading">
-      <div><p class="eyebrow">Tablero de tareas</p><h2 id="tasks-list-title">Tareas del proyecto</h2></div>
+      <div><p class="eyebrow">{{ t('proyecto.tablero_de_tareas') }}</p><h2 id="tasks-list-title">{{ t('proyecto.tareas_del_proyecto') }}</h2></div>
       <div class="task-filter-wrap">
-        <label class="sr-only" for="task-status-filter">Filtrar por estado</label>
+        <label class="sr-only" for="task-status-filter">{{ t('proyecto.filtrar_por_estado') }}</label>
         <select id="task-status-filter">
-          <option value="all">Todas las tareas</option>
-          <option value="sin-empezar">Sin empezar</option>
-          <option value="en-proceso">En proceso</option>
-          <option value="en-revision">En revisión</option>
-          <option value="terminada">Terminadas</option>
+          <option value="all">{{ t('proyecto.todas_las_tareas') }}</option>
+          <option value="sin-empezar">{{ t('fases.sin_empezar') }}</option>
+          <option value="en-proceso">{{ t('fases.en_proceso') }}</option>
+          <option value="en-revision">{{ t('entregables.en_revision_2') }}</option>
+          <option value="terminada">{{ t('proyecto.terminadas') }}</option>
         </select>
       </div>
     </div>
     <div id="project-tasks" class="task-cards-grid"></div>
   </section>
 
-  <section class="project-team-settings" aria-label="Administrar proyecto">
+  <section class="project-team-settings" aria-label="{{ t('proyecto.administrar_proyecto') }}">
     <div>
-      <h2>Equipo del proyecto</h2>
+      <h2>{{ t('proyecto.equipo_del_proyecto') }}</h2>
     </div>
     <div class="flex flex-wrap gap-2.5">
-      <button class="btn btn-secondary" type="button" data-manage-members hidden><i class="bi bi-people"></i> Modificar integrantes</button>
+      <button class="btn btn-secondary" type="button" data-manage-members hidden><i class="bi bi-people"></i> {{ t('proyecto.modificar_integrantes') }}</button>
     </div>
   </section>
 </template>
@@ -140,9 +140,9 @@
 <template id="task-card-template">
   <article class="task-card">
     <div class="task-card-top">
-      <button class="task-check" type="button" aria-label="Marcar tarea como completada"><i class="bi bi-check"></i></button>
+      <button class="task-check" type="button" aria-label="{{ t('proyecto.marcar_tarea_como_completada') }}"><i class="bi bi-check"></i></button>
       <span class="task-status"></span>
-      <button class="task-menu-button" type="button" aria-label="Editar tarea"><i class="bi bi-pencil"></i></button>
+      <button class="task-menu-button" type="button" aria-label="{{ t('fases.editar_tarea') }}"><i class="bi bi-pencil"></i></button>
     </div>
     <h3 class="task-title"></h3>
     <p class="task-description"></p>
@@ -150,8 +150,8 @@
     <div class="task-card-footer">
       <span class="task-assignee"><i class="assignee-dot"></i><span></span></span>
       <a class="file-control" href="#"
-         title="Los archivos del equipo se comparten en los canales del proyecto">
-        <i class="bi bi-paperclip"></i><span>Archivos</span>
+         title="{{ t('proyecto.los_archivos_del_equipo_se_comparten_en_los') }}">
+        <i class="bi bi-paperclip"></i><span>{{ t('proyecto.archivos') }}</span>
       </a>
     </div>
   </article>
@@ -160,9 +160,9 @@
 <template id="dialog-member-row-template">
   <div class="dialog-member-row">
     <span class="member-row-avatar"></span>
-    <label class="form-field"><span class="sr-only">Nombre del integrante</span><input class="dialog-member-name" required maxlength="60" placeholder="Nombre"></label>
-    <label class="form-field"><span class="sr-only">Contacto</span><input class="dialog-member-contact" maxlength="100" placeholder="Correo o @usuario"></label>
-    <button class="icon-button" type="button" data-invitar hidden aria-label="Copiar enlace de invitación" title="Copiar enlace de invitación"><i class="bi bi-link-45deg"></i></button>
-    <button class="icon-button remove-dialog-member" type="button" aria-label="Eliminar integrante"><i class="bi bi-trash3"></i></button>
+    <label class="form-field"><span class="sr-only">{{ t('crear_proyecto.nombre_del_integrante') }}</span><input class="dialog-member-name" required maxlength="60" placeholder="{{ t('editar_perfil.nombre') }}"></label>
+    <label class="form-field"><span class="sr-only">{{ t('proyecto.contacto') }}</span><input class="dialog-member-contact" maxlength="100" placeholder="{{ t('proyecto.correo_o_usuario') }}"></label>
+    <button class="icon-button" type="button" data-invitar hidden aria-label="{{ t('proyecto.copiar_enlace_de_invitacion') }}" title="{{ t('proyecto.copiar_enlace_de_invitacion') }}"><i class="bi bi-link-45deg"></i></button>
+    <button class="icon-button remove-dialog-member" type="button" aria-label="{{ t('crear_proyecto.eliminar_integrante') }}"><i class="bi bi-trash3"></i></button>
   </div>
 </template>

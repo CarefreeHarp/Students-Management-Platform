@@ -3,10 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, defer, EMPTY, exhaustMap, filter, firstValueFrom, fromEvent, takeUntil, timer } from 'rxjs';
 import { Auth, Usuario } from './auth';
 import { SesionAdmin } from './sesion-admin';
+import { StudyFlowLanguage, t } from './idioma';
 import { Transporte } from './transporte';
 
 interface PageScope { signal: AbortSignal; destroy(): void }
 interface ScopeOptions {
+  language: typeof StudyFlowLanguage;
   request: (url: string, options?: RequestInit, signal?: AbortSignal) => Promise<Response>;
   loginAdmin: (usuario: string, contrasena: string, signal: AbortSignal) => Promise<void>;
   navigate: (url: string) => unknown;
@@ -25,6 +27,7 @@ const scopeModule: Promise<{ createPageScope(root: HTMLElement, options: ScopeOp
 
 @Directive()
 export abstract class Pagina implements AfterViewInit, OnDestroy {
+  readonly t = t;
   private readonly route = inject(ActivatedRoute);
   private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
   private readonly router = inject(Router);
@@ -52,6 +55,7 @@ export abstract class Pagina implements AfterViewInit, OnDestroy {
     ]);
     if (this.removed) return;
     this.scope = createPageScope(this.host, {
+      language: StudyFlowLanguage,
       request: this.transport.request.bind(this.transport),
       loginAdmin: (usuario, contrasena, signal) => firstValueFrom(
         this.sesionAdmin.acceder(usuario, contrasena).pipe(takeUntil(fromEvent(signal, 'abort')))

@@ -1,32 +1,32 @@
-<a class="skip-link" href="#contenido">Ir al contenido</a>
+<a class="skip-link" href="#contenido">{{ t('canales.ir_al_contenido') }}</a>
 <header id="main-nav" class="app-nav"></header>
 
 <main id="contenido" class="page-shell">
-  <a class="back-link" id="back-to-project" href="/proyectos"><i class="bi bi-arrow-left"></i> Volver al proyecto</a>
+  <a class="back-link" id="back-to-project" href="/proyectos"><i class="bi bi-arrow-left"></i> {{ t('canales.volver_al_proyecto') }}</a>
 
   <section class="page-heading" aria-labelledby="fases-title">
     <div>
-      <p class="eyebrow" id="project-label">Planificación</p>
-      <h1 id="fases-title">Diagrama de fases y tareas</h1>
+      <p class="eyebrow" id="project-label">{{ t('fases.planificacion') }}</p>
+      <h1 id="fases-title">{{ t('fases.diagrama_de_fases_y_tareas') }}</h1>
       <p class="mt-2 max-w-[62ch] text-muted">
-        Sigue las ramas de arriba hacia abajo: cada conexión es una dependencia real.
+        {{ t('fases.sigue_las_ramas_de_arriba_hacia_abajo_cada') }}
       </p>
     </div>
-    <a class="btn btn-secondary" id="link-deliverables" href="#"><i class="bi bi-folder2-open"></i> Entregables</a>
+    <a class="btn btn-secondary" id="link-deliverables" href="#"><i class="bi bi-folder2-open"></i> {{ t('fases.entregables') }}</a>
   </section>
 
   <section class="panel reparto-panel" aria-labelledby="reparto-title">
     <div class="reparto-summary">
-      <div><h2 id="reparto-title">Reparto del trabajo</h2><p id="reparto-description">Cargando configuración…</p></div>
-      <button id="configure-reparto" class="btn btn-secondary btn-sm" type="button" aria-expanded="false" aria-controls="reparto-settings"><i class="bi bi-sliders"></i> Configurar</button>
+      <div><h2 id="reparto-title">{{ t('fases.reparto_del_trabajo') }}</h2><p id="reparto-description">{{ t('fases.cargando_configuracion') }}</p></div>
+      <button id="configure-reparto" class="btn btn-secondary btn-sm" type="button" aria-expanded="false" aria-controls="reparto-settings"><i class="bi bi-sliders"></i> {{ t('fases.configurar') }}</button>
     </div>
     <form id="reparto-settings" hidden>
       <fieldset class="reparto-options">
-        <legend class="sr-only">Cómo se reparten las tareas</legend>
-        <label class="reparto-option"><input type="radio" name="modoReparto" value="asignado"><span><strong>Tareas asignadas</strong><small>Elige quién se encarga de cada tarea.</small></span></label>
-        <label class="reparto-option"><input type="radio" name="modoReparto" value="libre"><span><strong>Elección libre</strong><small>Cualquiera del equipo puede tomar una tarea disponible.</small></span></label>
+        <legend class="sr-only">{{ t('fases.como_se_reparten_las_tareas') }}</legend>
+        <label class="reparto-option"><input type="radio" name="modoReparto" value="asignado"><span><strong>{{ t('crear_proyecto.tareas_asignadas') }}</strong><small>{{ t('fases.elige_quien_se_encarga_de_cada_tarea') }}</small></span></label>
+        <label class="reparto-option"><input type="radio" name="modoReparto" value="libre"><span><strong>{{ t('crear_proyecto.eleccion_libre') }}</strong><small>{{ t('fases.cualquiera_del_equipo_puede_tomar_una_tarea_disponible') }}</small></span></label>
       </fieldset>
-      <div class="reparto-actions"><p>El cambio conserva los responsables actuales.</p><button class="btn btn-primary btn-sm" type="submit">Guardar modo</button></div>
+      <div class="reparto-actions"><p>{{ t('fases.el_cambio_conserva_los_responsables_actuales') }}</p><button class="btn btn-primary btn-sm" type="submit">{{ t('fases.guardar_modo') }}</button></div>
       <p id="reparto-feedback" class="form-feedback" role="status"></p>
     </form>
   </section>
@@ -34,8 +34,8 @@
   <section id="available-section" class="panel available-section" aria-labelledby="available-title" hidden>
     <div class="section-head flex-wrap">
       <div>
-        <h2 id="available-title">Tareas disponibles</h2>
-        <p>Sin responsable y sin bloqueos. Elige por dónde empezar.</p>
+        <h2 id="available-title">{{ t('fases.tareas_disponibles') }}</h2>
+        <p>{{ t('fases.sin_responsable_y_sin_bloqueos_elige_por_donde') }}</p>
       </div>
       <span id="available-count" class="tag bg-primary-soft text-[var(--estado-primary)]">0</span>
     </div>
@@ -46,13 +46,13 @@
   <section class="panel branch-panel" aria-labelledby="diagram-title">
     <div class="section-head flex-wrap">
       <div>
-        <h2 id="diagram-title">Diagrama de fases y tareas</h2>
-        <p>Pasa el cursor para ver el detalle; abre una tarea para editar sus conexiones.</p>
+        <h2 id="diagram-title">{{ t('fases.diagrama_de_fases_y_tareas') }}</h2>
+        <p>{{ t('fases.pasa_el_cursor_para_ver_el_detalle_abre') }}</p>
       </div>
-      <button id="configure-phases" class="btn btn-secondary btn-sm" type="button" hidden><i class="bi bi-kanban"></i> Gestionar fases</button>
+      <button id="configure-phases" class="btn btn-secondary btn-sm" type="button" hidden><i class="bi bi-kanban"></i> {{ t('fases.gestionar_fases') }}</button>
     </div>
-    <div id="phase-legend" class="branch-legend" aria-label="Etapas del proyecto"></div>
-    <div class="branch-diagram-region" role="region" aria-label="Ramas y dependencias del proyecto; ordenadas de arriba hacia abajo">
+    <div id="phase-legend" class="branch-legend" aria-label="{{ t('fases.etapas_del_proyecto') }}"></div>
+    <div class="branch-diagram-region" role="region" aria-label="{{ t('fases.ramas_y_dependencias_del_proyecto_ordenadas_de_arriba') }}">
       <div id="diagram" class="branch-diagram"></div>
     </div>
   </section>
@@ -62,37 +62,37 @@
 <dialog id="task-dialog" class="app-dialog">
   <form id="task-form" class="dialog-form" novalidate>
     <div class="dialog-header">
-      <div><p class="eyebrow" id="task-dialog-kicker">Editar tarea</p><h2 id="task-dialog-title">Tarea</h2></div>
-      <button class="icon-button" type="button" data-close-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+      <div><p class="eyebrow" id="task-dialog-kicker">{{ t('fases.editar_tarea') }}</p><h2 id="task-dialog-title">{{ t('fases.tarea') }}</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="{{ t('canales.cerrar') }}"><i class="bi bi-x-lg"></i></button>
     </div>
     <input id="editing-task-id" type="hidden">
-    <label class="form-field">Nombre de la tarea<input id="task-title-input" required maxlength="100"></label>
-    <label class="form-field">Descripción<textarea id="task-description-input" rows="3" maxlength="400"></textarea></label>
+    <label class="form-field">{{ t('fases.nombre_de_la_tarea') }}<input id="task-title-input" required maxlength="100"></label>
+    <label class="form-field">{{ t('canales.descripcion') }}<textarea id="task-description-input" rows="3" maxlength="400"></textarea></label>
     <div class="form-grid-two">
-      <label class="form-field">Responsable asignado<select id="task-assignee-input"></select></label>
-      <label class="form-field">Fase<select id="task-stage-input"></select></label>
+      <label class="form-field">{{ t('fases.responsable_asignado') }}<select id="task-assignee-input"></select></label>
+      <label class="form-field">{{ t('crear_proyecto.fase') }}<select id="task-stage-input"></select></label>
     </div>
     <div class="form-grid-two">
-      <label class="form-field">Fecha límite<input id="task-date-input" type="date"></label>
-      <label class="form-field">Estado<select id="task-state-input"><option value="sin-empezar">Sin empezar</option><option value="en-proceso">En proceso</option><option value="en-revision">En revisión</option><option value="terminada">Terminada</option></select></label>
+      <label class="form-field">{{ t('fases.fecha_limite') }}<input id="task-date-input" type="date"></label>
+      <label class="form-field">{{ t('entregables.estado') }}<select id="task-state-input"><option value="sin-empezar">{{ t('fases.sin_empezar') }}</option><option value="en-proceso">{{ t('fases.en_proceso') }}</option><option value="en-revision">{{ t('entregables.en_revision_2') }}</option><option value="terminada">{{ t('fases.terminada') }}</option></select></label>
     </div>
     <section id="task-result-section" class="task-result-form" hidden aria-labelledby="task-result-title">
-      <div><p class="eyebrow">Resultado requerido</p><h3 id="task-result-title">¿Qué entregaste?</h3><p>Antes de terminar la tarea, registra un comentario, un archivo o ambos.</p></div>
-      <label class="form-field">Resultado o comentario<textarea id="task-result-input" rows="3" maxlength="2000" placeholder="Explica qué se completó o comparte las conclusiones."></textarea></label>
-      <label class="form-field">Archivo de resultado<input id="task-result-file" type="file"><span class="field-hint">Opcional si ya escribiste un resultado. Máximo 10 MB.</span></label>
+      <div><p class="eyebrow">{{ t('fases.resultado_requerido') }}</p><h3 id="task-result-title">{{ t('fases.que_entregaste') }}</h3><p>{{ t('fases.antes_de_terminar_la_tarea_registra_un_comentario') }}</p></div>
+      <label class="form-field">{{ t('fases.resultado_o_comentario') }}<textarea id="task-result-input" rows="3" maxlength="2000" placeholder="{{ t('fases.explica_que_se_completo_o_comparte_las_conclusiones') }}"></textarea></label>
+      <label class="form-field">{{ t('fases.archivo_de_resultado') }}<input id="task-result-file" type="file"><span class="field-hint">{{ t('fases.opcional_si_ya_escribiste_un_resultado_maximo_10') }}</span></label>
       <a id="task-result-file-link" class="text-link" hidden download><i class="bi bi-paperclip" aria-hidden="true"></i> <span></span></a>
     </section>
     <div class="form-field">
-      <label for="task-dependency">Esta tarea depende de</label>
+      <label for="task-dependency">{{ t('fases.esta_tarea_depende_de') }}</label>
       <select id="task-dependency"></select>
-      <p class="mt-1 text-[11px] text-muted">Al elegir una tarea se añadirá la conexión al diagrama.</p>
-      <div class="mt-3"><p class="text-[11px] font-semibold text-muted">Tareas de las que depende</p><div id="dependency-list" class="mt-2 flex flex-wrap gap-1.5"></div></div>
+      <p class="mt-1 text-[11px] text-muted">{{ t('fases.al_elegir_una_tarea_se_anadira_la_conexion') }}</p>
+      <div class="mt-3"><p class="text-[11px] font-semibold text-muted">{{ t('fases.tareas_de_las_que_depende') }}</p><div id="dependency-list" class="mt-2 flex flex-wrap gap-1.5"></div></div>
     </div>
     <p id="task-blocked" class="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] font-semibold text-[var(--estado-warning)]" hidden></p>
     <p id="task-feedback" class="form-feedback" role="alert"></p>
     <div class="dialog-actions">
-      <div class="flex flex-wrap gap-2"><button id="release-task" class="btn btn-ghost" type="button">Liberar tarea</button><button id="claim-task" class="btn btn-secondary" type="button"><i class="bi bi-hand-index"></i> Tomar esta tarea</button></div>
-      <div class="flex gap-2"><button class="btn btn-ghost" type="button" data-close-dialog>Cancelar</button><button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar cambios</button></div>
+      <div class="flex flex-wrap gap-2"><button id="release-task" class="btn btn-ghost" type="button">{{ t('fases.liberar_tarea') }}</button><button id="claim-task" class="btn btn-secondary" type="button"><i class="bi bi-hand-index"></i> {{ t('fases.tomar_esta_tarea') }}</button></div>
+      <div class="flex gap-2"><button class="btn btn-ghost" type="button" data-close-dialog>{{ t('admin.cancelar') }}</button><button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> {{ t('editar_perfil.guardar_cambios') }}</button></div>
     </div>
   </form>
 </dialog>
@@ -101,20 +101,20 @@
 <dialog id="phase-dialog" class="app-dialog">
   <form id="phase-form" class="dialog-form" novalidate>
     <div class="dialog-header">
-      <div><p class="eyebrow">Estructura del proyecto</p><h2>Gestionar fases</h2></div>
-      <button class="icon-button" type="button" data-close-phase-dialog aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+      <div><p class="eyebrow">{{ t('fases.estructura_del_proyecto') }}</p><h2>{{ t('fases.gestionar_fases') }}</h2></div>
+      <button class="icon-button" type="button" data-close-phase-dialog aria-label="{{ t('canales.cerrar') }}"><i class="bi bi-x-lg"></i></button>
     </div>
-    <p class="text-[13px] text-muted">Crea, renombra y ordena las fases. Para eliminar una fase con tareas, primero muévelas desde cada tarea.</p>
+    <p class="text-[13px] text-muted">{{ t('fases.crea_renombra_y_ordena_las_fases_para_eliminar') }}</p>
     <div id="phase-editor-list" class="grid gap-2" aria-live="polite"></div>
-    <button id="add-phase" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus-lg"></i> Añadir fase</button>
-    <label class="form-field">Fase predeterminada para tareas nuevas
+    <button id="add-phase" class="btn btn-secondary btn-sm" type="button"><i class="bi bi-plus-lg"></i> {{ t('fases.anadir_fase') }}</button>
+    <label class="form-field">{{ t('fases.fase_predeterminada_para_tareas_nuevas') }}
       <select id="default-phase"></select>
-      <span class="field-hint">Puedes cambiar la fase de cada tarea después.</span>
+      <span class="field-hint">{{ t('fases.puedes_cambiar_la_fase_de_cada_tarea_despues') }}</span>
     </label>
     <p id="phase-feedback" class="form-feedback" role="alert"></p>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" type="button" data-close-phase-dialog>Cancelar</button>
-      <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> Guardar fases</button>
+      <button class="btn btn-ghost" type="button" data-close-phase-dialog>{{ t('admin.cancelar') }}</button>
+      <button class="btn btn-primary" type="submit"><i class="bi bi-check2"></i> {{ t('fases.guardar_fases') }}</button>
     </div>
   </form>
 </dialog>

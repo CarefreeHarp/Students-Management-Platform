@@ -1,0 +1,13 @@
+<div class="plans-page"><header class="topbar"><a class="brand" href="/"><img src="/assets/img/studyflow-isotipo.png" alt=""> StudyFlow</a><a class="top-link" href="/perfil">{{ t('confirmar_plan.mi_perfil') }}</a></header>
+      <main class="content confirm"><a class="back" href="/planes">{{ t('confirmar_plan.volver_a_los_planes') }}</a>
+        @if (plan; as selected) {
+          <section class="confirm-card"><span class="eyebrow">{{ t('confirmar_plan.tu_eleccion') }}</span><h1>{{ t('confirmar_plan.un_paso_mas_cerca_de_tu') }} <em>{{ t('confirmar_plan.flow') }}</em></h1><p class="confirm-intro">{{ t('confirmar_plan.revisa_los_detalles_de_tu_plan') }}</p>
+            <div class="summary"><div><span>{{ t('confirmar_plan.plan_premium') }}</span><strong>{{ selected.name }}</strong></div><div class="summary-price"><strong>{{ selected.price }}</strong><span>{{ selected.period }}</span></div></div>
+            <div class="notice compact"><span aria-hidden="true">✦</span><div><strong>{{ t('confirmar_plan.pago_de_prueba_con_wompi') }}</strong><p>{{ t('confirmar_plan.sin_dinero_real_y_sin_renovacion_automatica_los') }}</p></div></div>
+            <button class="action pay" type="button" (click)="pagar()" [disabled]="busy">{{ busy ? t('confirmar_plan.preparando_pago') : t('confirmar_plan.continuar_a_wompi') }} <span>↗</span></button>
+            @if (error) { <p class="payment-error" role="alert">{{ error }}</p> }
+            <a class="action secondary" href="/planes">{{ t('confirmar_plan.explorar_otros_planes') }} <span>↗</span></a>
+          </section>
+        } @else { <section class="confirm-card"><h1>{{ t('confirmar_plan.plan_no_encontrado') }}</h1><p>{{ t('confirmar_plan.elige_una_de_las_opciones_disponibles') }}</p><a class="action secondary" href="/planes">{{ t('confirmar_plan.ver_planes') }}</a></section> }
+      </main>
+    </div>
