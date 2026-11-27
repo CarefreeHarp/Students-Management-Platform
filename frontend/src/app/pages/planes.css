@@ -12,3 +12,11 @@ a { color:inherit; text-decoration:none; } a:focus-visible { outline:3px solid #
 @media(max-width:1050px) { .plans-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.price { font-size:34px; } } @media(max-width:560px) { .topbar { padding:20px; }.content { padding:28px 20px 55px; }.intro { margin:45px auto 30px; }.plans-grid { grid-template-columns:1fr; }.plan { min-height:290px; }.description { min-height:0; }.confirm-card { padding:24px; margin:35px auto; }.note { padding:22px; }.note-star { display:none; } }
 
 button.pay { width:100%; cursor:pointer; border:0; font:700 14px "DM Sans",sans-serif; margin-bottom:12px; } button.pay:disabled { opacity:.6; cursor:wait; } .payment-error { color:#ffb6b6; }
+
+/* Cada símbolo identifica visualmente el tipo de plan. */
+.plan-icon { width:44px; height:44px; flex:0 0 44px; border:1px solid #ffffff24; box-shadow:inset 0 1px 0 #ffffff20,0 6px 18px #07091425; }
+.plan-icon svg { width:24px; height:24px; stroke:currentColor; stroke-width:1.55; stroke-linecap:round; stroke-linejoin:round; }
+.plan-icon-basic { color:#c9ccf6; background:linear-gradient(145deg,#555a92,#3b416e); }
+.plan-icon-month { color:#bae5f6; background:linear-gradient(145deg,#416d91,#334b79); }
+.plan-icon-semester { color:#c8f1ec; background:linear-gradient(145deg,#4d8895,#46678f); }
+.plan-icon-lifetime { color:#ffe3b0; background:linear-gradient(145deg,#9b7b67,#725d80); }
