@@ -3,7 +3,6 @@
         @if (plan; as selected) {
           <section class="confirm-card"><span class="eyebrow">{{ t('confirmar_plan.tu_eleccion') }}</span><h1>{{ t('confirmar_plan.un_paso_mas_cerca_de_tu') }} <em>{{ t('confirmar_plan.flow') }}</em></h1><p class="confirm-intro">{{ t('confirmar_plan.revisa_los_detalles_de_tu_plan') }}</p>
             <div class="summary"><div><span>{{ t('confirmar_plan.plan_premium') }}</span><strong>{{ selected.name }}</strong></div><div class="summary-price"><strong>{{ selected.price }}</strong><span>{{ selected.period }}</span></div></div>
-            <div class="notice compact"><span aria-hidden="true">✦</span><div><strong>{{ t('confirmar_plan.pago_de_prueba_con_wompi') }}</strong><p>{{ t('confirmar_plan.sin_dinero_real_y_sin_renovacion_automatica_los') }}</p></div></div>
             <button class="action pay" type="button" (click)="pagar()" [disabled]="busy">{{ busy ? t('confirmar_plan.preparando_pago') : t('confirmar_plan.continuar_a_wompi') }} <span>↗</span></button>
             @if (error) { <p class="payment-error" role="alert">{{ error }}</p> }
             <a class="action secondary" href="/planes">{{ t('confirmar_plan.explorar_otros_planes') }} <span>↗</span></a>
