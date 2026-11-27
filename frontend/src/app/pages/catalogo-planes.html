@@ -43,7 +43,7 @@
           <div class="price">{{ plan.price }}</div>
           <p class="period">{{ plan.period }}</p>
           <ul class="benefits" [attr.aria-label]="t('planes.incluye', {'0': plan.name})">
-            @for (feature of features; track feature) { <li>{{ feature }}</li> }
+            @for (clave of plan.beneficios; track clave) { <li>{{ t(clave) }}</li> }
           </ul>
           @if (plan.id === 'basico') {
             <a class="action secondary" routerLink="/registro">{{ t('catalogo_planes.crear_mi_cuenta') }} <span aria-hidden="true">↗</span></a>

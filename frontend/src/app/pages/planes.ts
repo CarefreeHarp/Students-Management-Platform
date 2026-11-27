@@ -4,11 +4,14 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-interface Plan { id: string; name: string; price: string; period: string; description: string }
+interface Plan { id: string; name: string; price: string; period: string; description: string; beneficios: string[] }
 const planes: Plan[] = [
-  { id: 'mensual', name: t("planes.mensual"), price: '$19.900', period: t("planes.cop_mes"), description: t("planes.30_dias_de_acceso_sin_renovacion_automatica") },
-  { id: 'semestral', name: t("planes.semestral"), price: '$79.900', period: t("planes.cop_semestre"), description: t("planes.180_dias_de_acceso_sin_renovacion_automatica") },
-  { id: 'vitalicio', name: t("planes.vitalicio"), price: '$320.000', period: t("planes.cop_pago_unico"), description: t("planes.un_solo_pago_sin_fecha_de_vencimiento") }
+  { id: 'mensual', name: t("planes.mensual"), price: '$19.900', period: t("planes.cop_mes"), description: t("planes.30_dias_de_acceso_sin_renovacion_automatica"),
+    beneficios: ["planes.incluye_basico", "planes.avisos_entrega", "planes.resumen_acuerdos"] },
+  { id: 'semestral', name: t("planes.semestral"), price: '$79.900', period: t("planes.cop_semestre"), description: t("planes.180_dias_de_acceso_sin_renovacion_automatica"),
+    beneficios: ["planes.incluye_basico", "planes.avisos_semestrales", "planes.resumenes_semestrales"] },
+  { id: 'vitalicio', name: t("planes.vitalicio"), price: '$320.000', period: t("planes.cop_pago_unico"), description: t("planes.un_solo_pago_sin_fecha_de_vencimiento"),
+    beneficios: ["planes.premium_de_por_vida", "planes.cupos_por_semestre"] }
 ];
 
 function prepararVista() {
@@ -26,13 +29,9 @@ function prepararVista() {
 export class Planes {
   readonly t = t;
   readonly plans: Plan[] = [
-    { id: 'basico', name: t("planes.basico"), price: '$0', period: t("planes.cop_gratis"), description: t("planes.empieza_hoy_sin_tarjeta_ni_cuotas") },
+    { id: 'basico', name: t("planes.basico"), price: '$0', period: t("planes.cop_gratis"), description: t("planes.empieza_hoy_sin_tarjeta_ni_cuotas"),
+    beneficios: ["planes.calendario", "planes.dependencias", "planes.canales_archivos"] },
     ...planes
-  ];
-  readonly features = [
-    t("planes.horario_y_pendientes_de_clase"),
-    t("planes.proyectos_y_tareas_en_equipo"),
-    t("planes.chat_por_canales_con_resumenes_de_gemini")
   ];
   constructor() { prepararVista(); }
 }
