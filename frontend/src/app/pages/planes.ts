@@ -5,13 +5,14 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 interface Plan { id: string; name: string; price: string; period: string; description: string; beneficios: string[] }
+const beneficiosPremium = ["planes.incluye_basico", "planes.avisos_entrega", "planes.resumen_acuerdos"];
 const planes: Plan[] = [
   { id: 'mensual', name: t("planes.mensual"), price: '$19.900', period: t("planes.cop_mes"), description: t("planes.30_dias_de_acceso_sin_renovacion_automatica"),
-    beneficios: ["planes.incluye_basico", "planes.avisos_entrega", "planes.resumen_acuerdos"] },
+    beneficios: beneficiosPremium },
   { id: 'semestral', name: t("planes.semestral"), price: '$79.900', period: t("planes.cop_semestre"), description: t("planes.180_dias_de_acceso_sin_renovacion_automatica"),
-    beneficios: ["planes.incluye_basico", "planes.avisos_semestrales", "planes.resumenes_semestrales"] },
+    beneficios: beneficiosPremium },
   { id: 'vitalicio', name: t("planes.vitalicio"), price: '$320.000', period: t("planes.cop_pago_unico"), description: t("planes.un_solo_pago_sin_fecha_de_vencimiento"),
-    beneficios: ["planes.premium_de_por_vida", "planes.cupos_por_semestre"] }
+    beneficios: beneficiosPremium }
 ];
 
 function prepararVista() {
