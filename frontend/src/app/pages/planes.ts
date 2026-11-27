@@ -25,7 +25,6 @@ function prepararVista() {
       <main class="content">
         <a class="back" href="/">← Volver al inicio</a>
         <section class="intro"><span class="eyebrow">ELIGE TU RITMO</span><h1>Hazle espacio a lo que <em>importa.</em></h1><p>Un lugar para tus clases, proyectos y todo lo que viene. Descubre el plan que se adapta a ti.</p></section>
-        <div class="notice"><span aria-hidden="true">✦</span><div><strong>Modo de prueba</strong><p>Usa únicamente datos de prueba: no hay cobros reales ni funciones Premium exclusivas.</p></div></div>
         <section class="plans-grid" aria-label="Planes disponibles">
           <article class="plan"><div class="plan-top"><span class="plan-icon">✧</span><span class="badge neutral">GRATIS</span></div><h2>Básico</h2><p class="description">Tu espacio para empezar a organizarte.</p><div class="price">$0 <small>COP</small></div><p class="period">Sin costo</p><a class="action secondary" href="/registro">Crear mi cuenta <span>↗</span></a></article>
           @for (plan of plans; track plan.id) {
@@ -33,7 +32,6 @@ function prepararVista() {
           }
         </section>
         <section class="note"><div><span class="eyebrow">PRÓXIMAMENTE</span><h2>30 días para descubrir Premium.</h2><p>La prueba gratuita anunciada está en preparación. Sus condiciones se comunicarán antes de activarla.</p></div><span class="note-star" aria-hidden="true">✧</span></section>
-        <footer>Precios en pesos colombianos. Simulación: los datos se reinician cuando el servidor se reinicia.</footer>
       </main>
     </div>`
 })
