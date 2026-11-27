@@ -1,0 +1,74 @@
+.plans-page {
+  overflow: hidden;
+  background: radial-gradient(ellipse at 82% 16%, #44457488, transparent 42%),
+    radial-gradient(ellipse at 9% 84%, #28475a80, transparent 48%), #1c2538;
+}
+.topbar, .content { max-width: 1440px; padding-inline: clamp(20px, 6vw, 88px); }
+.topbar { min-height: 76px; padding-block: 16px; }
+.brand { font-size: 23px; letter-spacing: -.05em; }
+.brand-accent, .catalog-hero em { color: #b9b5ff; }
+nav { display: flex; align-items: center; gap: clamp(14px, 3vw, 36px); }
+nav a { font-size: 13px; }
+.top-link { border: 1px solid #b8b6d84d; padding: 11px 17px; border-radius: 30px; color: #eeedff; }
+.top-link span { margin-left: 8px; }
+.content { padding-block: 0 44px; }
+.catalog-hero { position: relative; display: flex; align-items: center; min-height: 310px; padding: 48px 0; }
+.hero-copy { position: relative; z-index: 1; width: 60%; }
+.eyebrow { margin: 0; text-transform: uppercase; color: #c4c1ff; letter-spacing: .18em; }
+.catalog-hero h1 { font: 650 clamp(42px, 5vw, 76px)/1.04 'Plus Jakarta Sans', sans-serif; letter-spacing: -.06em; margin: 16px 0; }
+.catalog-hero em { font-style: normal; }
+.lead { max-width: 470px; margin: 0; color: #c7cddd; font-size: 16px; line-height: 1.6; }
+.universe {
+  position: absolute; inset: 0 0 0 56%; pointer-events: none;
+  background: radial-gradient(circle at 16% 23%, #d1d5ff 1px, transparent 2px),
+    radial-gradient(circle at 82% 61%, #c8f6ff 1px, transparent 2px),
+    radial-gradient(circle at 66% 19%, #c2c6e9 1.5px, transparent 2.5px),
+    radial-gradient(circle at 25% 81%, #b9b5ff 1px, transparent 2px);
+}
+.planet, .orbit, .moon { position: absolute; border-radius: 50%; }
+.planet {
+  width: clamp(92px, 10vw, 148px); aspect-ratio: 1; left: 48%; top: 49%; transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 28% 23%, #e0ebff, #b7aff9 24%, #807bc4 44%, #494674 63%, #282c48 81%);
+  box-shadow: inset -5px -5px 14px #21254180, 0 0 48px #a296ff29;
+}
+.orbit { width: 83%; height: 30%; left: 48%; top: 49%; transform: translate(-50%, -50%) rotate(-17deg); border: 1px solid #c1bdfa55; }
+.outer { width: 99%; height: 43%; border-style: dashed; border-color: #bcb9ff36; }
+.inner { border-top-color: transparent; border-bottom-color: #cac4fcc4; }
+.moon { width: 15px; height: 15px; left: 82%; top: 43%; background: radial-gradient(circle at 30% 20%, #c1fafe, #66aabd 40%, #425771 72%); }
+.plans-grid { margin-top: 0; }
+.plan {
+  --accent: #c0baff;
+  border-color: #bfc1ed38; background: linear-gradient(145deg, #30394f, #232c40);
+  box-shadow: 0 14px 34px #11182936; padding: clamp(18px, 2vw, 28px);
+}
+.plan[data-plan=mensual] { --accent: #a9dff3; }
+.plan[data-plan=semestral] { --accent: #a4e5df; }
+.plan[data-plan=vitalicio] { --accent: #f6d6aa; }
+.plan.featured { border-color: #a7a3f1; background: linear-gradient(150deg, #464670, #303750 58%, #2a334b); }
+.plan-icon { color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, #30364d); border-color: color-mix(in srgb, var(--accent) 34%, transparent); }
+.badge { text-transform: uppercase; }
+.plan h2 { font-size: 24px; margin: 21px 0 8px; letter-spacing: -.04em; }
+.description { margin: 0; color: #c4cadb; min-height: 3.1em; }
+.price { margin-top: 18px; }
+.period { margin-bottom: 0; color: #c4cadb; }
+.benefits { display: grid; align-content: start; gap: 9px; list-style: none; border-top: 1px solid #c0c0e52b; margin: 18px 0 24px; padding: 17px 0 0; }
+.benefits li { display: flex; gap: 9px; align-items: baseline; color: #e1e4f2; font-size: 13px; line-height: 1.5; }
+.benefits li::before { content: ''; flex: 0 0 8px; height: 5px; border: solid var(--accent); border-width: 0 0 1.5px 1.5px; transform: translateY(-3px) rotate(-45deg); }
+.featured .action { background: #b9b5ff; color: #24213b; }
+.featured .action:hover { background: #d1ceff; }
+.note { background: linear-gradient(110deg, #2b3c52, #303751); border-color: #bfc1ed33; }
+@media (max-width: 700px) {
+  .catalog-hero { min-height: auto; padding-block: 38px; }
+  .hero-copy { width: 100%; }
+  .universe { inset: 0 -30px auto auto; width: 28%; height: 116px; opacity: .7; }
+  .planet { width: 38px; }
+  .moon { width: 6px; height: 6px; }
+  .lead { max-width: 37ch; }
+}
+@media (max-width: 560px) {
+  .brand { gap: 6px; font-size: 19px; }
+  nav { gap: 10px; }
+  nav a { font-size: 12px; }
+  .top-link { padding: 9px 11px; }
+  .description { min-height: 0; }
+}

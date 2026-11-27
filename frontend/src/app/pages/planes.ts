@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 interface Plan { id: string; name: string; price: string; period: string; description: string }
 const planes: Plan[] = [
-  { id: 'mensual', name: 'Mensual', price: '$19.900', period: 'COP / mes', description: 'Simulación por 30 días. Pago único; sin renovación automática.' },
-  { id: 'semestral', name: 'Semestral', price: '$79.900', period: 'COP / semestre', description: 'Simulación por 180 días. Pago único; sin renovación automática.' },
-  { id: 'vitalicio', name: 'Vitalicio', price: '$320.000', period: 'COP · pago único', description: 'Simulación de pago único, sin vencimiento.' }
+  { id: 'mensual', name: 'Mensual', price: '$19.900', period: 'COP / mes', description: '30 días de acceso, sin renovación automática.' },
+  { id: 'semestral', name: 'Semestral', price: '$79.900', period: 'COP / semestre', description: '180 días de acceso, sin renovación automática.' },
+  { id: 'vitalicio', name: 'Vitalicio', price: '$320.000', period: 'COP · pago único', description: 'Un solo pago, sin fecha de vencimiento.' }
 ];
 
 function prepararVista() {
@@ -18,29 +18,20 @@ function prepararVista() {
 
 @Component({
   selector: 'studyflow-planes',
-  styleUrl: './planes.css',
-  template: `
-    <div class="plans-page">
-      <header class="topbar"><a class="brand" href="/"><img src="/assets/img/studyflow-isotipo.png" alt=""> StudyFlow</a><a class="top-link" href="/login?acceso=cuenta">Mi cuenta <span aria-hidden="true">↗</span></a></header>
-      <main class="content">
-        <a class="back" href="/">← Volver al inicio</a>
-        <section class="intro"><span class="eyebrow">ELIGE TU RITMO</span><h1>Hazle espacio a lo que <em>importa.</em></h1><p>Un lugar para tus clases, proyectos y todo lo que viene. Descubre el plan que se adapta a ti.</p></section>
-        <section class="plans-grid" aria-label="Planes disponibles">
-          <article class="plan"><div class="plan-top"><span class="plan-icon plan-icon-basic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5 13.9 9l5.6 2-5.6 2L12 18.5 10.1 13l-5.6-2 5.6-2L12 3.5Z"/><path d="M18.5 16v3m-1.5-1.5h3"/></svg></span><span class="badge neutral">ACTUAL</span></div><h2>Básico</h2><p class="description">Tu espacio para empezar a organizarte.</p><div class="price">$0 <small>COP</small></div><p class="period">Sin costo</p><a class="action secondary" href="/registro">Crear mi cuenta <span>↗</span></a></article>
-          @for (plan of plans; track plan.id) {
-            <article class="plan" [class.featured]="plan.id === 'semestral'"><div class="plan-top"><span class="plan-icon" [class.plan-icon-month]="plan.id === 'mensual'" [class.plan-icon-semester]="plan.id === 'semestral'" [class.plan-icon-lifetime]="plan.id === 'vitalicio'" aria-hidden="true">
-              @if (plan.id === 'mensual') { <svg viewBox="0 0 24 24" fill="none"><rect x="4.5" y="5.5" width="15" height="14" rx="3"/><path d="M8 3.5v4M16 3.5v4M4.5 10h15M8 13.5h2m4 0h2m-8 3h2"/></svg> }
-              @else if (plan.id === 'semestral') { <svg viewBox="0 0 24 24" fill="none"><path d="M7 14.5 5.5 21l4-2 2.5 2 1.3-5.3M17 14.5l1.5 6.5-4-2-2.5 2"/><circle cx="12" cy="9.5" r="6"/><path d="m12 6.2 1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3L12 6.2Z"/></svg> }
-              @else { <svg viewBox="0 0 24 24" fill="none"><path d="M4 8.5 7.3 5h9.4L20 8.5 12 19 4 8.5Z"/><path d="M4 8.5h16M7.3 5 10 8.5 12 19l2-10.5L16.7 5"/><path d="m18.5 2 .5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5Z"/></svg> }
-            </span>@if (plan.id === 'semestral') { <span class="badge">RECOMENDADO</span> }</div><h2>{{ plan.name }}</h2><p class="description">{{ plan.description }}</p><div class="price">{{ plan.price }}</div><p class="period">{{ plan.period }}</p><a class="action" [class.secondary]="plan.id !== 'semestral'" [href]="'/planes/confirmar/' + plan.id">Ver detalles <span>↗</span></a></article>
-          }
-        </section>
-        <section class="note"><div><span class="eyebrow">PRÓXIMAMENTE</span><h2>30 días para descubrir Premium.</h2><p>La prueba gratuita anunciada está en preparación. Sus condiciones se comunicarán antes de activarla.</p></div><span class="note-star" aria-hidden="true">✧</span></section>
-      </main>
-    </div>`
+  imports: [RouterLink],
+  styleUrls: ['./planes.css', './catalogo-planes.css'],
+  templateUrl: './catalogo-planes.html'
 })
 export class Planes {
-  readonly plans = planes;
+  readonly plans: Plan[] = [
+    { id: 'basico', name: 'Básico', price: '$0', period: 'COP · gratis', description: 'Empieza hoy, sin tarjeta ni cuotas.' },
+    ...planes
+  ];
+  readonly features = [
+    'Horario y pendientes de clase',
+    'Proyectos y tareas en equipo',
+    'Chat por canales con resúmenes de Gemini'
+  ];
   constructor() { prepararVista(); }
 }
 
